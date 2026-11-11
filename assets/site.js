@@ -65,24 +65,25 @@
     visionneuse.classList.add('on');
   }
   Array.prototype.forEach.call(document.querySelectorAll('.diapo'), function (d) {
-    var imgs = Array.prototype.slice.call(d.querySelectorAll('img'));
-    if (!imgs.length) return;
+    var slides = Array.prototype.slice.call(d.querySelectorAll('.slide'));
+    var imgs = slides.map(function (s) { return s.querySelector('img'); });
+    if (!slides.length) return;
     var sources = imgs.map(function (im) { return im.getAttribute('src'); });
     var i = 0, minuterie = null;
     d.classList.add('actif');
     imgs.forEach(function (im, n) {
       im.removeAttribute('loading');
-      im.addEventListener('click', function () { ouvrir(sources, n); });
+      if (!im.closest('a')) im.addEventListener('click', function () { ouvrir(sources, n); });
     });
     var compte = document.createElement('span'); compte.className = 'd-compte';
     function aller(n) {
-      i = (n + imgs.length) % imgs.length;
-      imgs.forEach(function (im, k) { im.classList.toggle('on', k === i); });
-      compte.textContent = (i + 1) + ' / ' + imgs.length;
+      i = (n + slides.length) % slides.length;
+      slides.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+      compte.textContent = (i + 1) + ' / ' + slides.length;
     }
-    function lancer() { if (!calme && imgs.length > 1 && !minuterie) minuterie = setInterval(function () { aller(i + 1); }, 5000); }
+    function lancer() { if (!calme && slides.length > 1 && !minuterie) minuterie = setInterval(function () { aller(i + 1); }, 5000); }
     function arreter() { clearInterval(minuterie); minuterie = null; }
-    if (imgs.length > 1) {
+    if (slides.length > 1) {
       var prec = bouton('d-prec', '‹', 'Image précédente');
       var suiv = bouton('d-suiv', '›', 'Image suivante');
       prec.addEventListener('click', function () { arreter(); aller(i - 1); });
