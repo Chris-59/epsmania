@@ -202,3 +202,4 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
 .vie-liste p { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .vie-tete { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
 .vie-tete time { color: var(--muted); font-size: 0.9em; }
+.vie-bloc { padding-top: 0 !important; padding-bottom: 40px; }
