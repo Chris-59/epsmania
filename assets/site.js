@@ -100,15 +100,30 @@
   });
 })();
 
-// Telephones sans plein ecran (iPhone/Safari) : le bouton « Plein ecran » des applications ouvrirait un onglet sans retour. On le masque.
+// Plein ecran des applications sur telephone : si le navigateur ne sait pas le faire (iPhone), l'application s'ouvrait dans un onglet sans retour.
+// On l'affiche a la place en plein ecran DANS la page, avec un bouton pour quitter.
 (function () {
-  var ok = document.fullscreenEnabled || document.webkitFullscreenEnabled;
-  if (ok) return;
-  function masquer() {
-    Array.prototype.forEach.call(document.querySelectorAll('button'), function (b) {
-      if (/Plein\s+.cran/i.test(b.textContent || '') && b.style.display !== 'none') b.style.display = 'none';
-    });
+  var ouvrirNatif = window.open;
+  function quitter() {
+    var o = document.getElementById('pe-overlay'); if (o) o.parentNode.removeChild(o);
+    document.documentElement.style.overflow = '';
+    document.removeEventListener('keydown', touche);
   }
-  masquer();
-  if (window.MutationObserver) new MutationObserver(masquer).observe(document.body, { childList: true, subtree: true });
+  function touche(e) { if (e.key === 'Escape') quitter(); }
+  window.open = function (url) {
+    if (typeof url !== 'string' || url.indexOf('blob:') !== 0) return ouvrirNatif.apply(window, arguments);
+    quitter();
+    var o = document.createElement('div'); o.id = 'pe-overlay';
+    o.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#fff;display:flex;flex-direction:column;height:100vh;height:100dvh';
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = '\u2715 Quitter le plein \u00e9cran';
+    b.style.cssText = 'flex:none;margin:0;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;border:0;border-bottom:1px solid #c9d3df;background:#0f2b4f;color:#fff;font:600 16px/1.2 system-ui,sans-serif;text-align:center;cursor:pointer';
+    b.addEventListener('click', quitter);
+    var f = document.createElement('iframe'); f.src = url; f.title = 'Application en plein \u00e9cran';
+    f.setAttribute('allow', 'microphone; fullscreen; clipboard-write; autoplay');
+    f.style.cssText = 'flex:1 1 auto;width:100%;border:0;background:#fff';
+    o.appendChild(b); o.appendChild(f); document.body.appendChild(o);
+    document.documentElement.style.overflow = 'hidden';
+    document.addEventListener('keydown', touche);
+    return null;
+  };
 })();
