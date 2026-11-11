@@ -8,8 +8,13 @@
   --c: var(--ink);
   color-scheme: light;
 }
+:root[data-theme="dark"] {
+  --paper: #14161a; --surface: #1d2026; --ink: #f1f2f5; --muted: #a9afba; --line: #323742;
+  --violet: #a58bf0; --blue: #6ea8f5; --green: #5cc494; --yellow: #f0c545; --orange: #f39a55; --red: #f07a81;
+  color-scheme: dark;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --paper: #14161a; --surface: #1d2026; --ink: #f1f2f5; --muted: #a9afba; --line: #323742;
     --violet: #a58bf0; --blue: #6ea8f5; --green: #5cc494; --yellow: #f0c545; --orange: #f39a55; --red: #f07a81;
     color-scheme: dark;
@@ -167,12 +172,14 @@ footer small { color: var(--muted); display: block; margin-top: 8px; max-width: 
 
 /* Tuile de repli quand une page n'a aucune image */
 .card .vig.tuile { display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; color: #fff; font-family: var(--display); font-weight: 900; font-stretch: 115%; font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.1; background: linear-gradient(180deg, transparent 0 82%, rgba(255, 255, 255, 0.85) 82% 85%, transparent 85% 88%, rgba(255, 255, 255, 0.85) 88% 91%, transparent 91% 94%, rgba(255, 255, 255, 0.85) 94% 97%, transparent 97%), var(--c); }
-@media (prefers-color-scheme: dark) { .card .vig.tuile { color: #14161a; } }
+:root[data-theme="dark"] .card .vig.tuile { color: #14161a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .card .vig.tuile { color: #14161a; } }
 
 /* Le jaune est trop clair pour du texte sur fond blanc : texte plus fonce dans les rubriques jaunes */
 [style*="--yellow"] { --ct: #7a5600; }
 [style*="--yellow"] .vig.tuile { color: #1b1d22; }
-@media (prefers-color-scheme: dark) { [style*="--yellow"] { --ct: var(--yellow); } }
+:root[data-theme="dark"] [style*="--yellow"] { --ct: var(--yellow); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) [style*="--yellow"] { --ct: var(--yellow); } }
 
 /* Nouveautes, cartes de texte, pages d'information */
 .nouv { list-style: none; margin: 0; padding: 0; }
@@ -218,3 +225,18 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
 .diapo .slide figcaption { margin: 10px auto 0; max-width: 62ch; padding: 0 56px; color: var(--ink); font-size: 0.95rem; line-height: 1.45; text-align: center; }
 .diapo .slide figcaption .btn { margin-top: 8px; }
 .diapo:not(.actif) .slide { flex: 0 0 auto; max-width: 70vw; }
+
+/* Choix du theme : clair ou sombre */
+.logo-sombre { display: none; }
+:root[data-theme="dark"] .logo-clair { display: none; }
+:root[data-theme="dark"] .logo-sombre { display: block; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .logo-clair { display: none; } :root:not([data-theme]) .logo-sombre { display: block; } }
+.top .wrap { position: relative; }
+.theme-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--ink); cursor: pointer; flex: none; }
+.theme-btn:hover { border-color: var(--ink); }
+.theme-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.theme-btn .i-lune { display: none; }
+:root[data-theme="dark"] .theme-btn .i-soleil { display: none; }
+:root[data-theme="dark"] .theme-btn .i-lune { display: block; }
+@media (max-width: 820px) { .theme-btn { position: absolute; top: 10px; right: 24px; } .brand { padding-right: 52px; } }
+@media print { .theme-btn { display: none; } }

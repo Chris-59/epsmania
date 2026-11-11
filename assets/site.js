@@ -151,3 +151,22 @@
   balayer();
   if (window.MutationObserver) new MutationObserver(balayer).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
 })();
+
+/* Bouton clair / sombre : memorise le choix du visiteur */
+(function () {
+  var cle = 'epsmania-theme', racine = document.documentElement;
+  function actuel() { return racine.getAttribute('data-theme') || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  function appliquer(t) {
+    racine.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'dark' ? '#14161a' : '#ffffff');
+    var b = document.querySelector('.theme-btn');
+    if (b) { var lib = t === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'; b.setAttribute('aria-label', lib); b.setAttribute('title', lib); }
+  }
+  appliquer(actuel());
+  var b = document.querySelector('.theme-btn');
+  if (b) b.addEventListener('click', function () {
+    var t = actuel() === 'dark' ? 'light' : 'dark';
+    appliquer(t);
+    try { localStorage.setItem(cle, t); } catch (e) {}
+  });
+})();
