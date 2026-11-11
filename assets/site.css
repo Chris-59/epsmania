@@ -63,7 +63,7 @@ section.fond { background: var(--surface); }
 .door { background: var(--surface); border: 1px solid var(--line); border-left: 8px solid var(--c); border-radius: 12px; padding: 24px; text-decoration: none; display: flex; flex-direction: column; gap: 10px; }
 .door:hover { border-color: var(--c); }
 .door p { color: var(--muted); }
-.door span { font-weight: 700; color: var(--c); margin-top: auto; }
+.door span { font-weight: 700; color: var(--ct, var(--c)); margin-top: auto; }
 .figures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 26px 0; }
 .figures b { display: block; font-family: var(--display); font-weight: 900; font-stretch: 115%; font-size: clamp(1.8rem, 4vw, 2.8rem); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .figures span { color: var(--muted); }
@@ -103,7 +103,7 @@ section.fond { background: var(--surface); }
 .contenu h2.tc { justify-self: center; text-align: center; }
 .para { max-width: 74ch; overflow-wrap: anywhere; }
 .para.tc, p.tc { text-align: center; margin-inline: auto; }
-.para a, .prose a { color: var(--c); font-weight: 700; }
+.para a, .prose a { color: var(--ct, var(--c)); font-weight: 700; }
 .para ul, .para ol { margin: 0.5em 0; padding-left: 1.4em; }
 .para li { margin-bottom: 0.4em; }
 .para li::marker { color: var(--c); }
@@ -163,3 +163,8 @@ footer small { color: var(--muted); display: block; margin-top: 8px; max-width: 
 /* Tuile de repli quand une page n'a aucune image */
 .card .vig.tuile { display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; color: #fff; font-family: var(--display); font-weight: 900; font-stretch: 115%; font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.1; background: linear-gradient(180deg, transparent 0 82%, rgba(255, 255, 255, 0.85) 82% 85%, transparent 85% 88%, rgba(255, 255, 255, 0.85) 88% 91%, transparent 91% 94%, rgba(255, 255, 255, 0.85) 94% 97%, transparent 97%), var(--c); }
 @media (prefers-color-scheme: dark) { .card .vig.tuile { color: #14161a; } }
+
+/* Le jaune est trop clair pour du texte sur fond blanc : texte plus fonce dans les rubriques jaunes */
+[style*="--yellow"] { --ct: #7a5600; }
+[style*="--yellow"] .vig.tuile { color: #1b1d22; }
+@media (prefers-color-scheme: dark) { [style*="--yellow"] { --ct: var(--yellow); } }
