@@ -1,3 +1,2 @@
-/* Adresse de la base Firebase. À renseigner une fois le projet créé, par exemple :
-   window.VIE = { databaseURL: 'https://epsmania-xxxxx-default-rtdb.europe-west1.firebasedatabase.app' }; */
-window.VIE = { databaseURL: '' };
+/* Adresse de la base Firebase du compteur de visites et des messages (pages CRPE). */
+window.VIE = { databaseURL: 'https://epsmania-21a98-default-rtdb.europe-west1.firebasedatabase.app' };
