@@ -168,3 +168,19 @@ footer small { color: var(--muted); display: block; margin-top: 8px; max-width: 
 [style*="--yellow"] { --ct: #7a5600; }
 [style*="--yellow"] .vig.tuile { color: #1b1d22; }
 @media (prefers-color-scheme: dark) { [style*="--yellow"] { --ct: var(--yellow); } }
+
+/* Nouveautes, cartes de texte, pages d'information */
+.nouv { list-style: none; margin: 0; padding: 0; }
+.nouv li { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
+.nouv li:last-child { border-bottom: 1px solid var(--line); }
+.nouv .quand { color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+.nouv a { font-weight: 700; text-decoration: none; }
+.nouv a:hover { text-decoration: underline; }
+div.card a { color: var(--ct, var(--c)); font-weight: 700; }
+.prose h2 { margin-top: 0.6em; }
+.retour.actions { margin-top: 12px; }
+@media (max-width: 820px) { .nouv li { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Les boutons gardent leur couleur dans les textes */
+.prose a.btn, .para a.btn, div.card a.btn { color: var(--paper); }
+.prose a.btn.ghost, .para a.btn.ghost, div.card a.btn.ghost { color: var(--ink); }
