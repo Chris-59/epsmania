@@ -35,7 +35,19 @@
 <main id="contenu">
 <div class="wrap page"><div class="entete"><p class="fil"><a href="etudiants.html">Espace étudiants</a></p><h1>CRPE M1 PEFE</h1></div><div class="contenu"><div class="embed"><div id="app-eps-m1-pefe"></div>
 <script src="https://chris-59.github.io/applications-eps/objectif-eps-m1-pefe.js"></script></div>
-<hr/></div><p class="retour"><a class="btn ghost small" href="etudiants.html">Retour : Espace étudiants</a></p></div>
+<hr/></div><section aria-label="Visites et messages" class="vie" data-page="m1-pefe" hidden="" id="vie">
+<p class="vie-compteur"><strong>…</strong> visites de cette page</p>
+<h2>Laisser un message</h2>
+<form class="vie-form" novalidate="">
+<label>Pseudo<input autocomplete="nickname" maxlength="40" name="nom" required=""/></label>
+<label>Message<textarea maxlength="600" name="texte" required="" rows="3"></textarea></label>
+<input aria-hidden="true" autocomplete="off" class="vie-piege" name="site" tabindex="-1"/>
+<button class="btn small" type="submit">Publier</button> <span class="vie-etat" role="status"></span>
+<small>Les messages sont publics. N'indiquez ni nom complet, ni adresse, ni donnée personnelle. Les liens sont refusés.</small>
+</form>
+<p class="vie-vide">Aucun message pour le moment. Soyez le premier !</p>
+<ul class="vie-liste"></ul>
+</section><p class="retour"><a class="btn ghost small" href="etudiants.html">Retour : Espace étudiants</a></p></div>
 </main>
 <footer><div class="wrap">
 <div><a class="brand" href="index.html"><span>EPS Mania</span></a><small>Partager pour mieux enseigner. Un collectif d'enseignants d'EPS depuis 2017.</small></div>
@@ -57,6 +69,8 @@
 <li><a href="mentions-legales.html">Mentions légales</a></li>
 </ul></div>
 </div></footer>
+<script src="assets/vie-config.js"></script>
 <script src="assets/site.js"></script>
+<script src="assets/vie.js" defer></script>
 </body>
 </html>

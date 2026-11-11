@@ -184,3 +184,21 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
 /* Les boutons gardent leur couleur dans les textes */
 .prose a.btn, .para a.btn, div.card a.btn { color: var(--paper); }
 .prose a.btn.ghost, .para a.btn.ghost, div.card a.btn.ghost { color: var(--ink); }
+
+/* Compteur de visites et messages des pages CRPE */
+.vie { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); max-width: 760px; }
+.vie[hidden] { display: none; }
+.vie-compteur { color: var(--muted); font-weight: 700; margin: 0 0 8px; }
+.vie-compteur strong { color: var(--ct, var(--c)); font-variant-numeric: tabular-nums; }
+.vie h2 { margin: 0.4em 0 0.6em; }
+.vie-form { display: grid; gap: 12px; margin-bottom: 20px; }
+.vie-form label { display: grid; gap: 4px; font-weight: 700; }
+.vie-form input, .vie-form textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); }
+.vie-form input:focus, .vie-form textarea:focus { outline: 3px solid var(--c); outline-offset: 1px; }
+.vie-form .vie-piege { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.vie-form small, .vie-etat { color: var(--muted); }
+.vie-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.vie-liste li { padding: 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 8px; }
+.vie-liste p { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vie-tete { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.vie-tete time { color: var(--muted); font-size: 0.9em; }
