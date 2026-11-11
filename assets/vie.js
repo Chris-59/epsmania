@@ -15,7 +15,7 @@
     zone.hidden = false;
 
     // Compteur : une visite par navigateur et par session
-    var compteur = zone.querySelector('.vie-compteur strong');
+    var compteur = { set textContent(n) { zone.querySelector('.vie-compteur strong').textContent = n; zone.querySelector('.vie-compteur .lib').textContent = (n === '0' || n === '1') ? 'visite' : 'visites'; } };
     var ref = db.ref('visites/' + page);
     var cle = 'vu-' + page;
     var deja = false; try { deja = sessionStorage.getItem(cle) === '1'; } catch (e) {}
