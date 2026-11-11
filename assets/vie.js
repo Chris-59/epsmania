@@ -57,6 +57,14 @@
       db.ref('messages/' + page).push({ nom: nom, texte: texte, t: firebase.database.ServerValue.TIMESTAMP }).then(function () {
         form.elements.texte.value = ''; etat.textContent = 'Message publié. Merci !';
         try { localStorage.setItem('vie-dernier', String(maintenant)); localStorage.setItem('vie-nom', nom); } catch (e3) {}
+        var ej = window.VIE && window.VIE.emailjs;                // notification par courriel (facultative)
+        if (ej && ej.service && ej.template && ej.cle) {
+          try {
+            fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ service_id: ej.service, template_id: ej.template, user_id: ej.cle,
+                template_params: { page: page, pseudo: nom, message: texte, lien: location.href } }) }).catch(function () {});
+          } catch (e5) {}
+        }
       }).catch(function () { etat.textContent = "Le message n'a pas pu être envoyé. Réessayez plus tard."; }).then(function () { bouton.disabled = false; });
     });
     try { var n = localStorage.getItem('vie-nom'); if (n) form.elements.nom.value = n; } catch (e4) {}
