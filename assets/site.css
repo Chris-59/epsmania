@@ -159,3 +159,7 @@ footer small { color: var(--muted); display: block; margin-top: 8px; max-width: 
 .visionneuse img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
 .visionneuse.seule .v-prec, .visionneuse.seule .v-suiv { display: none; }
 .v-fermer { top: 16px; right: 16px; }
+
+/* Tuile de repli quand une page n'a aucune image */
+.card .vig.tuile { display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; color: #fff; font-family: var(--display); font-weight: 900; font-stretch: 115%; font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.1; background: linear-gradient(180deg, transparent 0 82%, rgba(255, 255, 255, 0.85) 82% 85%, transparent 85% 88%, rgba(255, 255, 255, 0.85) 88% 91%, transparent 91% 94%, rgba(255, 255, 255, 0.85) 94% 97%, transparent 97%), var(--c); }
+@media (prefers-color-scheme: dark) { .card .vig.tuile { color: #14161a; } }
