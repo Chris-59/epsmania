@@ -99,3 +99,16 @@
     im.addEventListener('click', function () { ouvrir([im.getAttribute('src')], 0); });
   });
 })();
+
+// Telephones sans plein ecran (iPhone/Safari) : le bouton « Plein ecran » des applications ouvrirait un onglet sans retour. On le masque.
+(function () {
+  var ok = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  if (ok) return;
+  function masquer() {
+    Array.prototype.forEach.call(document.querySelectorAll('button'), function (b) {
+      if (/Plein\s+.cran/i.test(b.textContent || '') && b.style.display !== 'none') b.style.display = 'none';
+    });
+  }
+  masquer();
+  if (window.MutationObserver) new MutationObserver(masquer).observe(document.body, { childList: true, subtree: true });
+})();
