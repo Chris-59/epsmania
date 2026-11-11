@@ -127,3 +127,27 @@
     return null;
   };
 })();
+
+// iPhone : Safari zoome dans tout champ de saisie dont le texte fait moins de 16 px et reste zoome ensuite.
+// On force 16 px dans les applications integrees (documents blob de meme origine), en page normale comme en plein ecran.
+(function () {
+  var CSS = '@media (max-width: 820px) { input, select, textarea { font-size: 16px !important; } }';
+  function corriger(f) {
+    try {
+      var d = f.contentDocument;
+      if (!d || !d.head || d.getElementById('correctif-saisie')) return;
+      var st = d.createElement('style'); st.id = 'correctif-saisie'; st.textContent = CSS; d.head.appendChild(st);
+    } catch (e) {}
+  }
+  function suivre(f) {
+    if (f.getAttribute('data-corrige')) return;
+    var src = f.getAttribute('src') || '';
+    if (src.indexOf('blob:') !== 0) return;
+    f.setAttribute('data-corrige', '1');
+    f.addEventListener('load', function () { corriger(f); });
+    corriger(f);
+  }
+  function balayer() { Array.prototype.forEach.call(document.querySelectorAll('iframe'), suivre); }
+  balayer();
+  if (window.MutationObserver) new MutationObserver(balayer).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+})();
