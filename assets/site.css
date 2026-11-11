@@ -143,3 +143,19 @@ footer small { color: var(--muted); display: block; margin-top: 8px; max-width: 
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn:hover { transform: none; } }
 @media print { .top, footer, .retour { display: none; } }
+
+/* Diaporamas interactifs (actives par site.js) */
+.diapo.actif { display: block; position: relative; overflow: hidden; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.diapo.actif img { display: none; margin: 0 auto; width: auto; height: auto; max-width: 100%; max-height: min(72vh, 600px); border-radius: 0; cursor: zoom-in; }
+.diapo.actif img.on { display: block; }
+.d-prec, .d-suiv, .v-prec, .v-suiv, .v-fermer { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 2px solid #fff; background: rgba(20, 22, 26, 0.82); color: #fff; font-size: 28px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 0 4px; }
+.d-prec, .v-prec { left: 12px; top: 50%; transform: translateY(-50%); }
+.d-suiv, .v-suiv { right: 12px; top: 50%; transform: translateY(-50%); }
+.d-prec:hover, .d-suiv:hover, .v-prec:hover, .v-suiv:hover, .v-fermer:hover { background: #000; }
+.d-compte { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); background: rgba(20, 22, 26, 0.82); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 2px 12px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.fig img.zoom { cursor: zoom-in; }
+.visionneuse { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.92); align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+.visionneuse.on { display: flex; }
+.visionneuse img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+.visionneuse.seule .v-prec, .visionneuse.seule .v-suiv { display: none; }
+.v-fermer { top: 16px; right: 16px; }
