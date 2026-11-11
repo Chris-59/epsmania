@@ -139,6 +139,12 @@ footer small { color: var(--muted); display: block; margin-top: 8px; max-width: 
   .logo-rond { order: -1; width: 200px; }
   section { padding: 38px 0; }
   .top { position: static; }
+  .top .wrap { gap: 6px 12px; padding-top: 12px; padding-bottom: 8px; }
+  .brand { flex: 1 1 100%; }
+  .nav { flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin: 0 -24px; padding: 0 24px; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a { white-space: nowrap; padding: 9px 12px; }
+  .top > .wrap > .btn.small { display: none; }
   .pdf iframe { height: 440px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn:hover { transform: none; } }
