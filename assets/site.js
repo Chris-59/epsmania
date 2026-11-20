@@ -170,3 +170,19 @@
     try { localStorage.setItem(cle, t); } catch (e) {}
   });
 })();
+
+/* Nouveautés : hauteur ajustée pour montrer exactement trois lignes */
+(function () {
+  var ul = document.querySelector('ul.nouv');
+  if (!ul) return;
+  function ajuster() {
+    var li = ul.children;
+    if (li.length <= 3) { ul.style.maxHeight = 'none'; return; }
+    ul.style.maxHeight = 'none';
+    var h = li[2].offsetTop + li[2].offsetHeight - li[0].offsetTop;
+    ul.style.maxHeight = (h + 1) + 'px';
+  }
+  ajuster();
+  window.addEventListener('resize', ajuster);
+  window.addEventListener('load', ajuster);
+})();

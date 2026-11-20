@@ -257,3 +257,7 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
 .eval-liens a { display: grid; justify-items: center; gap: 4px; text-decoration: none; color: var(--ink); font-size: 0.85rem; font-weight: 700; }
 .eval-liens img { width: 56px; height: 56px; object-fit: contain; display: block; }
 .eval-liens a:hover span { text-decoration: underline; }
+
+/* Nouveautés : trois lignes visibles, défilement pour les plus anciennes */
+.nouv { overflow-y: auto; max-height: 12.5rem; overscroll-behavior: contain; }
+.nouv:focus-visible { outline: 2px solid var(--c, currentColor); outline-offset: 4px; }
