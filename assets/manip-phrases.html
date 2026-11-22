@@ -1351,7 +1351,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 22 h 50. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 23 h 15. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -2046,7 +2046,7 @@ function bandsView(root) {
     draw("#btest");
   }
   function draw(focus) {
-    const B = UI.bands, sent = B.sent, all = sent.ch.length, placed = Object.keys(B.place).length, hasCC = sent.ch.some((c) => c.fn === "CC");
+    const y0 = window.scrollY, B = UI.bands, sent = B.sent, all = sent.ch.length, placed = Object.keys(B.place).length, hasCC = sent.ch.some((c) => c.fn === "CC");
     fill(holder,
       h("div", { class: "row" },
         h("button", { type: "button", class: "btn primary", on: { click: nextSentence } }, ico("star"), "Phrase nouvelle"),
@@ -2054,7 +2054,7 @@ function bandsView(root) {
       h("div", { class: "card", style: "margin:1rem 0" },
         h("p", { class: "muted small", style: "margin:0 0 .4rem" }, "La phrase"),
         h("p", { class: "out", id: "bsent", tabindex: "-1", style: "margin:0" }, plain(sent))),
-      B.ok ? null : h("div", { class: "card", style: "margin-bottom:1rem" },
+      B.ok ? null : h("div", { class: "card", id: "bpool", style: "margin-bottom:1rem" + (B.poolH ? ";min-height:" + B.poolH + "px" : "") },
         h("h2", null, "Groupes à placer (" + (all - placed) + ")"),
         h("div", { class: "sent", role: "group", "aria-label": "Groupes à placer" }, sent.ch.map((c, i) => B.place[i] ? null : h("div", { class: "chunkwrap" }, tile(i)))),
         h("p", { class: "muted small", style: "margin:.6rem 0 0" }, B.sel === null ? "Touche un groupe, puis touche la bande où il va." : "Groupe choisi : « " + sent.ch[B.sel].t + " ». Touche maintenant une bande.")),
@@ -2080,7 +2080,17 @@ function bandsView(root) {
         h("div", { class: "row" },
           h("button", { type: "button", class: "btn primary", on: { click: () => { UI.gen = sent; UI.lab = freshLab(sent, "gen"); UI.manipTab = "outils"; render(); } } }, ico("tag"), "Continuer avec les quatre outils"),
           h("button", { type: "button", class: "btn", on: { click: nextSentence } }, ico("star"), "Phrase nouvelle"))) : null);
-    if (focus) { const f = $(focus, holder); if (f) f.focus(); }
+    const pool = $("#bpool", holder);
+    if (pool && !B.poolH) B.poolH = pool.offsetHeight;
+    window.scrollTo(0, y0);
+    if (focus) {
+      const f = $(focus, holder);
+      if (f) {
+        f.focus({ preventScroll: true });
+        // on ne fait défiler que pour montrer un message ou un résultat, jamais pour un simple placement
+        if (focus !== "#bsent") { const r = f.getBoundingClientRect(); if (r.top < 0 || r.bottom > window.innerHeight) f.scrollIntoView({ block: "nearest" }); }
+      }
+    }
   }
 }
 
