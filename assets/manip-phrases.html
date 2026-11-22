@@ -573,6 +573,8 @@ const IC = {
   users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5a5 5 0 0 1 4.5 5"/>',
   chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   upload: '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
+  full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  unfull: '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
   sh_S: '<circle cx="12" cy="12" r="8" fill="currentColor" stroke="none"/>',
   sh_V: '<rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" stroke="none"/>',
   sh_COD: '<path d="M12 3l10 17H2z" fill="currentColor" stroke="none"/>',
@@ -789,11 +791,11 @@ function viewAccueil(root) {
       h("button", { type: "button", class: "btn primary", on: { click: () => { if (nxt) { UI.quizSkill = nxt.k; UI.tab = "quiz"; UI.quiz = null; } go("entrainer"); } } }, ico("play"), nxt ? "Continuer : " + nxt.name.toLowerCase() : "S'entraîner"),
       h("button", { type: "button", class: "btn", on: { click: () => go("apprendre") } }, ico("book"), "Revoir une leçon")),
     h("div", { class: "grid g3" },
-      [["entrainer", "S'entraîner", "quiz", "Quiz et cartes mémoire pour réviser en jouant."],
-       ["creer", "Créer des phrases", "build", "Je construis mes propres phrases avec un verbe, un sujet et des compléments."],
-       ["etiquettes", "Les étiquettes", "tag", "Je touche un groupe de mots, j'essaie un outil, je trouve sa fonction."],
+      [["parcours", "Mon parcours", "path", "Mes étoiles, mes badges et mes progrès."],
        ["apprendre", "Apprendre", "book", "Six petites leçons avec des exemples."],
-       ["parcours", "Mon parcours", "path", "Mes étoiles, mes badges et mes progrès."]]
+       ["manipulations", "Les manipulations", "tag", "Je touche un groupe de mots, j'essaie un outil, je trouve sa fonction."],
+       ["entrainer", "S'entraîner", "quiz", "Quiz et cartes mémoire pour réviser en jouant."],
+       ["creer", "Créer des phrases", "build", "Je construis mes propres phrases avec un verbe, un sujet et des compléments."]]
         .map(([r, n, i, d]) => h("a", { class: "tile", href: "#" + r }, ico(i), h("b", null, n), h("span", { class: "muted small" }, d)))),
     h("div", { class: "card", style: "margin-top:1.2rem" },
       h("h2", null, "Mon prénom"),
@@ -801,7 +803,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 09 h 59. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 03. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -952,7 +954,7 @@ function cardsView(box, draw) {
 }
 
 /* ======================================================= ÉTIQUETTES */
-// Dans l'espace étiquettes, le résultat d'un test ne dit jamais la fonction : c'est à l'élève de la trouver.
+// Dans l'espace manipulations, le résultat d'un test ne dit jamais la fonction : c'est à l'élève de la trouver.
 function neutralMsg(tool, c, res) {
   if (tool === "effacer") return res.verdict === "ok" ? "La phrase tient debout." : res.verdict === "meh" ? "La phrase reste possible, mais on perd une information importante. Ce test n'est pas très sûr : essaie un autre outil." : "La phrase est incomplète ou n'a plus de sens.";
   if (tool === "deplacer") return res.verdict === "ok" ? "La phrase sonne juste à la nouvelle place." : "La phrase sonne faux.";
@@ -960,11 +962,11 @@ function neutralMsg(tool, c, res) {
   if (res.verdict !== "ok") return "Ce test n'aide pas ici. Essaie un autre outil.";
   return c.fn === "V" ? "Ça marche : le mot est entouré par ne et pas." : c.fn === "S" ? "Ça marche : le groupe est entouré par c'est et qui." : "Ça marche : « et cela se passe » s'ajoute sans problème.";
 }
-function viewEtiquettes(root) {
+function viewManipulations(root) {
   if (UI.custom && UI.customFresh) { UI.lab = freshLab(UI.custom, "custom"); UI.customFresh = false; }
   if (!UI.lab) UI.lab = freshLab(SENT[0], "s1");
   const holder = h("div");
-  root.append(...title("Les étiquettes", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), pictoStrip([["hand", "Je touche un groupe"], ["erase", "J'essaie un outil"], ["tag", "Je trouve sa fonction"]]), holder);
+  root.append(...title("Les manipulations", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), pictoStrip([["hand", "Je touche un groupe"], ["erase", "J'essaie un outil"], ["tag", "Je trouve sa fonction"]]), holder);
   draw();
 
   function pickSentence(key) {
@@ -1056,7 +1058,7 @@ function viewCreer(root) {
         h("p", { class: "out", style: "margin-top:.8rem" }, plain(sent)),
         h("div", { class: "row" },
           speakBtn(() => plain(sent), "Écouter ma phrase"),
-          h("button", { type: "button", class: "btn primary", on: { click: () => { UI.custom = sent; UI.customFresh = true; UI.lab = null; go("etiquettes"); } } }, ico("tag"), "La tester avec les étiquettes"),
+          h("button", { type: "button", class: "btn primary", on: { click: () => { UI.custom = sent; UI.customFresh = true; UI.lab = null; go("manipulations"); } } }, ico("tag"), "La tester dans les manipulations"),
           h("button", { type: "button", class: "btn", on: { click: () => keep(sent) } }, ico("save"), "Garder dans mon carnet"))));
   }
   function keep(sent) {
@@ -1095,7 +1097,7 @@ function viewCreer(root) {
           return h("li", { class: "card", style: "display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between" },
             h("span", { style: "font-weight:500" }, txt),
             h("span", { class: "row" },
-              h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = s; UI.customFresh = true; UI.lab = null; go("etiquettes"); } } }, ico("tag"), "Tester", h("span", { class: "sr" }, " " + txt)),
+              h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = s; UI.customFresh = true; UI.lab = null; go("manipulations"); } } }, ico("tag"), "Tester", h("span", { class: "sr" }, " " + txt)),
               h("button", { type: "button", class: "btn ghost", on: { click: () => { S.notebook.splice(i, 1); save(); draw("#nbtitle"); } } }, ico("trash"), "Supprimer", h("span", { class: "sr" }, " " + txt))));
         })) : h("p", { class: "muted" }, "Mon carnet est vide. Je peux y garder jusqu'à 12 phrases.")));
     drawPreview();
@@ -1234,7 +1236,7 @@ function demo(sent, i, tool) {
 const L_ELI = () => buildSentence({ frame: "observer", subj: SUBJ[0], cod: ["le volcan", "le"], coi: null, cc: null, ccPos: "start" });
 const LESSONS = [
   { id: "l1", title: "Mes quatre outils", skill: null, lab: "s1", body: () => [
-    P("Pour comprendre une phrase, je peux la manipuler comme avec des étiquettes. J'ai quatre outils. Un outil me donne un indice. Quand deux outils disent la même chose, je peux avoir confiance."),
+    P("Pour comprendre une phrase, je peux la manipuler comme avec des étiquettes de mots. J'ai quatre outils. Un outil me donne un indice. Quand deux outils disent la même chose, je peux avoir confiance."),
     demo(SENT[0], 0, "effacer"), demo(SENT[0], 0, "deplacer"), demo(SENT[0], 3, "remplacer"), demo(SENT[0], 2, "ajouter")] },
   { id: "l2", title: "Le verbe et le sujet", skill: "verbe", lab: "s1", body: () => [
     h("ol", { class: "steps" },
@@ -1308,7 +1310,7 @@ function viewApprendre(root) {
           h("button", { type: "button", class: "btn primary", "aria-pressed": done ? "true" : "false", on: { click: () => {
             if (!S.lessons[L.id]) { S.lessons[L.id] = 1; gain(5); toast("Leçon terminée. +5 points", "book"); } else { delete S.lessons[L.id]; save(); }
             draw("#ltitle"); } } }, ico("check"), done ? "J'ai compris (cliquer pour annuler)" : "J'ai compris"),
-          h("button", { type: "button", class: "btn", on: { click: () => { const s = SENT.find((x) => x.id === L.lab) || SENT[0]; UI.custom = null; UI.lab = freshLab(s, s.id); go("etiquettes"); } } }, ico("tag"), "Essayer avec les étiquettes"),
+          h("button", { type: "button", class: "btn", on: { click: () => { const s = SENT.find((x) => x.id === L.lab) || SENT[0]; UI.custom = null; UI.lab = freshLab(s, s.id); go("manipulations"); } } }, ico("tag"), "Essayer dans les manipulations"),
           L.skill ? h("button", { type: "button", class: "btn", on: { click: () => { UI.quizSkill = L.skill; UI.tab = "quiz"; UI.quiz = null; go("entrainer"); } } }, ico("quiz"), "M'entraîner") : null),
         h("div", { class: "row", style: "margin-top:.8rem" },
           UI.lesson > 0 ? h("button", { type: "button", class: "btn ghost", on: { click: () => { UI.lesson--; draw("#ltitle"); } } }, "Leçon précédente") : null,
@@ -1413,8 +1415,18 @@ function voiceBox() {
 try { if (canSpeak()) speechSynthesis.addEventListener("voiceschanged", () => { const d = $("#dlg"); if (d && d.open && d.querySelector("#voice") === null) openSettings(); }); } catch (e) {}
 
 /* ======================================================= ROUTEUR ET DÉMARRAGE */
-const ROUTES = { accueil: viewAccueil, entrainer: viewEntrainer, creer: viewCreer, etiquettes: viewEtiquettes, apprendre: viewApprendre, parcours: viewParcours, enseignant: viewEnseignant };
-const NAV = [["accueil", "Accueil", "home"], ["entrainer", "S'entraîner", "quiz"], ["creer", "Créer", "build"], ["etiquettes", "Étiquettes", "tag"], ["apprendre", "Apprendre", "book"], ["parcours", "Mon parcours", "path"]];
+const ROUTES = { accueil: viewAccueil, entrainer: viewEntrainer, creer: viewCreer, manipulations: viewManipulations, apprendre: viewApprendre, parcours: viewParcours, enseignant: viewEnseignant };
+const NAV = [["accueil", "Accueil", "home"], ["parcours", "Mon parcours", "path"], ["apprendre", "Apprendre", "book"], ["manipulations", "Manipulations", "tag"], ["entrainer", "S'entraîner", "quiz"], ["creer", "Créer", "build"]];
+const fsOn = () => document.fullscreenElement || document.webkitFullscreenElement;
+const fsOk = () => !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+function toggleFS() {
+  try {
+    if (fsOn()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else { const r = document.documentElement; (r.requestFullscreen || r.webkitRequestFullscreen).call(r); }
+  } catch (e) {}
+}
+function refreshFS() { const b = $("#fs"); if (b) b.replaceChildren(ico(fsOn() ? "unfull" : "full"), fsOn() ? "Quitter le plein écran" : "Plein écran"); }
+document.addEventListener("fullscreenchange", refreshFS); document.addEventListener("webkitfullscreenchange", refreshFS);
 function drawHeader() {
   const top = $("#topbar");
   if (!top.firstChild) {
@@ -1422,13 +1434,14 @@ function drawHeader() {
       h("a", { class: "logo", href: "#accueil" }, magma(44), h("span", null, "Manip'Phrases", h("small", null, "Les manipulations syntaxiques en jouant"))),
       h("span", { class: "spacer" }),
       h("span", { id: "pill", class: "pill" }),
-      h("button", { type: "button", class: "btn", on: { click: openSettings } }, ico("gear"), "Réglages"));
-    refreshPill();
+      h("button", { type: "button", class: "btn", on: { click: openSettings } }, ico("gear"), "Réglages"),
+      fsOk() ? h("button", { type: "button", id: "fs", class: "btn", on: { click: toggleFS } }) : null);
+    refreshPill(); refreshFS();
   }
   $("#navlist").replaceChildren(...NAV.map(([r, n, i]) => h("li", null, h("a", { class: "navbtn", href: "#" + r, "aria-current": UI.route === r ? "page" : null }, ico(i), n))));
 }
 function render() {
-  const r = (location.hash || "#accueil").slice(1);
+  let r = (location.hash || "#accueil").slice(1); if (r === "etiquettes") r = "manipulations";
   UI.route = ROUTES[r] ? r : "accueil";
   drawHeader();
   const main = $("#main");
