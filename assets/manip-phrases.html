@@ -301,6 +301,44 @@ function buildSentence({ frame, subj, cod, coi, cc, ccPos }) {
   return { id: "perso", ch };
 }
 
+
+/* --- Générateur de phrases pour l'entraînement --- */
+// Assemble des phrases correctes à partir des cadres (verbe, sujet, COD, COI, CC). Évite les répétitions de mots et les doublons.
+let SENT_MODE = "nouvelles"; // "nouvelles" | "mix" | "depart"
+const setSentMode = (m) => { SENT_MODE = m; };
+let GEN_N = 0;
+const headWord = (t) => t.toLowerCase().replace(/[’']/g, " ").split(/\s+/).filter((w) => !["le", "la", "les", "l", "au", "aux", "à", "son", "sa", "ses", "du", "des", "un", "une", "près", "dans", "en", "pendant", "avec"].includes(w)).pop() || t;
+const GEN_CC = CC_OPTS.filter(([t]) => t !== "hier" && t !== "ce matin");
+function randomSentence(need) {
+  need = need || {};
+  for (let tries = 0; tries < 200; tries++) {
+    const f = pick(FRAMES.filter((x) => (!need.COD || x.cod) && (!need.COI || x.coi)));
+    const subj = pick(SUBJ);
+    const cod = f.cod ? pick(f.cod) : null;
+    const withCoi = f.coi && (need.COI || !f.cod || Math.random() < 0.55);
+    const coi = withCoi ? pick(f.coi) : null;
+    const wantCc = need.CC ? true : Math.random() < 0.75;
+    const cc = wantCc ? pick(GEN_CC) : null;
+    if (!cod && !coi) continue;
+    const words = [subj.t, cod && cod[0], coi && coi[0], cc && cc[0]].filter(Boolean).map(headWord);
+    if (new Set(words).size !== words.length) continue;
+    const sent = buildSentence({ frame: f.id, subj, cod, coi, cc: cc ? { t: cc[0], kind: cc[1] } : null, ccPos: cc && Math.random() < 0.55 ? "start" : "end" });
+    if (!sent) continue;
+    sent.id = "g" + (++GEN_N);
+    return sent;
+  }
+  return SENT[0];
+}
+// Phrase pour une question : tirée du générateur ou des 16 phrases de départ selon le mode choisi.
+function sentFor(pred, need) {
+  const fromList = SENT_MODE === "depart" || (SENT_MODE === "mix" && Math.random() < 0.4);
+  if (!fromList) {
+    for (let k = 0; k < 60; k++) { const g = randomSentence(need); if (!pred || pred(g)) return g; }
+  }
+  const pool = pred ? SENT.filter(pred) : SENT;
+  return pick(pool.length ? pool : SENT);
+}
+
 /* --- Texte --- */
 function sentText(chs) {
   let s = "";
@@ -477,7 +515,8 @@ function genQuestion(skill) {
   const types = TYPES[skill] || TYPES.tous;
   for (let tries = 0; tries < 40; tries++) {
     const t = pick(types);
-    const sent = pick(SENT);
+    const needs = skill === "cod" ? { COD: true } : skill === "coi" ? { COI: true } : skill === "cc" ? { CC: true } : (t === "pron" ? {} : {});
+    const sent = sentFor(null, needs);
     if (t === "neg") {
       if (skill !== "tous" && skill !== "verbe") continue;
       const nv = negVariants(sent);
@@ -497,7 +536,7 @@ function genQuestion(skill) {
       if (skill === "tous") continue;
       const key = SKN2[skill], wantYes = Math.random() < 0.5;
       const has = (sn, f) => sn.ch.some((c) => (f ? c.fn === key : c.fn !== key));
-      const sn = pick(SENT.filter((x) => has(x, wantYes)));
+      const sn = sentFor((x) => has(x, wantYes), wantYes ? { [key]: true } : {});
       const cand = sn.ch.map((c, i) => i).filter((i) => (sn.ch[i].fn === key) === wantYes);
       const i = pick(cand), c = sn.ch[i], yes = c.fn === key, sent2 = sn;
       return { type: "isfn", skill, sent: sent2, target: i, prompt: "Le groupe encadré est-il " + ART[key] + " ?", options: [{ id: "o", label: "Oui" }, { id: "n", label: "Non" }], correct: yes ? "o" : "n", exp: explainChunk(sent2, i) + (yes ? "" : " Ce n'est donc pas " + ART[key] + "."), hint: FN[key].tip };
@@ -608,7 +647,7 @@ function starsFor(n, k) {
 const starsByCount = (n, steps) => (n >= steps[2] ? 3 : n >= steps[1] ? 2 : n >= steps[0] ? 1 : 0);
 
 if (typeof module !== "undefined") {
-  module.exports = { SENT, FRAMES, SUBJ, CC_OPTS, CARDS, VF, FN, buildSentence, sentText, plain, doErase, doMove, doReplace, doAdd, explainChunk, genQuestion, starsFor, starsByCount, shuffle };
+  module.exports = { randomSentence, setSentMode, SENT, FRAMES, SUBJ, CC_OPTS, CARDS, VF, FN, buildSentence, sentText, plain, doErase, doMove, doReplace, doAdd, explainChunk, genQuestion, starsFor, starsByCount, shuffle };
 }
 /* ===== OUTILS DOM ===== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -871,7 +910,7 @@ const PICTOS = [
   ["gear", "Mes réglages", "Je choisis mon confort : couleurs, taille, voix."], ["check", "Bonne réponse", "Retour clair, jamais de punition."],
 ];
 /* ===== ÉTAT DE L'INTERFACE ===== */
-const UI = { tab: "quiz", quizSkill: "tous", quizLen: 8, quiz: null, deck: null, skillCards: "tous", cardsLen: 10, lab: null, custom: null, at: null, lesson: 0 };
+const UI = { tab: "quiz", quizSkill: "tous", quizLen: 8, quiz: null, deck: null, skillCards: "tous", cardsLen: 10, sentMode: "nouvelles", gen: null, lab: null, custom: null, at: null, lesson: 0 };
 const freshLab = (sent, key) => ({ key, sent, sel: null, tool: null, res: null, found: {}, wrong: 0, tip: null, done: false });
 const go = (name) => { location.hash = name; };
 
@@ -907,7 +946,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 10. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 25. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -930,6 +969,7 @@ function viewEntrainer(root) {
 }
 const skillOpts = () => [["tous", "Un peu de tout", null], ...SK.map((s) => [s.k, s.name, "sh_" + s.fn])];
 
+const MODES = [["nouvelles", "Des phrases nouvelles (créées par l\u2019appli)"], ["mix", "Un mélange"], ["depart", "Les 16 phrases de départ"]];
 function startQuiz(skill, len) {
   const list = [], seen = new Set();
   let guard = 0;
@@ -948,8 +988,9 @@ function quizView(box, draw) {
     put(box, 
       h("p", null, "Je réponds à des questions courtes. Pas de chrono, pas de points en moins : je peux prendre mon temps et demander un indice."),
       radioGroup("Qu'est-ce que je travaille ?", "qs", skillOpts(), UI.quizSkill, (v) => { UI.quizSkill = v; }),
+      radioGroup("Quelles phrases ?", "qm", MODES, UI.sentMode, (v) => { UI.sentMode = v; }),
       radioGroup("Combien de questions ?", "ql", [[5, "5 questions"], [8, "8 questions"], [12, "12 questions"]], UI.quizLen, (v) => { UI.quizLen = Number(v); }),
-      h("button", { type: "button", class: "btn primary", on: { click: () => { startQuiz(UI.quizSkill, UI.quizLen); if (!UI.quiz.list.length) { UI.quiz = null; toast("Pas de question pour ce choix.", "ask"); return; } draw("#qtitle"); } } }, ico("play"), "C'est parti !"));
+      h("button", { type: "button", class: "btn primary", on: { click: () => { setSentMode(UI.sentMode); startQuiz(UI.quizSkill, UI.quizLen); if (!UI.quiz.list.length) { UI.quiz = null; toast("Pas de question pour ce choix.", "ask"); return; } draw("#qtitle"); } } }, ico("play"), "C'est parti !"));
     return;
   }
   if (Q.i >= Q.list.length) return quizEnd(box, draw);
@@ -1076,13 +1117,16 @@ function viewManipulations(root) {
   draw();
 
   function pickSentence(key) {
-    if (key === "custom" && UI.custom) UI.lab = freshLab(UI.custom, "custom");
+    if (key === "gen" && UI.gen) UI.lab = freshLab(UI.gen, "gen");
+    else if (key === "custom" && UI.custom) UI.lab = freshLab(UI.custom, "custom");
     else UI.lab = freshLab(SENT.find((s) => s.id === key) || SENT[0], key);
     draw("#sentgrp");
   }
+  function newSentence() { UI.gen = randomSentence(); UI.lab = freshLab(UI.gen, "gen"); draw("#sentgrp"); }
   function draw(focus) {
     const L = UI.lab, sent = L.sent, nFound = Object.keys(L.found).length, total = sent.ch.length;
     const sel = h("select", { id: "selsent", on: { change: (e) => pickSentence(e.target.value) } },
+      UI.gen ? h("option", { value: "gen", selected: L.key === "gen" }, "Phrase nouvelle : " + plain(UI.gen)) : null,
       UI.custom ? h("option", { value: "custom", selected: L.key === "custom" }, "Ma phrase : " + plain(UI.custom)) : null,
       SENT.map((s) => h("option", { value: s.id, selected: L.key === s.id }, plain(s))));
     const step = L.done ? "Bravo, la phrase est résolue !" : L.sel === null ? "Étape 1 : touche un groupe de mots." : L.res ? "Étape 3 : à ton avis, quelle est sa fonction ?" : "Étape 2 : choisis un outil pour tester ce groupe.";
@@ -1091,6 +1135,7 @@ function viewManipulations(root) {
       h("div", { class: "row" },
         h("label", { for: "selsent", class: "sr" }, "Choisir une phrase"), sel,
         h("button", { type: "button", class: "btn", on: { click: () => { const pool = SENT.filter((s) => s.id !== L.key); pickSentence(pool[rnd(pool.length)].id); } } }, ico("dice"), "Au hasard"),
+        h("button", { type: "button", id: "newsent", class: "btn primary", on: { click: newSentence } }, ico("star"), "Phrase nouvelle"),
         speakBtn(() => plain(sent), "Écouter la phrase")),
       h("div", { class: "row", style: "margin:.8rem 0 .4rem; justify-content:space-between" },
         h("span", { class: "pill" }, "Fonctions trouvées : " + nFound + " sur " + total),
@@ -1113,7 +1158,8 @@ function viewManipulations(root) {
       L.done ? h("div", { class: "card brand", style: "margin-top:1rem" },
         h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, "Bravo, détective ! Tu as trouvé toutes les fonctions. +15 points."))),
         h("div", { class: "row", style: "margin-top:.8rem" },
-          h("button", { type: "button", id: "nextsent", class: "btn primary", on: { click: () => { const pool = SENT.filter((s) => s.id !== L.key); pickSentence(pool[rnd(pool.length)].id); } } }, ico("next"), "Phrase suivante"))) : null);
+          h("button", { type: "button", id: "nextsent", class: "btn primary", on: { click: () => { const pool = SENT.filter((s) => s.id !== L.key); pickSentence(pool[rnd(pool.length)].id); } } }, ico("next"), "Phrase suivante"),
+          h("button", { type: "button", class: "btn primary", on: { click: newSentence } }, ico("star"), "Phrase nouvelle"))) : null);
     if (focus) { const f = $(focus, holder); if (f) f.focus(); }
   }
   function useTool(t) {
