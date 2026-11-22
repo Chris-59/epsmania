@@ -248,6 +248,44 @@ select { font: inherit; letter-spacing: inherit; min-height: 3rem; padding: .3re
   @keyframes pop { 0% { transform: scale(.85); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
 }
 @media (max-width: 560px) { .station { grid-template-columns: auto 1fr; } .station .act { grid-column: 1 / -1; } h1 { font-size: 1.6rem; } }
+
+/* Trois bandes, mode classe, mémo, impression */
+:root { --bb:#1F4EA8; --bbg:#E3ECFB; --bj:#7A5C00; --bjbg:#FFF4CC; --bv:#17703A; --bvbg:#E1F4E7; }
+@media (prefers-color-scheme: dark) { :root[data-skin="auto"] { --bb:#82B5FF; --bbg:#1A2A52; --bj:#FFD54A; --bjbg:#3A3010; --bv:#6FD98F; --bvbg:#143522; } }
+:root[data-skin="dark"] { --bb:#82B5FF; --bbg:#1A2A52; --bj:#FFD54A; --bjbg:#3A3010; --bv:#6FD98F; --bvbg:#143522; }
+:root[data-skin="hc"] { --bb:#6BB6FF; --bbg:#000; --bj:#FFD400; --bjbg:#000; --bv:#5CFF8F; --bvbg:#000; }
+.bands { display: grid; gap: .9rem; margin: 1rem 0; }
+.band { border: 4px solid var(--bc); border-radius: 16px; background: var(--bgb); padding: .7rem .9rem; }
+.band h3 { margin: 0 0 .1rem; display: flex; align-items: center; gap: .4rem; }
+.band .bsym { display: inline-block; min-width: 1.4rem; text-align: center; color: var(--bc); font-size: 1.2rem; }
+.b-bleu { --bc: var(--bb); --bgb: var(--bbg); border-style: solid; }
+.b-jaune { --bc: var(--bj); --bgb: var(--bjbg); border-style: double; border-width: 7px; }
+.b-vert { --bc: var(--bv); --bgb: var(--bvbg); border-style: dashed; }
+.bandtiles { display: flex; flex-wrap: wrap; gap: .5rem; min-height: 3.2rem; align-items: center; margin-bottom: .5rem; }
+.chunk.ok { border-style: solid; border-color: var(--ok); }
+.chunk:disabled { cursor: default; }
+:root[data-classe="1"] { font-size: calc(26px * var(--fs)); }
+:root[data-classe="1"] header.top, :root[data-classe="1"] nav.main, :root[data-classe="1"] footer.foot { display: none; }
+:root[data-classe="1"] .wrap { max-width: 1300px; }
+#classeExit { position: fixed; right: .8rem; bottom: .8rem; z-index: 40; }
+.memosheet h1 { font-size: 1.5rem; }
+.memosheet .memoitem { border: 2px solid var(--line); border-radius: 12px; padding: .5rem .8rem; margin: .5rem 0; }
+.memosheet .memoitem h2 { font-size: 1.1rem; margin: 0; }
+.memosheet .q { margin: .1rem 0; font-size: .9rem; }
+.pzgroups { display: flex; flex-wrap: wrap; gap: .4rem; margin: .4rem 0; }
+.pzg { text-align: center; } .pzbox { border: 2px solid var(--line); border-radius: 8px; padding: .2rem .6rem; }
+.pzline { margin-top: .3rem; color: var(--ink2); }
+.pzitem { margin: .8rem 0; } .pzitem p { margin: .2rem 0; } .pzkey { margin: .3rem 0; max-width: none; }
+#printzone { display: none; }
+@media print {
+  html, body { background: #fff !important; color: #000 !important; }
+  body[data-print] > *:not(#printzone) { display: none !important; }
+  body[data-print] #printzone { display: block !important; font: 12pt/1.5 Arial, Helvetica, sans-serif; color: #000; }
+  #printzone * { color: #000 !important; border-color: #000 !important; background: transparent !important; }
+  #printzone h1 { font-size: 16pt; } #printzone h2 { font-size: 12pt; }
+  .pzbreak { page-break-before: always; }
+  .pzitem, .memoitem { break-inside: avoid; }
+}
 </style>
 </head>
 <body>
@@ -295,7 +333,7 @@ const SENT = [
   { id: "s15", ch: [C("le guide", "S"), C("parle", "V"), C("aux touristes", "COI", { pron: "leur" }), C("calmement", "CC", { kind: "m" })] },
   { id: "s16", ch: [C("les pompiers", "S", { pl: true }), C("protègent", "V"), C("les habitants", "COD", { pron: "les" }), C("pendant la tempête", "CC", { kind: "t" })] },
   { id: "s17", ch: [C("le dimanche", "CC", { kind: "t" }), C("la voisine", "S"), C("apporte", "V"), C("la tarte", "COD", { pron: "la" }), C("à son ami", "COI", { pron: "lui" })] },
-  { id: "s18", ch: [C("les musiciens", "S", { pl: true }), C("jouent", "V"), C("le morceau", "COD", { pron: "le" }), C("avec passion", "CC", { kind: "m" })] },
+  { id: "s18", ch: [C("les musiciens", "S", { pl: true }), C("jouent", "V"), C("le morceau", "COD", { pron: "le", abs: true }), C("avec passion", "CC", { kind: "m" })] },
   { id: "s19", ch: [C("au gymnase", "CC", { kind: "l" }), C("la gymnaste", "S"), C("obéit", "V"), C("au signal", "COI", { pron: "y" })] },
   { id: "s20", ch: [C("les commerçants", "S", { pl: true }), C("vendent", "V"), C("les fruits", "COD", { pron: "les" }), C("aux clients", "COI", { pron: "leur" }), C("sur la place", "CC", { kind: "l" })] },
   { id: "s21", ch: [C("le soir", "CC", { kind: "t" }), C("le papa", "S"), C("raconte", "V"), C("l'histoire", "COD", { pron: "la" }), C("aux enfants", "COI", { pron: "leur" })] },
@@ -303,14 +341,19 @@ const SENT = [
   { id: "s23", ch: [C("tous les jours", "CC", { kind: "t" }), C("Max", "S", { proper: true }), C("parle", "V"), C("à sa voisine", "COI", { pron: "lui" })] },
   { id: "s24", ch: [C("les oiseaux", "S", { pl: true }), C("construisent", "V"), C("le nid", "COD", { pron: "le" }), C("au printemps", "CC", { kind: "t" })] },
   { id: "s25", ch: [C("les volcanologues", "S", { pl: true }), C("observent", "V"), C("le cratère", "COD", { pron: "le" }), C("avec attention", "CC", { kind: "m" })] },
+  { id: "s26", ch: [C("à midi", "CC", { kind: "t" }), C("les enfants", "S", { pl: true }), C("mangent", "V"), C("une pomme", "COD", { pron: "la", abs: true }), C("dans la cour", "CC", { kind: "l" })] },
+  { id: "s27", ch: [C("le soir", "CC", { kind: "t" }), C("Inès", "S", { proper: true }), C("lit", "V"), C("un roman", "COD", { pron: "le", abs: true }), C("dans sa chambre", "CC", { kind: "l" })] },
+  { id: "s28", ch: [C("chaque jour", "CC", { kind: "t" }), C("le peintre", "S"), C("dessine", "V"), C("un paysage", "COD", { pron: "le", abs: true }), C("dans le parc", "CC", { kind: "l" })] },
 ];
 
 /* --- Thèmes pour l'atelier de création et le générateur (chaque thème a ses sujets, verbes, compléments et CC) --- */
 const P1 = (t) => ({ t }), PL = (t) => ({ t, pl: true }), PR = (t) => ({ t, proper: true });
 // verbe : [infinitif, singulier, pluriel, [COD], [COI]] ; COD/COI : [groupe, petit mot]
+// Verbes dont le COD peut manquer (« Je mange une pomme » → « Je mange »). La phrase reste possible, mais on perd une information.
+const ABS_INF = new Set(["lire", "manger", "chanter", "dessiner", "peindre", "jouer", "étudier", "conduire", "vendre", "observer"]);
 const mkTheme = (id, name, subj, frames, cc) => ({
   id, name, subj, cc,
-  frames: frames.map(([inf, v1, v3, cod, coi]) => ({ id: id + ":" + inf, inf, theme: id, v: [v1, v3], cod: cod || undefined, coi: coi || undefined })),
+  frames: frames.map(([inf, v1, v3, cod, coi]) => ({ id: id + ":" + inf, inf, theme: id, v: [v1, v3], cod: cod || undefined, coi: coi || undefined, abs: !!(cod && ABS_INF.has(inf)) })),
 });
 const THEMES = [
   mkTheme("ecole", "À l'école", [P1("la maîtresse"), P1("le directeur"), PR("Léa"), PR("Max"), PL("les élèves"), PL("les enfants")], [
@@ -390,7 +433,7 @@ function buildSentence({ frame, subj, cod, coi, cc, ccPos }) {
   if (ccChunk && ccPos !== "end") ch.push(ccChunk);
   ch.push(C(subj.t, "S", { pl: !!subj.pl, proper: !!subj.proper }));
   ch.push(C(f.v[subj.pl ? 1 : 0], "V"));
-  if (cod) ch.push(C(cod[0], "COD", { pron: cod[1] }));
+  if (cod) ch.push(C(cod[0], "COD", f.abs ? { pron: cod[1], abs: true } : { pron: cod[1] }));
   if (coi) ch.push(C(coi[0], "COI", { pron: coi[1] }));
   if (ccChunk && ccPos === "end") ch.push(ccChunk);
   return { id: "perso", ch };
@@ -407,7 +450,7 @@ function randomSentence(need) {
   need = need || {};
   for (let tries = 0; tries < 300; tries++) {
     const th = pick(THEMES);
-    const f = pick(th.frames.filter((x) => (!need.COD || x.cod) && (!need.COI || x.coi)).concat([]));
+    const f = pick(th.frames.filter((x) => (!need.COD || x.cod) && (!need.COI || x.coi) && (!need.abs || x.abs)).concat([]));
     if (!f) continue;
     const subj = pick(th.subj);
     const cod = f.cod ? pick(f.cod) : null;
@@ -508,8 +551,14 @@ function buildCustom(gr, id) {
     if (g.fn === "S") { o.pl = !!(g.pl || guessPlural(t)); if (proper) o.proper = true; }
     return C(t, g.fn, o);
   });
+  const vch = ch.find((c) => c.fn === "V");
+  if (vch && absVerb(vch.t)) ch.forEach((c) => { if (c.fn === "COD") c.abs = true; });
   return { id: id || "m" + Date.now().toString(36), ch, mine: true };
 }
+const ABS_ER = [["mang", ["e", "es", "eons", "ez", "ent", "eait", "eaient", "eais", "era", "eront", "é", "ée", "és", "ées"]], ["chant", null], ["dessin", null], ["jou", null], ["étudi", null], ["observ", null], ["cuisin", null]];
+const ABS_FORMS = new Set(["lis", "lit", "lisons", "lisez", "lisent", "lisait", "lisaient", "lira", "liront", "lu", "lue", "lus", "lues", "boit", "boivent", "buvait", "boira", "bu", "peint", "peignent", "peignait", "peindra", "écrit", "écrivent", "écrivait", "écrira", "conduit", "conduisent", "conduisait", "conduira", "vend", "vendent", "vendait", "vendra", "vendu"]);
+ABS_ER.forEach(([st, en]) => (en || ["e", "es", "ons", "ez", "ent", "ait", "aient", "ais", "ions", "iez", "era", "eront", "erai", "é", "ée", "és", "ées"]).forEach((e) => ABS_FORMS.add(st + e)));
+const absVerb = (t) => { const w = cleanText(t).toLowerCase().split(" "); return ABS_FORMS.has(w[w.length - 1]); };
 const mineToSent = (m) => buildCustom(m.ch.map((c) => ({ t: c.t, fn: c.fn, pron: c.pron, kind: c.kind, pl: c.pl })), m.id);
 
 /* --- Texte --- */
@@ -537,7 +586,8 @@ function doErase(sent, i) {
   const chs = sent.ch.filter((_, k) => k !== i);
   const text = sentText(chs);
   if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase reste correcte. Un CC s'efface sans problème." };
-  if (c.fn === "COD") return { text, verdict: "no", msg: "La phrase est incomplète : il manque l'information importante. Un COD ne s'efface pas." };
+  if (c.fn === "COD" && c.abs) return { text, verdict: "meh", msg: "La phrase reste possible, car ce verbe peut s'employer sans complément (comme manger, lire, chanter). Mais on perd ce que l'on mange, lit ou chante : le sens est incomplet. Effacer ne suffit pas à reconnaître un COD, je teste aussi remplacer." };
+  if (c.fn === "COD") return { text, verdict: "no", msg: "La phrase est incomplète : il manque l'information importante. Avec la plupart des verbes, un COD ne s'efface pas. Mais attention : quelques verbes (manger, lire, chanter...) s'emploient aussi sans COD, donc je teste aussi remplacer." };
   if (c.fn === "COI") return { text, verdict: "meh", msg: "La phrase peut rester possible, mais on perd une information importante. Ce test n'est pas sûr pour un COI : je préfère remplacer par lui, leur, y." };
   if (c.fn === "S") return { text, verdict: "no", msg: "La phrase n'est plus correcte : il n'y a plus personne qui agit. Le sujet ne s'efface pas." };
   return { text, verdict: "no", msg: "La phrase n'est plus une phrase : il n'y a plus de verbe. Le verbe ne s'efface pas." };
@@ -551,6 +601,10 @@ function doMove(sent, i) {
   // pour un non-CC, on place le groupe tout au début sans virgule (ou à la fin s'il était déjà premier)
   const text = c.fn === "CC" ? sentText(chs) : sentText(chs.map((x) => (x === c ? { ...x, fn: "X" } : x)));
   if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase sonne juste à la nouvelle place. Un CC se déplace." };
+  if (c.fn === "COD" || c.fn === "COI") {
+    const rp = doReplace(sent, i);
+    return { text, verdict: "no", msg: "La phrase sonne faux : un " + c.fn + " ne se déplace pas tel quel. Il ne peut passer devant le verbe que s'il est remplacé par un petit mot" + (rp.text ? " : « " + rp.text.replace(/\.$/, "") + " »." : ".") };
+  }
   return { text, verdict: "no", msg: "La phrase sonne faux : ce groupe ne peut pas voyager dans la phrase. " + ({ V: "Le verbe", S: "Le sujet", COD: "Un COD", COI: "Un COI", CC: "Un CC" }[c.fn] || "Ce groupe") + " ne se déplace pas comme ça." };
 }
 function pronWhy(c, word) {
@@ -639,7 +693,7 @@ function explainChunk(sent, i) {
   const c = sent.ch[i];
   const q = "« " + c.t + " »";
   if (c.fn === "CC") return q + " s'efface et se déplace : c'est un CC.";
-  if (c.fn === "COD") { const r = doReplace(sent, i); return q + " ne s'efface pas, ne se déplace pas et se remplace par « " + r.pron + " » : c'est un COD. " + r.why; }
+  if (c.fn === "COD") { const r = doReplace(sent, i); return q + (c.abs ? " pourrait s'effacer avec ce verbe (la phrase resterait possible, mais incomplète), ne se déplace pas tel quel et se remplace par « " : " ne s'efface pas, ne se déplace pas tel quel et se remplace par « ") + r.pron + " » : c'est un COD. " + r.why; }
   if (c.fn === "COI") { const r = doReplace(sent, i); return q + " se remplace par « " + r.pron + " » : c'est un COI. " + r.why; }
   if (c.fn === "S") return q + " est encadré par " + (c.pl ? "ce sont...qui" : "c'est...qui") + " : c'est le sujet.";
   return q + " reste seul quand on met ne...pas autour : c'est le verbe.";
@@ -655,7 +709,7 @@ const VF = [
   { q: "Un CC peut presque toujours s'effacer et se déplacer.", a: true, skill: "cc", exp: "Oui : j'efface, je déplace, et la phrase reste correcte." },
   { q: "On peut remplacer un COD par le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : « Le facteur distribue le courrier » devient « Le facteur le distribue »." },
   { q: "Un COI se remplace souvent par lui, leur ou y.", a: true, skill: "coi", exp: "Oui : « Il parle aux touristes » devient « Il leur parle »." },
-  { q: "Le COD se déplace facilement dans la phrase.", a: false, skill: "cod", exp: "Non : le COD ne se déplace pas. Ce sont les CC qui voyagent." },
+  { q: "Le COD se déplace facilement dans la phrase.", a: false, skill: "cod", exp: "Non : le COD ne se déplace pas tel quel. Ce sont les CC qui voyagent. Le COD ne passe devant le verbe que s'il est remplacé par un petit mot (le, la, l', les)." },
   { q: "Pour trouver le verbe, je peux mettre ne...pas autour.", a: true, skill: "verbe", exp: "Oui : « Le chien ne mord pas ». Le verbe est entre ne et pas." },
   { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le facteur qui distribue ». Le sujet est entre c'est et qui." },
   { q: "Un CC complète le verbe comme un COD.", a: false, skill: "cc", exp: "Non : le CC donne une information en plus (quand, où, comment). On peut l'effacer." },
@@ -669,9 +723,33 @@ const VF = [
   { q: "Le sujet peut s'effacer sans problème.", a: false, skill: "sujet", exp: "Non : sans sujet, on ne sait plus qui fait l'action." },
   { q: "Quand le sujet est au pluriel, je peux dire ce sont...qui.", a: true, skill: "sujet", exp: "Oui : « Ce sont les enfants qui obéissent »." },
   { q: "Si un test hésite, je peux en faire un deuxième.", a: true, skill: "cod", exp: "Oui : deux tests qui disent la même chose, c'est plus sûr." },
-  { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le facteur distribue aux habitants » : on se demande quoi. Le COD ne s'efface pas." },
+  { q: "Avec tous les verbes, quand j'efface le COD, la phrase n'est plus correcte.", a: false, skill: "cod", exp: "Non : « Je mange une pomme » devient « Je mange », qui reste possible. Quelques verbes (manger, lire, chanter, dessiner) s'emploient sans COD. On perd pourtant une information." },
+  { q: "Si j'efface un groupe et que la phrase reste correcte, c'est forcément un CC.", a: false, skill: "cod", exp: "Non : « Je mange une pomme » → « Je mange ». Pourtant « une pomme » est un COD. Je fais un deuxième test : « Je la mange »." },
+  { q: "Un verbe comme manger, lire ou chanter peut s'employer sans COD.", a: true, skill: "cod", exp: "Oui : « Je lis » est une phrase possible. Mais on ne sait plus ce que je lis." },
+  { q: "« Je mange une pomme » devient « Je mange » : « une pomme » n'est donc pas un COD.", a: false, skill: "cod", exp: "Non : « une pomme » est bien un COD, car je peux dire « Je la mange ». Le verbe manger peut s'employer sans complément." },
+  { q: "Pour être sûr d'un COD, je teste aussi avec le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : un seul test peut tromper. Remplacer par un petit mot confirme le COD." },
+  { q: "Un COD peut passer devant le verbe s'il est remplacé par un petit mot.", a: true, skill: "cod", exp: "Oui : « Le facteur distribue le courrier » devient « Le facteur le distribue »." },
+  { q: "« du pain » est toujours un COI, parce qu'il y a « de » dans « du ».", a: false, skill: "coi", exp: "Non : dans « Max mange du pain », « du » est un article : c'est un COD (« Max en mange »). Dans « Max profite du soleil », « du » veut dire « de le » : c'est un COI." },
+  { q: "Avec « parler à quelqu'un », le complément est un COI.", a: true, skill: "coi", exp: "Oui : « Il parle à sa voisine » devient « Il lui parle »." },
 ];
 
+
+/* --- Phrases pièges : COD ou COI ? (verbes à préposition, du / de la / des) --- */
+const TRAPS = [
+  { id: "t1", note: "« assimiler quelque chose à quelque chose » : le premier complément est un COD, le deuxième un COI (à).", ch: [C("les Romains", "S", { pl: true }), C("assimilaient", "V"), C("les éruptions", "COD", { pron: "les" }), C("à la colère des dieux", "COI", { pron: "y" })] },
+  { id: "t2", note: "Ici « du » veut dire « de le » : on dit « profiter de », c'est un COI (« Ils en profitent »).", ch: [C("les touristes", "S", { pl: true }), C("profitent", "V"), C("du soleil", "COI", { pron: "en" }), C("tous les jours", "CC", { kind: "t" })] },
+  { id: "t3", note: "Ici « du » est un article (un peu de pain) : c'est un COD (« Max en mange »).", ch: [C("Max", "S", { proper: true }), C("mange", "V"), C("du pain", "COD", { pron: "en", abs: true }), C("à midi", "CC", { kind: "t" })] },
+  { id: "t4", note: "On dit « penser à » : c'est un COI (« Léa y pense »).", ch: [C("Léa", "S", { proper: true }), C("pense", "V"), C("à son voyage", "COI", { pron: "y" }), C("chaque soir", "CC", { kind: "t" })] },
+  { id: "t5", note: "On dit « parler de » : c'est un COI (« Le guide en parle »).", ch: [C("le guide", "S"), C("parle", "V"), C("de l'histoire du château", "COI", { pron: "en" }), C("calmement", "CC", { kind: "m" })] },
+  { id: "t6", note: "Ici « de l' » est un article (un peu d'eau) : c'est un COD (« Max en boit »).", ch: [C("Max", "S", { proper: true }), C("boit", "V"), C("de l'eau", "COD", { pron: "en", abs: true }), C("après le match", "CC", { kind: "t" })] },
+  { id: "t7", note: "On dit « profiter de » : c'est un COI (« Les élèves en profitent »).", ch: [C("les élèves", "S", { pl: true }), C("profitent", "V"), C("de la récréation", "COI", { pron: "en" }), C("dans la cour", "CC", { kind: "l" })] },
+  { id: "t8", note: "Pas de préposition : « soigner quelqu'un », c'est un COD (« La maîtresse le soigne »).", ch: [C("la maîtresse", "S"), C("soigne", "V"), C("le blessé", "COD", { pron: "le" }), C("dans l'infirmerie", "CC", { kind: "l" })] },
+  { id: "t9", note: "On dit « penser à » : c'est un COI (« Les voisins y pensent »).", ch: [C("les voisins", "S", { pl: true }), C("pensent", "V"), C("à leurs vacances", "COI", { pron: "y" }), C("en été", "CC", { kind: "t" })] },
+  { id: "t10", note: "Ici « des » est un article (plusieurs fruits) : c'est un COD (« Léa en choisit »).", ch: [C("Léa", "S", { proper: true }), C("choisit", "V"), C("des fruits", "COD", { pron: "en" }), C("au marché", "CC", { kind: "l" })] },
+  { id: "t11", note: "On dit « obéir à » : c'est un COI (« Le chien lui obéit »).", ch: [C("le chien", "S"), C("obéit", "V"), C("à son maître", "COI", { pron: "lui" }), C("toujours", "CC", { kind: "m" })] },
+  { id: "t12", note: "On dit « se servir de » ; ici « utiliser » n'a pas de préposition : c'est un COD (« La peintre l'utilise »).", ch: [C("la peintre", "S"), C("utilise", "V"), C("le pinceau", "COD", { pron: "le" }), C("avec soin", "CC", { kind: "m" })] },
+];
+const trapSent = () => (SENT_MODE === "mes" ? sentFor((x) => x.ch.some((c) => c.fn === "COD" || c.fn === "COI")) : pick(TRAPS));
 
 /* --- Aides pour les questions de forme négative et de c'est...qui --- */
 function negVariants(sent) {
@@ -699,19 +777,39 @@ const ART = { S: "le sujet", V: "le verbe", COD: "un COD", COI: "un COI", CC: "u
 function genQuestion(skill) {
   // skill : tous | verbe | sujet | cc | cod | coi
   const TYPES = {
-    tous: ["fn", "fn", "erase", "move", "pron", "verb", "subj", "neg", "cqui", "vf"],
+    tous: ["fn", "fn", "erase", "move", "pron", "verb", "subj", "neg", "cqui", "vf", "codcoi", "abs"],
     verbe: ["verb", "neg", "neg", "isfn", "vf"],
     sujet: ["subj", "cqui", "cqui", "isfn", "vf"],
     cc: ["isfn", "erase", "move", "vf"],
-    cod: ["isfn", "erase", "move", "pron", "vf"],
-    coi: ["isfn", "pron", "pron", "vf"],
+    cod: ["isfn", "erase", "move", "pron", "vf", "abs", "codcoi"],
+    coi: ["isfn", "pron", "pron", "vf", "codcoi"],
   };
   const types = TYPES[skill] || TYPES.tous;
   for (let tries = 0; tries < 40; tries++) {
     const t = pick(types);
     const needs = skill === "cod" ? { COD: true } : skill === "coi" ? { COI: true } : skill === "cc" ? { CC: true } : (t === "pron" ? {} : {});
-    const sent = sentFor(null, needs);
+    const sent = t === "abs" ? sentFor((x) => x.ch.some((c) => c.fn === "COD" && c.abs), { COD: true, abs: true }) : t === "codcoi" ? trapSent() : sentFor(null, needs);
     if (!sent) continue;
+    if (t === "abs") {
+      if (skill !== "tous" && skill !== "cod") continue;
+      const i = sent.ch.findIndex((c) => c.fn === "COD" && c.abs);
+      if (i < 0) continue;
+      const r = doErase(sent, i), rp = doReplace(sent, i);
+      if (!rp.text) continue;
+      const opts = shuffle([
+        { id: "g", label: "Rien de sûr : certains verbes s'emploient sans COD. Je teste aussi remplacer : « " + rp.text.replace(/\.$/, "") + " » marche, c'est un COD." },
+        { id: "a", label: "C'est forcément un CC, puisqu'il s'efface." },
+        { id: "b", label: "Ce n'est pas un COD, puisque la phrase reste correcte sans lui." },
+      ]);
+      return { type: "abs", skill: "cod", sent, target: i, prompt: "J'efface le groupe encadré et la phrase reste possible : « " + r.text + " » Que puis-je conclure ?", options: opts, correct: "g", exp: r.msg + " Avec « remplacer » : « " + rp.text.replace(/\.$/, "") + " ».", hint: "Je pense à manger, lire, chanter : ils s'emploient sans COD." };
+    }
+    if (t === "codcoi") {
+      if (skill !== "tous" && skill !== "cod" && skill !== "coi") continue;
+      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn === "COD" || sent.ch[i].fn === "COI");
+      if (!cands.length) continue;
+      const i = pick(cands), c = sent.ch[i], rp = doReplace(sent, i);
+      return { type: "codcoi", skill: c.fn === "COD" ? "cod" : "coi", sent, target: i, prompt: "Le groupe encadré est-il un COD ou un COI ?", options: shuffle([{ id: "COD", label: "Un COD (sans préposition)" }, { id: "COI", label: "Un COI (avec à ou de)" }]), correct: c.fn, exp: explainChunk(sent, i) + (sent.note ? " " + sent.note : "") + (rp.text ? " Je remplace : « " + rp.text.replace(/\.$/, "") + " »." : ""), hint: "Je cherche une préposition (à, de) devant le groupe. Attention à du, de la, des." };
+    }
     if (t === "neg") {
       if (skill !== "tous" && skill !== "verbe") continue;
       const nv = negVariants(sent);
@@ -751,7 +849,7 @@ function genQuestion(skill) {
       return { type: "fn", skill: FN[c.fn].skill, sent, target: i, prompt: "Quelle est la fonction du groupe encadré ?", options: FN_ORDER.map((k) => ({ id: k, label: FN[k].name, fn: k })), correct: c.fn, exp: explainChunk(sent, i), hint: c.fn === "CC" ? "J'efface le groupe, puis je le déplace." : c.fn === "COD" || c.fn === "COI" ? "Je le remplace par un petit mot : le, la, les, lui, leur, y." : c.fn === "V" ? "Je mets ne...pas autour." : "Je dis c'est...qui." };
     }
     if (t === "erase") {
-      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI");
+      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI" && !sent.ch[i].abs);
       if (!cands.length) continue;
       const ccs = cands.filter((k) => sent.ch[k].fn === "CC");
       const nccs = cands.filter((k) => sent.ch[k].fn !== "CC"), i = (Math.random() < 0.5 && ccs.length) || !nccs.length ? pick(ccs.length ? ccs : cands) : pick(nccs);
@@ -805,14 +903,14 @@ function genQuestion(skill) {
 
 /* --- Cartes mémoire --- */
 const CARDS = [
-  { id: "c1", skill: "cc", f: "À quoi sert l'outil EFFACER ?", b: "J'enlève un groupe de mots. Si la phrase reste correcte, c'est peut-être un CC." },
+  { id: "c1", skill: "cc", f: "À quoi sert l'outil EFFACER ?", b: "J'enlève un groupe de mots. Si la phrase reste correcte, c'est peut-être un CC. Attention : avec manger, lire, chanter, le COD peut aussi manquer (« Je mange »)." },
   { id: "c2", skill: "cc", f: "À quoi sert l'outil DÉPLACER ?", b: "Je change un groupe de place. Si la phrase sonne juste, c'est un CC." },
   { id: "c3", skill: "cod", f: "À quoi sert l'outil REMPLACER ?", b: "Je mets un petit mot à la place du groupe : le, la, l', les pour un COD ; lui, leur, y pour un COI." },
   { id: "c4", skill: "verbe", f: "À quoi sert l'outil AJOUTER ?", b: "J'ajoute des mots pour tester : ne...pas pour le verbe, c'est...qui pour le sujet, « et cela se passe » pour le CC." },
   { id: "c5", skill: "verbe", f: "Comment trouver le verbe ?", b: "Je mets ne...pas autour : « Le chien ne mord pas ». Le verbe est entre ne et pas. Je peux aussi changer le temps." },
   { id: "c6", skill: "sujet", f: "Comment trouver le sujet ?", b: "J'encadre avec c'est...qui (ou ce sont...qui). Je peux aussi le remplacer par il, elle, ils, elles." },
   { id: "c7", skill: "cc", f: "Comment reconnaître un CC ?", b: "Il s'efface et il se déplace. Il dit quand, où ou comment. Je peux ajouter « et cela se passe »." },
-  { id: "c8", skill: "cod", f: "Comment reconnaître un COD ?", b: "Il complète le verbe sans préposition. Il ne s'efface pas et ne se déplace pas. Je le remplace par le, la, l', les." },
+  { id: "c8", skill: "cod", f: "Comment reconnaître un COD ?", b: "Il complète le verbe sans préposition. En général il ne s'efface pas (sauf avec manger, lire, chanter...) et il ne se déplace pas tel quel. Je le remplace par le, la, l', les." },
   { id: "c9", skill: "coi", f: "Comment reconnaître un COI ?", b: "Il complète le verbe avec une préposition (à, de). Je le remplace par lui, leur, y." },
   { id: "c10", skill: "cod", f: "Quels petits mots remplacent un COD ?", b: "le, la, l', les." },
   { id: "c11", skill: "coi", f: "Quels petits mots remplacent un COI ?", b: "lui, leur, y." },
@@ -822,6 +920,12 @@ const CARDS = [
   { id: "c15", skill: "cc", f: "Quels deux gestes pour reconnaître un CC ?", b: "J'efface, puis je déplace. Si les deux marchent, c'est un CC." },
   { id: "c16", skill: "verbe", f: "Je mets « Les enfants obéissent » à la forme négative.", b: "Les enfants n'obéissent pas. Devant une voyelle, ne devient n'." },
   { id: "c17", skill: "cod", f: "Si j'hésite, que fais-je ?", b: "Je fais un deuxième test. Quand deux tests disent la même chose, je peux avoir confiance." },
+  { id: "c19", skill: "cod", f: "« Je mange une pomme » devient « Je mange » : est-ce encore un COD ?", b: "Oui. Certains verbes (manger, lire, chanter, dessiner) s'emploient sans COD. La phrase reste possible, mais on perd une information. Je teste aussi remplacer : « Je la mange »." },
+  { id: "c20", skill: "cod", f: "Un COD peut-il se déplacer ?", b: "Pas tel quel. Il passe devant le verbe seulement s'il est remplacé par un petit mot : « Le facteur le distribue »." },
+  { id: "c21", skill: "coi", f: "« du », « de la », « des » : COD ou COI ?", b: "Ça dépend. « Max mange du pain » : article, COD (Max en mange). « Max profite du soleil » : de + le, COI (Max en profite)." },
+  { id: "c22", skill: "coi", f: "Quels petits mots remplacent « de + quelque chose » ?", b: "en : « Il parle de son voyage » → « Il en parle »." },
+  { id: "c23", skill: "tous", f: "Quelles sont les trois bandes ?", b: "Bleue : de qui on parle (le sujet). Jaune : ce qu'on en dit (le verbe et ses compléments COD ou COI). Verte : où, quand, comment (les CC)." },
+  { id: "c24", skill: "cod", f: "Pourquoi faire deux tests pour un COD ?", b: "Parce qu'un seul peut tromper : avec manger ou lire, le COD s'efface. Si effacer et remplacer disent des choses différentes, je choisis remplacer." },
   { id: "c18", skill: "tous", f: "Dans quel ordre je cherche ?", b: "1. le verbe, 2. le sujet, 3. j'efface et je déplace (CC), 4. je remplace (COD ou COI)." },
 ];
 // cartes exemples générées à partir des phrases (une fonction par carte)
@@ -981,7 +1085,7 @@ const VERD = { ok: ["Ça marche", "check", "v-ok"], no: ["Ça ne marche pas", "c
 
 /* ===== MÉMOIRE LOCALE (avec secours si le stockage est bloqué) ===== */
 const KEY = "manip-phrases-v1";
-const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "astronaute", heroSet: false, mood: "classique" }, mine: [], okq: {} };
+const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "astronaute", heroSet: false, mood: "classique" }, mine: [], okq: {}, memo: {}, weekly: "", weeklyWrite: {} };
 function loadStore() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
 let S = (function () {
   const l = loadStore() || {};
@@ -1014,7 +1118,7 @@ const BADGES = [
   { id: "b7", name: "Élève curieux", desc: "Lire les 7 leçons.", ico: "book", test: () => lessonsDone() >= LESSONS.length },
   { id: "b8", name: "Étoiles partout", desc: "Obtenir 3 étoiles à chaque étape.", ico: "star", test: () => SK.every((s) => starsOf(s.k) === 3) },
 ];
-function gain(xp) { S.xp += xp; save(); refreshPill(); checkBadges(); }
+function gain(xp) { if (isClasse()) return; S.xp += xp; save(); refreshPill(); checkBadges(); }
 function checkBadges() {
   BADGES.forEach((b) => { if (!S.badges[b.id] && b.test()) { S.badges[b.id] = 1; save(); toast("Nouveau badge : " + b.name, b.ico); } });
 }
@@ -1027,6 +1131,7 @@ function qKey(q) {
 }
 function okCount() { return Object.keys(S.okq || {}).length; }
 function rememberQ(q, good) {
+  if (isClasse()) return;
   if (!S.okq) S.okq = {};
   const k = q.key || qKey(q);
   if (good) { delete S.okq[k]; S.okq[k] = 1; const ks = Object.keys(S.okq); if (ks.length > 4000) ks.slice(0, ks.length - 4000).forEach((x) => delete S.okq[x]); }
@@ -1034,6 +1139,7 @@ function rememberQ(q, good) {
   save();
 }
 function recordAnswer(skill, ok) {
+  if (isClasse()) return;
   const s = S.stats[skill] || (S.stats[skill] = { n: 0, k: 0 });
   s.n++; if (ok) s.k++;
   gain(ok ? 10 : 2);
@@ -1205,6 +1311,7 @@ function viewAccueil(root) {
   put(root, 
     ...title(hello),
     h("div", { class: "mascot" }, buddy(), h("div", { class: "bubble" }, h("p", null, msg))),
+    weeklyCard(),
     !S.settings.heroSet ? h("div", { class: "card brand", style: "margin:1rem 0" },
       h("h2", { style: "margin-top:0" }, "Choisis ton compagnon"),
       P("Il t'accompagne dans toute la mission. Tu pourras en changer, et choisir ton ambiance, dans les réglages."),
@@ -1225,7 +1332,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 13 h 40. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 22 h 25. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1397,10 +1504,11 @@ function neutralMsg(tool, c, res) {
   return c.fn === "V" ? "Ça marche : le mot est entouré par ne et pas." : c.fn === "S" ? "Ça marche : le groupe est entouré par c'est et qui." : "Ça marche : « et cela se passe » s'ajoute sans problème.";
 }
 function viewManipulations(root) {
+  if (UI.manipTab === "bandes") return bandsView(root);
   if (UI.custom && UI.customFresh) { UI.lab = freshLab(UI.custom, "custom"); UI.customFresh = false; }
   if (!UI.lab) UI.lab = freshLab(SENT[0], "s1");
   const holder = h("div");
-  put(root, ...title("Les manipulations", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), pictoStrip([["hand", "Je touche un groupe"], ["erase", "J'essaie un outil"], ["tag", "Je trouve sa fonction"]]), holder);
+  put(root, ...title("Les manipulations", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), manipTabs(), pictoStrip([["hand", "Je touche un groupe"], ["erase", "J'essaie un outil"], ["tag", "Je trouve sa fonction"]]), holder);
   draw();
 
   function pickSentence(key) {
@@ -1464,7 +1572,7 @@ function viewManipulations(root) {
       L.found[L.sel] = true; L.sel = null; L.tool = null; L.res = null; L.msg = null; L.wrong = 0;
       gain(3); beep(true);
       const all = Object.keys(L.found).length === L.sent.ch.length;
-      if (all && !L.done) { L.done = true; S.solved++; gain(15); save(); checkBadges(); announce("Bravo ! Toutes les fonctions sont trouvées."); draw("#nextsent"); }
+      if (all && !L.done) { L.done = true; if (!isClasse()) S.solved++; gain(15); save(); checkBadges(); announce("Bravo ! Toutes les fonctions sont trouvées."); draw("#nextsent"); }
       else { announce("Bravo, c'est la bonne fonction."); draw("#sentgrp"); }
     } else {
       L.wrong++; beep(false);
@@ -1478,14 +1586,15 @@ function viewManipulations(root) {
 function viewCreer(root) {
   const body = h("div");
   const tabs = h("ul", { class: "tabs", role: "list" },
-    [["atelier", "Atelier de phrases"], ["mes", "Mes propres phrases"]].map(([k, l]) =>
+    [["atelier", "Atelier de phrases"], ["mes", "Mes propres phrases"], ["memo", "Mon mémo"]].map(([k, l]) =>
       h("li", null, h("button", { type: "button", class: "tab", "aria-pressed": (UI.creerTab || "atelier") === k ? "true" : "false", on: { click: () => { UI.creerTab = k; draw(); } } }, l))));
   put(root, ...title("Créer des phrases", "Je construis une phrase avec l'atelier, ou j'écris la mienne."), tabs, body);
   draw();
   function draw() {
-    tabs.querySelectorAll(".tab").forEach((b, i) => b.setAttribute("aria-pressed", String((i === 0 ? "atelier" : "mes") === (UI.creerTab || "atelier"))));
+    tabs.querySelectorAll(".tab").forEach((b, i) => b.setAttribute("aria-pressed", String(["atelier", "mes", "memo"][i] === (UI.creerTab || "atelier"))));
     body.replaceChildren();
-    if ((UI.creerTab || "atelier") === "mes") mesPhrasesView(body); else atelierView(body);
+    const ct = UI.creerTab || "atelier";
+    if (ct === "mes") mesPhrasesView(body); else if (ct === "memo") memoView(body); else atelierView(body);
   }
 }
 function atelierView(root) {
@@ -1621,6 +1730,7 @@ function viewEnseignant(root) {
   const holder = h("div");
   put(root, ...title("Espace enseignant", "Je suis l'évolution de mes élèves. Les données restent sur cet appareil : rien n'est envoyé sur Internet."), holder);
   draw();
+  const fz = h("div"); root.append(fz); ficheCard(fz);
   function draw(focus) {
     const E = UI.ens, names = Object.keys(CLASSE.pupils).sort(), pupils = names.map((k) => CLASSE.pupils[k]);
     const ta = h("textarea", { class: "bilan", id: "codes", rows: "4", placeholder: "Coller un ou plusieurs codes (MP1-...), un par ligne", "aria-label": "Codes des élèves" });
@@ -1695,8 +1805,14 @@ function mineCode() {
   const o = S.mine.map((m) => m.ch.map((c) => [c.t, c.fn, c.pron || "", c.kind || "", c.pl ? 1 : 0]));
   return "MP-PH1-" + btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 }
+function weeklyCode() {
+  const m = S.mine.find((x) => x.id === S.weekly); if (!m) return "";
+  return "MP-PW1-" + btoa(unescape(encodeURIComponent(JSON.stringify([m.ch.map((c) => [c.t, c.fn, c.pron || "", c.kind || "", c.pl ? 1 : 0])]))));
+}
 function importMine(str) {
   str = String(str).trim();
+  let weekly = false;
+  if (str.indexOf("MP-PW1-") === 0) { weekly = true; str = "MP-PH1-" + str.slice(7); }
   if (str.indexOf("MP-PH1-") !== 0) throw new Error("format");
   const o = JSON.parse(decodeURIComponent(escape(atob(str.slice(7)))));
   if (!Array.isArray(o)) throw new Error("format");
@@ -1711,8 +1827,15 @@ function importMine(str) {
     S.mine.push({ id: sent.id + added, ch: sent.ch.map((c) => ({ t: c.t, fn: c.fn, pron: c.pron, kind: c.kind, pl: c.pl })) });
     added++;
   });
+  if (weekly && Array.isArray(o[0])) {
+    const g0 = o[0].map((c) => ({ t: String(c[0] || "").slice(0, 60), fn: String(c[1] || ""), pron: String(c[2] || ""), kind: String(c[3] || ""), pl: !!c[4] }));
+    if (!g0.some((g) => !FN[g.fn]) && !checkCustom(g0).length) {
+      const txt0 = plain(buildCustom(g0)), hit = S.mine.find((m) => plain(mineToSent(m)) === txt0);
+      if (hit) S.weekly = hit.id;
+    }
+  }
   save(); syncMine();
-  return { added, skipped };
+  return { added, skipped, weekly: weekly && !!S.weekly };
 }
 function mesPhrasesView(root) {
   const E = UI.ed || (UI.ed = { text: "", words: null, cuts: [], g: [], msg: "" });
@@ -1805,7 +1928,7 @@ function mesPhrasesView(root) {
   }
   function mineList() {
     const msg = h("p", { role: "status", class: "muted small" });
-    const ta = h("textarea", { class: "bilan", rows: "3", id: "mycode", placeholder: "Je colle ici un code de phrases reçu (il commence par MP-PH1-)", "aria-label": "Code de phrases à ajouter" });
+    const ta = h("textarea", { class: "bilan", rows: "3", id: "mycode", placeholder: "Je colle ici un code de phrases reçu (il commence par MP-PH1- ou MP-PW1-)", "aria-label": "Code de phrases à ajouter" });
     return h("div", { style: "margin-top:1.5rem" },
       h("h2", { id: "minetitle", tabindex: "-1" }, "Mes phrases enregistrées (" + S.mine.length + ")"),
       S.mine.length ? h("ul", { style: "list-style:none;padding:0;display:grid;gap:.6rem" }, S.mine.map((m, i) => {
@@ -1813,19 +1936,267 @@ function mesPhrasesView(root) {
         return h("li", { class: "card", style: "display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between" },
           h("span", { style: "font-weight:500" }, txt),
           h("span", { class: "row" },
-            h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = null; UI.lab = freshLab(s, "mine:" + m.id); go("manipulations"); } } }, ico("tag"), "Tester", h("span", { class: "sr" }, " " + txt)),
+            h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = null; UI.lab = freshLab(s, "mine:" + m.id); UI.manipTab = "outils"; go("manipulations"); } } }, ico("tag"), "Tester", h("span", { class: "sr" }, " " + txt)),
+            h("button", { type: "button", class: "btn" + (S.weekly === m.id ? " primary" : ""), "aria-pressed": S.weekly === m.id ? "true" : "false", on: { click: () => { S.weekly = S.weekly === m.id ? "" : m.id; save(); draw("#minetitle"); } } }, ico("star"), S.weekly === m.id ? "Phrase de la semaine" : "En faire la phrase de la semaine", h("span", { class: "sr" }, " " + txt)),
             h("button", { type: "button", class: "btn ghost", on: { click: () => askDialog("Supprimer cette phrase ?", "« " + txt + " » sera supprimée de mes phrases.", "Supprimer", () => { S.mine.splice(i, 1); save(); syncMine(); draw("#minetitle"); }) } }, ico("trash"), "Supprimer", h("span", { class: "sr" }, " " + txt))));
       })) : h("p", { class: "muted" }, "Je n'ai pas encore enregistré de phrase. Mes phrases serviront dans les manipulations et dans le quiz (choix « Mes phrases ajoutées »)."),
       S.mine.length ? h("details", { class: "card", style: "margin-top:1rem" }, h("summary", null, "Partager mes phrases avec une autre personne"),
         h("p", { class: "muted small" }, "Je copie ce code et je l'envoie. L'élève le colle dans « Ajouter des phrases reçues »."),
         h("textarea", { class: "bilan", readonly: true, rows: "3", "aria-label": "Code de mes phrases", on: { focus: (e) => e.target.select() } }, mineCode()),
         h("button", { type: "button", class: "btn", style: "margin-top:.4rem", on: { click: () => { try { navigator.clipboard.writeText(mineCode()).then(() => { msg.textContent = "Code copié."; }, () => { msg.textContent = "Copie impossible : sélectionne le code et copie-le."; }); } catch (e) { msg.textContent = "Copie impossible : sélectionne le code et copie-le."; } } } }, ico("copy"), "Copier le code")) : null,
+      weeklySent() ? h("details", { class: "card", style: "margin-top:1rem" }, h("summary", null, "Partager ma phrase de la semaine"),
+        h("p", { class: "muted small" }, "Je copie ce code et je l'envoie à la classe. Chaque élève le colle dans « Ajouter des phrases reçues » : la phrase s'ajoute et devient sa phrase de la semaine."),
+        h("textarea", { class: "bilan", readonly: true, rows: "2", "aria-label": "Code de la phrase de la semaine", on: { focus: (e) => e.target.select() } }, weeklyCode())) : null,
       h("details", { class: "card", style: "margin-top:1rem" }, h("summary", null, "Ajouter des phrases reçues"),
         h("label", { for: "mycode", class: "sr" }, "Code de phrases"), ta,
         h("button", { type: "button", class: "btn primary", style: "margin-top:.4rem", on: { click: () => {
-          try { const r = importMine(ta.value); msg.textContent = r.added + " phrase" + (r.added > 1 ? "s" : "") + " ajoutée" + (r.added > 1 ? "s" : "") + (r.skipped ? " (" + r.skipped + " ignorée" + (r.skipped > 1 ? "s" : "") + ")" : "") + "."; if (r.added) draw("#minetitle"); } catch (e) { msg.textContent = "Ce code n'est pas valide. Je vérifie que je l'ai copié en entier."; }
+          try { const r = importMine(ta.value); msg.textContent = r.added + " phrase" + (r.added > 1 ? "s" : "") + " ajoutée" + (r.added > 1 ? "s" : "") + (r.skipped ? " (" + r.skipped + " ignorée" + (r.skipped > 1 ? "s" : "") + ")" : "") + "." + (r.weekly ? " C'est maintenant ma phrase de la semaine." : ""); if (r.added || r.weekly) draw("#minetitle"); } catch (e) { msg.textContent = "Ce code n'est pas valide. Je vérifie que je l'ai copié en entier."; }
         } } }, ico("upload"), "Ajouter"),
         msg));
+  }
+}
+/* ===== MODE CLASSE (tableau), TROIS BANDES, MON MÉMO, PHRASE DE LA SEMAINE, FICHE IMPRIMABLE ===== */
+const isClasse = () => document.documentElement.dataset.classe === "1";
+function setClasse(on) {
+  if (on) document.documentElement.dataset.classe = "1"; else delete document.documentElement.dataset.classe;
+  const old = $("#classeExit"); if (old) old.remove();
+  if (on) document.body.append(h("button", { type: "button", id: "classeExit", class: "btn", on: { click: () => setClasse(false) } }, ico("unfull"), "Quitter le mode classe"));
+  announce(on ? "Mode classe : grandes lettres, rien n'est compté dans les points." : "Mode classe terminé.");
+  render();
+}
+
+/* ----- Onglets de l'espace Manipulations ----- */
+function manipTabs() {
+  const cur = UI.manipTab || "outils";
+  return h("div", { class: "row", style: "justify-content:space-between;align-items:center;margin:.4rem 0" },
+    h("ul", { class: "tabs", role: "list", style: "margin:0" },
+      [["outils", "Les quatre outils"], ["bandes", "Les trois bandes"]].map(([k, l]) =>
+        h("li", null, h("button", { type: "button", class: "tab", "aria-pressed": cur === k ? "true" : "false", on: { click: () => { UI.manipTab = k; render(); } } }, l)))),
+    h("button", { type: "button", class: "btn ghost", on: { click: () => setClasse(!isClasse()) } }, ico(isClasse() ? "unfull" : "full"), isClasse() ? "Quitter le mode classe" : "Mode classe (tableau)"));
+}
+
+/* ----- Les trois bandes (bleue, jaune, verte) ----- */
+const BANDS = [
+  { k: "bleu", sym: "●", name: "Bande bleue", q: "De qui ou de quoi on parle ?", fns: ["S"], why: "est le sujet : il dit de qui ou de quoi on parle." },
+  { k: "jaune", sym: "■", name: "Bande jaune", q: "Qu'est-ce qu'on en dit ? (le verbe et ses compléments)", fns: ["V", "COD", "COI"], why: "fait partie de ce qu'on dit du sujet : le verbe et ses compléments (COD, COI) restent ensemble." },
+  { k: "vert", sym: "▲", name: "Bande verte", q: "Où ? Quand ? Comment ?", fns: ["CC"], why: "dit où, quand ou comment : on peut l'effacer et le déplacer." },
+];
+const bandOf = (fn) => BANDS.find((b) => b.fns.includes(fn)).k;
+const freshBands = (sent) => ({ sent, place: {}, sel: null, msgs: [], tries: 0, ok: false, test: null });
+function newBandSentence() { setSentMode(UI.sentMode || "nouvelles"); return sentFor(null, { CC: Math.random() < 0.85 }); }
+
+function bandsView(root) {
+  if (!UI.bands) UI.bands = freshBands(newBandSentence());
+  const holder = h("div");
+  put(root, ...title("Les manipulations", "Je coupe la phrase en groupes et je les place sur les trois bandes, puis je teste avec effacer et déplacer."),
+    manipTabs(),
+    pictoStrip([["hand", "Je choisis un groupe"], ["tag", "Je le mets sur une bande"], ["check", "Je vérifie"], ["eye", "Je teste"]]),
+    holder);
+  draw();
+  function nextSentence() { UI.bands = freshBands(newBandSentence()); draw("#bsent"); }
+  function chunkLabel(c, i) { return i === 0 ? cap(c.t) : c.t; }
+  function tile(i, st) {
+    const B = UI.bands, c = B.sent.ch[i];
+    return h("button", { type: "button", class: "chunk" + (st ? " " + st : ""), "aria-pressed": B.sel === i ? "true" : "false", disabled: B.ok,
+      on: { click: () => { if (B.place[i]) { delete B.place[i]; B.sel = null; B.msgs = []; } else B.sel = B.sel === i ? null : i; draw("#bsent"); } } },
+      chunkLabel(c, i), B.place[i] ? h("span", { class: "sr" }, " (placé sur la " + B.place[i] + ", toucher pour le retirer)") : null);
+  }
+  function verify() {
+    const B = UI.bands, bad = [], first = B.tries === 0;
+    B.tries++;
+    B.sent.ch.forEach((c, i) => {
+      const good = bandOf(c.fn) === B.place[i];
+      if (first && !isClasse()) recordAnswer(FN[c.fn].skill, good);
+      if (!good) bad.push(i);
+    });
+    if (!bad.length) { B.ok = true; B.msgs = []; if (!isClasse()) { gain(10); S.bands = (S.bands || 0) + 1; save(); } beep(true); announce("Bravo ! Les trois bandes sont justes."); draw("#bok"); return; }
+    beep(false);
+    B.msgs = bad.map((i) => "« " + B.sent.ch[i].t + " » " + BANDS.find((b) => b.k === bandOf(B.sent.ch[i].fn)).why + " Il va sur la " + BANDS.find((b) => b.k === bandOf(B.sent.ch[i].fn)).name.toLowerCase() + ".");
+    bad.forEach((i) => delete B.place[i]);
+    announce("Pas tout à fait. " + bad.length + " groupe" + (bad.length > 1 ? "s sont" : " est") + " à replacer.");
+    draw("#bmsg");
+  }
+  function runTest(kind) {
+    const B = UI.bands, sent = B.sent, sT = (f) => sentText(sent.ch.filter(f));
+    const ci = sent.ch.findIndex((c) => c.fn === "CC");
+    if (kind === "eb") B.test = { t: "J'efface la bande bleue", text: sT((c) => c.fn !== "S"), verdict: "no", msg: "On ne sait plus de qui on parle. La bande bleue ne s'efface pas." };
+    if (kind === "ej") B.test = { t: "J'efface la bande jaune", text: sT((c) => c.fn === "S" || c.fn === "CC"), verdict: "no", msg: "On ne dit plus rien du sujet : la phrase est vide. La bande jaune ne s'efface pas." };
+    if (kind === "ev") B.test = { t: "J'efface la bande verte", text: sT((c) => c.fn !== "CC"), verdict: "ok", msg: "La phrase reste correcte : la bande verte s'efface." };
+    if (kind === "dv") { const r = doMove(sent, ci); B.test = { t: "Je déplace la bande verte", text: r.text, verdict: "ok", msg: "La phrase sonne juste : la bande verte se déplace." }; }
+    announce(B.test.t + " : " + VERD[B.test.verdict][0]);
+    draw("#btest");
+  }
+  function draw(focus) {
+    const B = UI.bands, sent = B.sent, all = sent.ch.length, placed = Object.keys(B.place).length, hasCC = sent.ch.some((c) => c.fn === "CC");
+    fill(holder,
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn primary", on: { click: nextSentence } }, ico("star"), "Phrase nouvelle"),
+        speakBtn(() => plain(sent), "Écouter la phrase")),
+      h("div", { class: "card", style: "margin:1rem 0" },
+        h("p", { class: "muted small", style: "margin:0 0 .4rem" }, "La phrase"),
+        h("p", { class: "out", id: "bsent", tabindex: "-1", style: "margin:0" }, plain(sent))),
+      B.ok ? null : h("div", { class: "card", style: "margin-bottom:1rem" },
+        h("h2", null, "Groupes à placer (" + (all - placed) + ")"),
+        h("div", { class: "sent", role: "group", "aria-label": "Groupes à placer" }, sent.ch.map((c, i) => B.place[i] ? null : h("div", { class: "chunkwrap" }, tile(i)))),
+        h("p", { class: "muted small", style: "margin:.6rem 0 0" }, B.sel === null ? "Touche un groupe, puis touche la bande où il va." : "Groupe choisi : « " + sent.ch[B.sel].t + " ». Touche maintenant une bande.")),
+      h("div", { class: "bands" }, BANDS.map((b) => h("section", { class: "band b-" + b.k, "aria-label": b.name + " : " + b.q },
+        h("h3", null, h("span", { class: "bsym", "aria-hidden": "true" }, b.sym), " " + b.name),
+        h("p", { class: "muted small", style: "margin:0 0 .5rem" }, b.q),
+        h("div", { class: "bandtiles" }, sent.ch.map((c, i) => B.place[i] === b.k ? h("div", { class: "chunkwrap" }, tile(i, B.ok ? "ok" : "")) : null)),
+        B.ok ? null : h("button", { type: "button", class: "btn", disabled: B.sel === null, on: { click: () => { B.place[B.sel] = b.k; B.sel = null; B.msgs = []; draw("#bsent"); } } }, ico("plus"), "Placer ici", h("span", { class: "sr" }, " sur la " + b.name.toLowerCase()))))),
+      B.msgs.length ? h("div", { class: "verdict v-no", id: "bmsg", tabindex: "-1", role: "status" }, ico("cross"), h("div", null, h("p", { class: "res" }, "Pas tout à fait : ces groupes sont à replacer"), B.msgs.map((m) => h("p", { style: "margin:.2rem 0" }, m)))) : null,
+      !B.ok ? h("div", { class: "row", style: "margin:1rem 0" },
+        h("button", { type: "button", class: "btn primary", disabled: placed < all, on: { click: verify } }, ico("check"), "Vérifier mes bandes"),
+        placed < all ? h("span", { class: "muted small" }, "Il reste " + (all - placed) + " groupe" + (all - placed > 1 ? "s" : "") + " à placer.") : null) : null,
+      B.ok ? h("div", { class: "card brand", style: "margin-top:1rem" },
+        h("div", { class: "mascot" }, buddy(), h("div", { class: "bubble", id: "bok", tabindex: "-1" }, h("p", null, "Bravo, les trois bandes sont justes !" + (isClasse() ? "" : " +10 points."), " Maintenant, je teste les bandes avec les manipulations."))),
+        h("div", { class: "row", style: "margin-top:.8rem" },
+          h("button", { type: "button", class: "btn", on: { click: () => runTest("eb") } }, ico("erase"), "Effacer la bande bleue"),
+          h("button", { type: "button", class: "btn", on: { click: () => runTest("ej") } }, ico("erase"), "Effacer la bande jaune"),
+          hasCC ? h("button", { type: "button", class: "btn", on: { click: () => runTest("ev") } }, ico("erase"), "Effacer la bande verte") : null,
+          hasCC ? h("button", { type: "button", class: "btn", on: { click: () => runTest("dv") } }, ico("move"), "Déplacer la bande verte") : null),
+        hasCC ? null : h("p", { class: "muted small" }, "Cette phrase n'a pas de bande verte. Essaie une autre phrase pour tester le vert."),
+        B.test ? h("div", { id: "btest", tabindex: "-1", style: "margin-top:1rem" }, h("h2", null, B.test.t), h("p", { class: "out" }, "« " + B.test.text + " »"), verdictBox({ verdict: B.test.verdict, msg: B.test.msg })) : null,
+        h("p", { style: "margin-top:1rem" }, "Dans la bande jaune, le verbe et ses compléments sont ensemble. Pour les séparer (verbe, COD, COI), j'utilise « remplacer » avec les quatre outils."),
+        h("div", { class: "row" },
+          h("button", { type: "button", class: "btn primary", on: { click: () => { UI.gen = sent; UI.lab = freshLab(sent, "gen"); UI.manipTab = "outils"; render(); } } }, ico("tag"), "Continuer avec les quatre outils"),
+          h("button", { type: "button", class: "btn", on: { click: nextSentence } }, ico("star"), "Phrase nouvelle"))) : null);
+    if (focus) { const f = $(focus, holder); if (f) f.focus(); }
+  }
+}
+
+/* ----- Impression (mémo, fiche) ----- */
+function printZone(node, kind) {
+  const old = $("#printzone"); if (old) old.remove();
+  const z = h("div", { id: "printzone" }); z.append(node.cloneNode(true));
+  document.body.append(z); document.body.dataset.print = kind;
+  const clean = () => { delete document.body.dataset.print; const e = $("#printzone"); if (e) e.remove(); window.removeEventListener("afterprint", clean); };
+  window.addEventListener("afterprint", clean);
+  setTimeout(() => { try { window.print(); } catch (e) { clean(); } }, 60);
+}
+
+/* ----- Mon mémo (rempli par l'élève avec ses mots) ----- */
+const MEMO_ITEMS = [
+  { k: "S", q: "De qui ou de quoi je parle ? Je trouve le sujet avec…" },
+  { k: "V", q: "Qu'est-ce que j'en dis ? Je trouve le verbe avec…" },
+  { k: "COD", q: "Je reconnais le COD parce que…" },
+  { k: "COI", q: "Je reconnais le COI parce que…" },
+  { k: "CC", q: "Où ? Quand ? Comment ? Je reconnais le CC parce que…" },
+];
+function memoNode(print) {
+  const M = S.memo || {};
+  return h("div", { class: "memosheet" },
+    h("h1", null, "Mon mémo des phrases" + (S.name ? " · " + S.name : "")),
+    MEMO_ITEMS.map((it) => h("section", { class: "memoitem" },
+      h("h2", null, FN[it.k].name), h("p", { class: "q" }, it.q),
+      h("p", { class: "mine" }, (M[it.k] && M[it.k].how) || (print ? "……………………………………………………" : "—")),
+      h("p", { class: "ex" }, h("b", null, "Mon exemple : "), (M[it.k] && M[it.k].ex) || (print ? "………………………………" : "—")))));
+}
+function memoView(root) {
+  S.memo = S.memo || {};
+  const msg = h("p", { role: "status", class: "muted small" });
+  put(root, h("p", null, "Je construis mon mémo avec mes mots. Je le garde sur cet appareil et je peux l'imprimer."),
+    MEMO_ITEMS.map((it) => {
+      const cur = S.memo[it.k] || (S.memo[it.k] = { how: "", ex: "" });
+      return h("div", { class: "card", style: "margin-bottom:1rem" },
+        h("div", { class: "row" }, fnBadge(it.k)),
+        h("label", { for: "mh-" + it.k, style: "display:block;font-weight:600;margin:.4rem 0 .2rem" }, it.q),
+        h("textarea", { id: "mh-" + it.k, class: "bilan", rows: "2", maxlength: "180", on: { change: (e) => { cur.how = e.target.value.trim().slice(0, 180); save(); msg.textContent = "Mémo enregistré."; } } }, cur.how),
+        h("label", { for: "me-" + it.k, style: "display:block;font-weight:600;margin:.4rem 0 .2rem" }, "Mon exemple"),
+        h("input", { id: "me-" + it.k, type: "text", maxlength: "90", value: cur.ex, style: "width:100%", on: { change: (e) => { cur.ex = e.target.value.trim().slice(0, 90); save(); msg.textContent = "Mémo enregistré."; } } }));
+    }),
+    h("div", { class: "row" },
+      h("button", { type: "button", class: "btn primary", on: { click: () => printZone(memoNode(true), "memo") } }, ico("save"), "Imprimer mon mémo"),
+      h("button", { type: "button", class: "btn ghost", on: { click: () => askDialog("Effacer mon mémo ?", "Tout ce que j'ai écrit dans mon mémo sera effacé.", "Effacer", () => { S.memo = {}; save(); render(); }) } }, ico("trash"), "Effacer mon mémo")),
+    msg);
+}
+
+/* ----- Phrase de la semaine ----- */
+const weeklySent = () => { const m = S.weekly && S.mine.find((x) => x.id === S.weekly); return m ? mineToSent(m) : null; };
+function weeklyCard() {
+  const sent = weeklySent(); if (!sent) return null;
+  return h("div", { class: "card brand", style: "margin:1rem 0" },
+    h("h2", { style: "margin-top:0" }, "Ma phrase de la semaine"),
+    h("p", { class: "out" }, plain(sent)),
+    h("a", { class: "btn primary", href: "#semaine" }, ico("play"), "Travailler ma phrase de la semaine"));
+}
+function viewSemaine(root) {
+  const sent = weeklySent();
+  put(root, ...title("Ma phrase de la semaine", "Je l'analyse, je la teste, puis j'écris une phrase qui lui ressemble."));
+  if (!sent) { put(root, h("p", null, "Il n'y a pas de phrase de la semaine pour le moment. Mon enseignant peut me donner un code, ou je choisis une de mes phrases."), h("a", { class: "btn primary", href: "#creer", on: { click: () => { UI.creerTab = "mes"; } } }, ico("build"), "Mes propres phrases")); return; }
+  S.weeklyWrite = S.weeklyWrite || {};
+  const writes = S.weeklyWrite[S.weekly] || (S.weeklyWrite[S.weekly] = []);
+  const ta = h("textarea", { class: "bilan", id: "wr", rows: "2", maxlength: "160", "aria-label": "Ma phrase" });
+  const list = h("div");
+  const drawList = () => fill(list, writes.length ? h("div", null, h("h3", null, "Mes phrases écrites"), h("ul", null, writes.map((w) => h("li", null, w)))) : null);
+  put(root,
+    h("div", { class: "card" }, h("p", { class: "muted small", style: "margin:0" }, "La phrase"), h("p", { class: "out", style: "margin:0" }, plain(sent)), h("div", { class: "row" }, speakBtn(() => plain(sent), "Écouter la phrase"))),
+    h("ol", { class: "steps", style: "margin-top:1rem" },
+      h("li", null, h("span", null, h("b", null, "Je place les groupes sur les trois bandes. "),
+        h("button", { type: "button", class: "btn", on: { click: () => { UI.bands = freshBands(sent); UI.manipTab = "bandes"; go("manipulations"); } } }, ico("tag"), "Les trois bandes"))),
+      h("li", null, h("span", null, h("b", null, "Je teste chaque groupe avec les quatre outils. "),
+        h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = null; UI.lab = freshLab(sent, "mine:" + S.weekly); UI.manipTab = "outils"; go("manipulations"); } } }, ico("tag"), "Les quatre outils"))),
+      h("li", null, h("span", null, h("b", null, "J'écris une phrase qui lui ressemble."), " Elle a un sujet et un verbe. Je peux ajouter un COD, un COI ou un CC, puis je la teste."))),
+    h("label", { for: "wr", class: "sr" }, "Ma phrase"), ta,
+    h("div", { class: "row", style: "margin-top:.5rem" },
+      h("button", { type: "button", class: "btn primary", on: { click: () => { const v = ta.value.trim(); if (!v) { announce("Écris d'abord ta phrase."); ta.focus(); return; } writes.unshift(v.slice(0, 160)); writes.length = Math.min(writes.length, 8); save(); ta.value = ""; drawList(); announce("Phrase enregistrée."); } } }, ico("save"), "Enregistrer ma phrase"),
+      h("a", { class: "btn", href: "#creer", on: { click: () => { UI.creerTab = "mes"; } } }, ico("build"), "La tester dans « Mes propres phrases »")),
+    list);
+  drawList();
+}
+
+/* ----- Fiche d'entraînement imprimable (espace enseignant) ----- */
+function ficheSentences(n, src) {
+  const out = [], seen = new Set();
+  for (let k = 0; k < 200 && out.length < n; k++) {
+    let s;
+    if (src === "mes") { if (!S.mine.length) break; s = mineToSent(S.mine[rnd(S.mine.length)]); }
+    else if (src === "depart") s = pick(SENT);
+    else s = randomSentence({ CC: Math.random() < 0.8 });
+    const t = plain(s);
+    if (seen.has(t)) continue;
+    seen.add(t); out.push(s);
+  }
+  return out;
+}
+function ficheNode(sents, key) {
+  const root = h("div", { class: "memosheet fiche" });
+  const head = (t) => h("div", null, h("h1", null, t), h("p", { class: "pzname" }, "Prénom : ………………………………   Date : …………………"));
+  root.append(head("Fiche d'entraînement : je retrouve les groupes de la phrase"),
+    h("p", null, "Pour chaque phrase, j'écris sous chaque groupe sa fonction : ", h("b", null, "Sujet, Verbe, COD, COI ou CC"), ". Puis, si la phrase a un COD ou un COI, j'écris le petit mot qui le remplace (le, la, l', les, lui, leur, y, en)."));
+  sents.forEach((s, n) => {
+    const rp = s.ch.findIndex((c) => c.fn === "COD" || c.fn === "COI");
+    root.append(h("div", { class: "pzitem" },
+      h("p", { class: "pzn" }, h("b", null, (n + 1) + ". "), plain(s)),
+      h("div", { class: "pzgroups" }, s.ch.map((c, i) => h("div", { class: "pzg" }, h("div", { class: "pzbox" }, i === 0 ? cap(c.t) : c.t), h("div", { class: "pzline" }, "………………")))),
+      rp >= 0 ? h("p", { class: "pzrep" }, "Petit mot qui remplace le complément du verbe : ………………") : null));
+  });
+  if (key) {
+    root.append(h("div", { class: "pzbreak" }), h("h1", null, "Corrigé"));
+    sents.forEach((s, n) => {
+      const cc = s.ch.map((c, i) => (i === 0 ? cap(c.t) : c.t) + " (" + FN[c.fn].name + (c.fn === "COD" || c.fn === "COI" ? " → " + doReplace(s, i).pron : "") + ")").join(" | ");
+      root.append(h("p", { class: "pzkey" }, h("b", null, (n + 1) + ". "), cc));
+    });
+  }
+  return root;
+}
+function ficheCard(box) {
+  const st = { n: 8, src: "nouvelles", key: true, sents: null };
+  const holder = h("div");
+  put(box, h("div", { class: "card", style: "margin-top:1.4rem" }, h("h2", null, "Fiche d'entraînement à imprimer"),
+    P("Je crée une fiche de phrases (nouvelles, de départ ou les miennes) avec un corrigé, puis je l'imprime ou je l'enregistre en PDF."), holder));
+  draw();
+  function draw() {
+    const sel = (id, label, opts, cur, fn) => h("label", { style: "display:inline-flex;gap:.4rem;align-items:center;margin-right:1rem" }, label, h("select", { id, on: { change: (e) => fn(e.target.value) } }, opts.map(([v, l]) => h("option", { value: v, selected: String(v) === String(cur) }, l))));
+    fill(holder,
+      h("div", { class: "row" },
+        sel("fn", "Phrases", [[6, "6"], [8, "8"], [10, "10"], [12, "12"]], st.n, (v) => { st.n = Number(v); }),
+        sel("fs", "Source", [["nouvelles", "Nouvelles"], ["depart", "De départ"], ...(S.mine.length ? [["mes", "Mes phrases"]] : [])], st.src, (v) => { st.src = v; }),
+        h("label", { style: "display:inline-flex;gap:.4rem;align-items:center" }, h("input", { type: "checkbox", checked: st.key, on: { change: (e) => { st.key = e.target.checked; } } }), "Avec le corrigé")),
+      h("div", { class: "row", style: "margin-top:.6rem" },
+        h("button", { type: "button", class: "btn primary", on: { click: () => { st.sents = ficheSentences(st.n, st.src); draw(); } } }, ico("dice"), st.sents ? "Nouvelle fiche" : "Créer la fiche"),
+        st.sents ? h("button", { type: "button", class: "btn", on: { click: () => printZone(ficheNode(st.sents, st.key), "fiche") } }, ico("save"), "Imprimer") : null),
+      st.sents ? h("div", { class: "card", style: "margin-top:1rem;overflow:auto" }, ficheNode(st.sents, st.key)) : null);
   }
 }
 /* ======================================================= APPRENDRE */
@@ -1875,8 +2246,11 @@ const LESSONS = [
     P("Le COD complète le verbe, ", h("b", null, "sans petit mot"), " entre les deux (pas de à, pas de de). Il répond à « qui ? » ou « quoi ? » après le verbe."),
     h("ol", { class: "steps" },
       h("li", null, h("span", null, "Je le ", h("b", null, "remplace"), " par ", h("b", null, "le, la, l', les"), ".")),
-      h("li", null, h("span", null, "Je teste : il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), "."))),
+      h("li", null, h("span", null, "Je teste : en général il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), " tel quel."))),
     demo(SENT[0], 3, "remplacer"), demo(SENT[0], 3, "effacer"), demo(SENT[0], 3, "deplacer"),
+    h("h3", { style: "margin-top:1rem" }, "Attention : effacer ne suffit pas"),
+    P("Avec certains verbes (", h("b", null, "manger, lire, chanter, dessiner"), "), on peut passer de « Je mange une pomme » à « Je mange ». La phrase reste possible, mais on ne sait plus ce que l'on mange. Le COD peut donc parfois s'effacer : je fais ", h("b", null, "toujours un deuxième test"), " avec remplacer."),
+    demo(SENT[25], 3, "effacer"), demo(SENT[25], 3, "remplacer"),
     P(h("b", null, "Attention : "), "devant une voyelle ou un h, « le » et « la » deviennent « l' »."),
     demo(L_ELI(), 2, "remplacer"),
     h("div", { class: "row" }, fnBadge("COD"))] },
@@ -1887,6 +2261,9 @@ const LESSONS = [
       h("li", null, h("span", null, "Pour une chose, je le remplace souvent par ", h("b", null, "y"), ".")),
       h("li", null, h("span", null, "Effacer n'est pas un test sûr pour un COI : je préfère remplacer."))),
     demo(SENT[7], 4, "remplacer"), demo(SENT[0], 4, "remplacer"), demo(SENT[6], 3, "remplacer"), demo(SENT[7], 4, "effacer"),
+    h("h3", { style: "margin-top:1rem" }, "Attention à du, de la, des"),
+    P("Ces petits mots peuvent être un article (COD) ou contenir « de » (COI). « Max mange ", h("b", null, "du pain"), " » : COD, Max en mange. « Les touristes profitent ", h("b", null, "du soleil"), " » : COI, ils en profitent."),
+    demo(TRAPS[2], 2, "remplacer"), demo(TRAPS[1], 2, "remplacer"),
     h("div", { class: "row" }, fnBadge("COI"))] },
   { id: "l6", title: "Je compare tout", skill: null, lab: "s16", body: () => [
     h("div", { class: "overflow" }, h("table", { class: "cmp" },
@@ -1896,8 +2273,8 @@ const LESSONS = [
         ["V", "ne...pas autour", "Non", "Non", "Je change le temps"],
         ["S", "c'est...qui", "Non", "Non", "il, elle, ils, elles"],
         ["CC", "et cela se passe", "Oui", "Oui", "Rien à remplacer"],
-        ["COD", "le, la, l', les", "Non", "Non", "le, la, l', les"],
-        ["COI", "lui, leur, y", "Pas sûr", "Non", "lui, leur, y"],
+        ["COD", "le, la, l', les", "Non, sauf manger, lire…", "Pas tel quel", "le, la, l', les"],
+        ["COI", "lui, leur, y, en", "Pas sûr", "Pas tel quel", "lui, leur, y, en"],
       ].map(([k, ...r]) => h("tr", null, h("th", { scope: "row" }, fnBadge(k)), r.map((x) => h("td", null, x))))))),
     h("h3", { style: "margin-top:1.2rem" }, "Mon ordre de recherche"),
     h("ol", { class: "steps" },
@@ -1905,7 +2282,7 @@ const LESSONS = [
       h("li", null, h("span", null, "Je cherche le ", h("b", null, "sujet"), " (c'est...qui).")),
       h("li", null, h("span", null, "J'efface et je déplace : si ça marche, c'est un ", h("b", null, "CC"), ".")),
       h("li", null, h("span", null, "Je remplace : le, la, l', les, c'est un ", h("b", null, "COD"), " ; lui, leur, y, c'est un ", h("b", null, "COI"), "."))),
-    P("Si j'hésite, je fais un deuxième test.")] },
+    P("Si j'hésite, je fais un deuxième test. Un seul test peut tromper : « Je mange une pomme » s'efface, et pourtant c'est un COD.")] },
 ];
 
 function viewApprendre(root) {
@@ -2035,7 +2412,7 @@ function voiceBox() {
 try { if (canSpeak()) speechSynthesis.addEventListener("voiceschanged", () => { const d = $("#dlg"); if (d && d.open && d.querySelector("#voice") === null) openSettings(); }); } catch (e) {}
 
 /* ======================================================= ROUTEUR ET DÉMARRAGE */
-const ROUTES = { accueil: viewAccueil, entrainer: viewEntrainer, creer: viewCreer, manipulations: viewManipulations, apprendre: viewApprendre, parcours: viewParcours, enseignant: viewEnseignant };
+const ROUTES = { accueil: viewAccueil, entrainer: viewEntrainer, creer: viewCreer, manipulations: viewManipulations, semaine: viewSemaine, apprendre: viewApprendre, parcours: viewParcours, enseignant: viewEnseignant };
 const NAV = [["accueil", "Accueil", "home"], ["parcours", "Mon parcours", "path"], ["apprendre", "Apprendre", "book"], ["manipulations", "Manipulations", "tag"], ["entrainer", "S'entraîner", "quiz"], ["creer", "Créer", "build"]];
 const fsOn = () => document.fullscreenElement || document.webkitFullscreenElement;
 const fsOk = () => !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
