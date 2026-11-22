@@ -212,7 +212,7 @@ select { font: inherit; letter-spacing: inherit; min-height: 3rem; padding: .3re
 <header class="top"><div class="wrap top-row" id="topbar"></div></header>
 <nav class="main" aria-label="Espaces de l’application"><div class="wrap"><ul id="navlist" style="list-style:none;margin:0;padding:.5rem 0;display:flex;flex-wrap:wrap;gap:.5rem"></ul></div></nav>
 <div class="wrap"><main id="main" tabindex="-1"></main></div>
-<footer class="foot"><div class="wrap"><a href="#enseignant">Espace enseignant</a> · Manip’Phrases, EPS Mania</div></footer>
+<footer class="foot"><div class="wrap"><a href="#enseignant">Espace enseignant</a> · Manip’Phrases, conçu par Christophe Honthaas, formateur à la Faculté d’Éducation de Perpignan</div></footer>
 <div id="live" class="sr" aria-live="polite" role="status"></div>
 <div id="toast" class="toast" hidden></div>
 <dialog id="dlg" aria-labelledby="dlgt"></dialog>
@@ -318,7 +318,7 @@ function doErase(sent, i) {
   const c = sent.ch[i];
   const chs = sent.ch.filter((_, k) => k !== i);
   const text = sentText(chs);
-  if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase tient debout. Un CC s'efface sans problème." };
+  if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase reste correcte. Un CC s'efface sans problème." };
   if (c.fn === "COD") return { text, verdict: "no", msg: "La phrase est incomplète : il manque l'information importante. Un COD ne s'efface pas." };
   if (c.fn === "COI") return { text, verdict: "meh", msg: "La phrase peut rester possible, mais on perd une information importante. Ce test n'est pas sûr pour un COI : je préfère remplacer par lui, leur, y." };
   if (c.fn === "S") return { text, verdict: "no", msg: "La phrase n'est plus correcte : il n'y a plus personne qui agit. Le sujet ne s'efface pas." };
@@ -502,7 +502,7 @@ function genQuestion(skill) {
       const i = Math.random() < 0.5 && ccs.length ? pick(ccs) : pick(cands);
       const c = sent.ch[i];
       const r = doErase(sent, i);
-      return { type: "erase", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase tient-elle encore debout ?", options: [{ id: "o", label: "Oui, elle tient debout" }, { id: "n", label: "Non, elle est incomplète" }], correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
+      return { type: "erase", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase reste-t-elle correcte ?", options: [{ id: "o", label: "Oui, elle reste correcte" }, { id: "n", label: "Non, elle est incomplète" }], correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
     }
     if (t === "move") {
       const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn === "CC" || sent.ch[i].fn === "COD");
@@ -550,7 +550,7 @@ function genQuestion(skill) {
 
 /* --- Cartes mémoire --- */
 const CARDS = [
-  { id: "c1", skill: "cc", f: "À quoi sert l'outil EFFACER ?", b: "J'enlève un groupe de mots. Si la phrase tient encore debout, c'est peut-être un CC." },
+  { id: "c1", skill: "cc", f: "À quoi sert l'outil EFFACER ?", b: "J'enlève un groupe de mots. Si la phrase reste correcte, c'est peut-être un CC." },
   { id: "c2", skill: "cc", f: "À quoi sert l'outil DÉPLACER ?", b: "Je change un groupe de place. Si la phrase sonne juste, c'est un CC." },
   { id: "c3", skill: "cod", f: "À quoi sert l'outil REMPLACER ?", b: "Je mets un petit mot à la place du groupe : le, la, l', les pour un COD ; lui, leur, y pour un COI." },
   { id: "c4", skill: "verbe", f: "À quoi sert l'outil AJOUTER ?", b: "J'ajoute des mots pour tester : ne...pas pour le verbe, c'est...qui pour le sujet, « et cela se passe » pour le CC." },
@@ -884,7 +884,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 15. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 24. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1037,7 +1037,7 @@ function cardsView(box, draw) {
 /* ======================================================= ÉTIQUETTES */
 // Dans l'espace manipulations, le résultat d'un test ne dit jamais la fonction : c'est à l'élève de la trouver.
 function neutralMsg(tool, c, res) {
-  if (tool === "effacer") return res.verdict === "ok" ? "La phrase tient debout." : res.verdict === "meh" ? "La phrase reste possible, mais on perd une information importante. Ce test n'est pas très sûr : essaie un autre outil." : "La phrase est incomplète ou n'a plus de sens.";
+  if (tool === "effacer") return res.verdict === "ok" ? "La phrase reste correcte." : res.verdict === "meh" ? "La phrase reste possible, mais on perd une information importante. Ce test n'est pas très sûr : essaie un autre outil." : "La phrase est incomplète ou n'a plus de sens.";
   if (tool === "deplacer") return res.verdict === "ok" ? "La phrase sonne juste à la nouvelle place." : "La phrase sonne faux.";
   if (tool === "remplacer") return res.verdict === "ok" ? "Ça marche avec « " + res.pron + " »." : "Aucun petit mot (le, la, l', les, lui, leur, y) ne remplace ce groupe.";
   if (res.verdict !== "ok") return "Ce test n'aide pas ici. Essaie un autre outil.";
@@ -1329,7 +1329,7 @@ const LESSONS = [
   { id: "l3", title: "Le CC (complément de phrase)", skill: "cc", lab: "s2", body: () => [
     P("Le CC donne une information en plus : ", h("b", null, "quand ?"), ", ", h("b", null, "où ?"), " ou ", h("b", null, "comment ?"), ". On l'appelle aussi complément de phrase."),
     h("ol", { class: "steps" },
-      h("li", null, h("span", null, "Je l'", h("b", null, "efface"), " : la phrase tient encore debout.")),
+      h("li", null, h("span", null, "Je l'", h("b", null, "efface"), " : la phrase reste correcte.")),
       h("li", null, h("span", null, "Je le ", h("b", null, "déplace"), " : la phrase sonne toujours juste.")),
       h("li", null, h("span", null, "J'ajoute « ", h("b", null, "et cela se passe"), " » ou « ", h("b", null, "et il le fait"), " » : ça marche."))),
     demo(SENT[1], 3, "effacer"), demo(SENT[1], 3, "deplacer"), demo(SENT[1], 3, "ajouter"),
