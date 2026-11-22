@@ -981,7 +981,7 @@ const VERD = { ok: ["Ça marche", "check", "v-ok"], no: ["Ça ne marche pas", "c
 
 /* ===== MÉMOIRE LOCALE (avec secours si le stockage est bloqué) ===== */
 const KEY = "manip-phrases-v1";
-const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "astronaute", heroSet: false, mood: "classique" }, mine: [] };
+const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "astronaute", heroSet: false, mood: "classique" }, mine: [], okq: {} };
 function loadStore() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
 let S = (function () {
   const l = loadStore() || {};
@@ -1017,6 +1017,21 @@ const BADGES = [
 function gain(xp) { S.xp += xp; save(); refreshPill(); checkBadges(); }
 function checkBadges() {
   BADGES.forEach((b) => { if (!S.badges[b.id] && b.test()) { S.badges[b.id] = 1; save(); toast("Nouveau badge : " + b.name, b.ico); } });
+}
+/* Questions réussies : on garde une empreinte courte de chaque question réussie pour ne pas la reposer */
+function qKey(q) {
+  const t = q.type + "|" + q.prompt + "|" + (q.sent ? plain(q.sent) : "") + "|" + (q.target == null ? "" : q.target) + "|" + q.options.map((o) => o.label).slice().sort().join("/");
+  let a = 5381, b = 52711;
+  for (let i = 0; i < t.length; i++) { const c = t.charCodeAt(i); a = ((a * 33) ^ c) >>> 0; b = ((b * 31) + c) >>> 0; }
+  return a.toString(36) + b.toString(36);
+}
+function okCount() { return Object.keys(S.okq || {}).length; }
+function rememberQ(q, good) {
+  if (!S.okq) S.okq = {};
+  const k = q.key || qKey(q);
+  if (good) { delete S.okq[k]; S.okq[k] = 1; const ks = Object.keys(S.okq); if (ks.length > 4000) ks.slice(0, ks.length - 4000).forEach((x) => delete S.okq[x]); }
+  else delete S.okq[k];
+  save();
 }
 function recordAnswer(skill, ok) {
   const s = S.stats[skill] || (S.stats[skill] = { n: 0, k: 0 });
@@ -1235,16 +1250,22 @@ const skillOpts = () => [["tous", "Un peu de tout", null], ...SK.map((s) => [s.k
 
 const MODES = () => [["nouvelles", "Des phrases nouvelles (créées par l\u2019appli)"], ["mix", "Un mélange"], ["depart", "Les " + SENT.length + " phrases de départ"], ...(S.mine.length ? [["mes", "Mes phrases ajoutées (" + S.mine.length + ")"]] : [])];
 function startQuiz(skill, len) {
-  const list = [], seen = new Set();
+  const list = [], seen = new Set(), later = [];
   let guard = 0;
-  while (list.length < len && guard++ < 600) {
+  while (list.length < len && guard++ < 900) {
     const q = genQuestion(skill);
     if (!q) break;
     const key = q.type + "|" + q.prompt + "|" + (q.sent ? plain(q.sent) : "") + "|" + q.target;
     if (seen.has(key)) continue;
-    seen.add(key); list.push(q);
+    seen.add(key);
+    q.key = qKey(q);
+    if (S.okq && S.okq[q.key]) { later.push(q); continue; }
+    list.push(q);
   }
-  UI.quiz = { skill, list, i: 0, right: 0, sel: null, hint: false, weak: {} };
+  // Si presque tout est déjà réussi, on complète avec d'anciennes questions (les moins récentes d'abord)
+  let repeats = 0;
+  while (list.length < len && later.length) { list.push(later.shift()); repeats++; }
+  UI.quiz = { skill, list, i: 0, right: 0, sel: null, hint: false, weak: {}, repeats };
 }
 function quizView(box, draw) {
   const Q = UI.quiz;
@@ -1254,7 +1275,9 @@ function quizView(box, draw) {
       radioGroup("Qu'est-ce que je travaille ?", "qs", skillOpts(), UI.quizSkill, (v) => { UI.quizSkill = v; }),
       radioGroup("Quelles phrases ?", "qm", MODES(), UI.sentMode, (v) => { UI.sentMode = v; }),
       radioGroup("Combien de questions ?", "ql", [[5, "5 questions"], [8, "8 questions"], [12, "12 questions"]], UI.quizLen, (v) => { UI.quizLen = Number(v); }),
-      h("button", { type: "button", class: "btn primary", on: { click: () => { setSentMode(UI.sentMode); startQuiz(UI.quizSkill, UI.quizLen); if (!UI.quiz.list.length) { UI.quiz = null; toast("Pas de question pour ce choix.", "ask"); return; } draw("#qtitle"); } } }, ico("play"), "C'est parti !"));
+      h("button", { type: "button", class: "btn primary", on: { click: () => { setSentMode(UI.sentMode); startQuiz(UI.quizSkill, UI.quizLen); if (!UI.quiz.list.length) { UI.quiz = null; toast("Pas de question pour ce choix.", "ask"); return; } if (UI.quiz.repeats) toast("Tu as déjà réussi presque toutes les questions de ce choix : " + UI.quiz.repeats + " reviennent.", "ask"); draw("#qtitle"); } } }, ico("play"), "C'est parti !"),
+      okCount() ? h("p", { class: "muted", style: "margin-top:.8rem" }, "Questions déjà réussies (elles ne sont plus posées) : ", h("b", null, String(okCount())), " ",
+        h("button", { type: "button", class: "btn ghost", on: { click: () => askDialog("Oublier mes questions réussies ?", "Elles pourront être posées de nouveau. Ta progression et tes badges ne changent pas.", "Oui, oublier", () => { S.okq = {}; save(); draw(); }) } }, "Tout oublier")) : null);
     return;
   }
   if (Q.i >= Q.list.length) return quizEnd(box, draw);
@@ -1289,7 +1312,7 @@ function quizView(box, draw) {
   function answer(id) {
     const good = id === q.correct;
     Q.sel = id; if (good) Q.right++; else Q.weak[q.skill] = (Q.weak[q.skill] || 0) + 1;
-    recordAnswer(q.skill, good); beep(good);
+    recordAnswer(q.skill, good); rememberQ(q, good); beep(good);
     draw("#nextq");
   }
   if (!answered && S.settings.auto && Q._said !== Q.i) { Q._said = Q.i; say(q.prompt + " " + (q.sent ? plain(q.sent) : "")); }
