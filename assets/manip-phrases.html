@@ -77,7 +77,14 @@ main:focus, #title:focus { outline: none; }
 .small { font-size: .85rem; }
 .pill { display: inline-flex; align-items: center; gap: .35rem; padding: .1rem .7rem; border: 2px solid var(--line); border-radius: 999px; font-size: .85rem; background: var(--surf); }
 
-/* Magma, la mascotte */
+.heroes { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .7rem; margin: .6rem 0; }
+.hero { display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .7rem .4rem; background: var(--surf); border: 3px solid var(--line); border-radius: 18px; color: var(--ink); font: inherit; cursor: pointer; }
+.hero svg { width: 64px; height: 64px; }
+.hero b { font-size: 1.05rem; }
+.hero span { font-size: .85rem; color: var(--ink2); }
+.hero[aria-pressed="true"] { border-color: var(--ink); background: var(--surf2); box-shadow: 0 0 0 3px var(--surf), 0 0 0 6px var(--ink); }
+.hero:focus-visible { outline: 4px solid var(--focus, #1E5AFF); outline-offset: 3px; }
+/* Compagnon choisi par l'élève */
 .mascot { display: flex; align-items: flex-end; gap: .8rem; }
 .mascot svg { width: 84px; height: 84px; flex: none; }
 .bubble { position: relative; background: var(--surf); border: 3px solid var(--brand); border-radius: 18px; padding: .7rem 1rem; max-width: 60ch; }
@@ -712,17 +719,47 @@ function ico(n) {
   t.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[n] + "</svg>";
   return t.content.firstChild;
 }
-function magma(size) {
+/* Compagnons au choix de l'élève (personnages originaux, même style : yeux bien visibles, sourire) */
+const HEROES = [
+  { id: "renard", name: "Roux", sp: "le renard" },
+  { id: "chouette", name: "Plume", sp: "la chouette" },
+  { id: "dragon", name: "Braise", sp: "le petit dragon" },
+  { id: "robot", name: "Bip", sp: "le robot" },
+  { id: "chat", name: "Filou", sp: "le chat" },
+  { id: "lapin", name: "Noisette", sp: "le lapin" },
+];
+const HERO_SVG = (() => {
+  const st = 'stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"';
+  const eyes = (x1, x2, y, r, pr) => '<circle cx="' + x1 + '" cy="' + y + '" r="' + r + '" fill="#fff" ' + st + '/><circle cx="' + x2 + '" cy="' + y + '" r="' + r + '" fill="#fff" ' + st + '/>' +
+    '<circle cx="' + (x1 + 1.5) + '" cy="' + (y + 1) + '" r="' + pr + '" fill="#141B34"/><circle cx="' + (x2 + 1.5) + '" cy="' + (y + 1) + '" r="' + pr + '" fill="#141B34"/>';
+  const smile = (x, y, w) => '<path d="M' + (x - w) + ' ' + y + 'q' + w + ' ' + (w * 0.9) + ' ' + (w * 2) + ' 0" fill="none" ' + st + '/>';
+  return {
+    renard: '<path d="M16 46L20 10l26 20z" fill="#F28C28" ' + st + '/><path d="M84 46L80 10 54 30z" fill="#F28C28" ' + st + '/><path d="M24 36l1-14 12 9z" fill="#5B2A12"/><path d="M76 36l-1-14-12 9z" fill="#5B2A12"/>' +
+      '<path d="M14 54C14 32 86 32 86 54 86 78 68 92 50 92S14 78 14 54z" fill="#F28C28" ' + st + '/><path d="M28 68c8-7 36-7 44 0-4 14-12 24-22 24S32 82 28 68z" fill="#fff" ' + st + '/>' +
+      eyes(36, 64, 55, 6.5, 3) + '<ellipse cx="50" cy="71" rx="5" ry="3.6" fill="#141B34"/>' + smile(50, 78, 6),
+    chouette: '<path d="M18 34L24 10l18 14z" fill="#A9743F" ' + st + '/><path d="M82 34L76 10 58 24z" fill="#A9743F" ' + st + '/>' +
+      '<ellipse cx="50" cy="58" rx="37" ry="36" fill="#A9743F" ' + st + '/><ellipse cx="50" cy="76" rx="20" ry="14" fill="#F3D9A8" ' + st + '/>' +
+      '<path d="M14 62q2 14 14 20M86 62q-2 14-14 20" fill="none" ' + st + '/>' + eyes(35, 65, 50, 12, 5.5) + '<path d="M43 60h14l-7 11z" fill="#FFB020" ' + st + '/>',
+    dragon: '<path d="M30 34L24 12l18 14z" fill="#FFC53D" ' + st + '/><path d="M70 34L76 12 58 26z" fill="#FFC53D" ' + st + '/><path d="M42 26L50 12l8 14z" fill="#FF8A3D" ' + st + '/>' +
+      '<ellipse cx="50" cy="56" rx="37" ry="33" fill="#2FB5AE" ' + st + '/><ellipse cx="50" cy="74" rx="19" ry="13" fill="#9BE3DD" ' + st + '/>' +
+      eyes(35, 65, 50, 8, 3.6) + '<circle cx="43" cy="72" r="2" fill="#141B34"/><circle cx="57" cy="72" r="2" fill="#141B34"/>' + smile(50, 78, 7),
+    robot: '<path d="M50 28V14" fill="none" ' + st + '/><circle cx="50" cy="11" r="5.5" fill="#FFC53D" ' + st + '/><rect x="10" y="48" width="9" height="22" rx="4" fill="#6F86BF" ' + st + '/><rect x="81" y="48" width="9" height="22" rx="4" fill="#6F86BF" ' + st + '/>' +
+      '<rect x="17" y="28" width="66" height="60" rx="14" fill="#8EA7D9" ' + st + '/>' + eyes(36, 64, 52, 8.5, 3.8) + '<rect x="35" y="68" width="30" height="11" rx="5.5" fill="#fff" ' + st + '/><path d="M45 68v11M55 68v11" ' + st + '/>',
+    chat: '<path d="M18 46L20 12l28 18z" fill="#A9B4C8" ' + st + '/><path d="M82 46L80 12 52 30z" fill="#A9B4C8" ' + st + '/><path d="M24 38l1-16 13 9z" fill="#F4A6B8"/><path d="M76 38l-1-16-13 9z" fill="#F4A6B8"/>' +
+      '<ellipse cx="50" cy="60" rx="38" ry="31" fill="#A9B4C8" ' + st + '/><path d="M16 62L4 57M16 70L4 72M84 62l12-5M84 70l12 2" fill="none" ' + st + '/>' +
+      eyes(35, 65, 54, 7.5, 3.4) + '<path d="M45 65h10l-5 6z" fill="#F4A6B8" ' + st + '/><path d="M42 76q4 4 8 0q4 4 8 0" fill="none" ' + st + '/>',
+    lapin: '<ellipse cx="35" cy="22" rx="10" ry="21" fill="#FFE3D1" ' + st + '/><ellipse cx="65" cy="22" rx="10" ry="21" fill="#FFE3D1" ' + st + '/><ellipse cx="35" cy="23" rx="4.5" ry="14" fill="#F4A6B8"/><ellipse cx="65" cy="23" rx="4.5" ry="14" fill="#F4A6B8"/>' +
+      '<ellipse cx="50" cy="64" rx="35" ry="29" fill="#FFE3D1" ' + st + '/>' + eyes(37, 63, 58, 7, 3.2) + '<ellipse cx="50" cy="69" rx="4.5" ry="3.2" fill="#F4A6B8" ' + st + '/><path d="M44 76q6 4 6-6 0 10 6 6" fill="none" ' + st + '/><rect x="46" y="77" width="8" height="8" rx="2" fill="#fff" ' + st + '/>',
+  };
+})();
+function heroId() { const id = S.settings.hero; return HEROES.some((x) => x.id === id) ? id : "renard"; }
+function hero() { return HEROES.find((x) => x.id === heroId()); }
+function buddy(size, id) {
   const t = document.createElement("template");
-  t.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false" style="color:var(--ink)' + (size ? ";width:" + size + "px;height:" + size + "px" : "") + '">' +
-    '<path d="M42 30c-2-9 4-12 3-20 7 4 10 10 6 16 4-2 6-6 5-10 6 6 6 15 0 19z" fill="#FFB020" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>' +
-    '<path d="M12 88L36 30h28l24 58z" fill="#B5532E" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>' +
-    '<path d="M36 30h28l-2 7H38z" fill="#FFB020" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>' +
-    '<circle cx="42" cy="56" r="6.5" fill="#fff" stroke="currentColor" stroke-width="2.5"/><circle cx="58" cy="56" r="6.5" fill="#fff" stroke="currentColor" stroke-width="2.5"/>' +
-    '<circle cx="43.5" cy="57" r="3" fill="#141B34"/><circle cx="59.5" cy="57" r="3" fill="#141B34"/>' +
-    '<path d="M42 71c4 6 12 6 16 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>';
+  t.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false" style="color:var(--ink)' + (size ? ";width:" + size + "px;height:" + size + "px" : "") + '">' + HERO_SVG[id || heroId()] + '</svg>';
   return t.content.firstChild;
 }
+const magma = buddy;
 
 /* ===== DONNÉES DE L'APPLICATION ===== */
 const SK = [
@@ -739,7 +776,7 @@ const VERD = { ok: ["Ça marche", "check", "v-ok"], no: ["Ça ne marche pas", "c
 
 /* ===== MÉMOIRE LOCALE (avec secours si le stockage est bloqué) ===== */
 const KEY = "manip-phrases-v1";
-const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9 } };
+const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "renard", heroSet: false } };
 function loadStore() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
 let S = (function () {
   const l = loadStore() || {};
@@ -892,6 +929,11 @@ function closeDlg() { const d = $("#dlg"); try { d.close(); } catch (e) { d.remo
 function refreshPill() { const p = $("#pill"); if (p) p.replaceChildren(ico("star"), "Niveau " + (level() + 1) + " · " + S.xp + " points"); }
 
 function put(el, ...kids) { el.append(...kids.flat(Infinity).filter((x) => x != null && x !== false)); }
+function heroPicker(onpick) {
+  return h("div", { class: "heroes", role: "group", "aria-label": "Choisis ton compagnon" }, HEROES.map((x) =>
+    h("button", { type: "button", class: "hero", "aria-pressed": String(S.settings.heroSet && heroId() === x.id), on: { click: () => onpick(x.id) } },
+      buddy(64, x.id), h("b", null, x.name), h("span", null, x.sp))));
+}
 function fill(el, ...kids) { el.replaceChildren(...kids.flat(Infinity).filter(Boolean)); }
 
 /* Pictogrammes d'aide (CUA : plusieurs façons de comprendre, d'agir et de s'engager) */
@@ -924,12 +966,16 @@ function viewAccueil(root) {
   const hello = S.name ? "Bonjour " + S.name + " !" : "Bonjour !";
   const nxt = nextStep();
   const msg = t.n === 0
-    ? "Je suis Magma, le petit volcan. Avec mes quatre outils, tu vas devenir un as des phrases. On commence quand tu veux !"
+    ? "Je suis " + hero().name + ", " + hero().sp + ". Avec mes quatre outils, tu vas devenir un as des phrases. On commence quand tu veux !"
     : nxt ? "Bravo pour ton travail. Prochaine étape : " + nxt.name.toLowerCase() + ". On y va ?" : "Tu as 3 étoiles partout. Tu peux encore créer des phrases ou t'amuser avec les étiquettes !";
   const nameIn = h("input", { type: "text", id: "nm", value: S.name, maxlength: "20", autocomplete: "off" });
   put(root, 
     ...title(hello),
-    h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, msg))),
+    h("div", { class: "mascot" }, buddy(), h("div", { class: "bubble" }, h("p", null, msg))),
+    !S.settings.heroSet ? h("div", { class: "card brand", style: "margin:1rem 0" },
+      h("h2", { style: "margin-top:0" }, "Choisis ton compagnon"),
+      P("Il t'accompagnera dans tout le parcours. Tu pourras en changer dans les réglages."),
+      heroPicker((id) => { S.settings.hero = id; S.settings.heroSet = true; save(); render(); })) : null,
     h("div", { class: "row", style: "margin:1rem 0" },
       h("button", { type: "button", class: "btn primary", on: { click: () => { if (nxt) { UI.quizSkill = nxt.k; UI.tab = "quiz"; UI.quiz = null; } go("entrainer"); } } }, ico("play"), nxt ? "Continuer : " + nxt.name.toLowerCase() : "S'entraîner"),
       h("button", { type: "button", class: "btn", on: { click: () => go("apprendre") } }, ico("book"), "Revoir une leçon")),
@@ -946,7 +992,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 25. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 45. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1541,6 +1587,7 @@ function openSettings() {
   d.replaceChildren(
     h("h2", null, "Mes réglages"),
     radioGroup("Apparence", "sk", [["auto", "Automatique"], ["light", "Clair"], ["dark", "Sombre"], ["hc", "Contraste fort"]], t.skin, (v) => set("skin", v)),
+    h("fieldset", null, h("legend", null, "Mon compagnon"), heroPicker((id) => { t.hero = id; t.heroSet = true; save(); openSettings(); refreshBuddies(); })),
     radioGroup("Pictogrammes", "pi", [[0, "Sans"], [1, "Avec"], [2, "Grands"]], t.picto, (v) => set("picto", Number(v))),
     radioGroup("Taille des lettres", "sz", [[1, "Normale"], [1.15, "Grande"], [1.3, "Très grande"]], t.size, (v) => set("size", Number(v))),
     h("fieldset", null, h("legend", null, "Confort"),
@@ -1559,12 +1606,12 @@ function voiceBox() {
   return h("fieldset", null, h("legend", null, "Voix de lecture"),
     vs.length ? h("div", { class: "row" },
       h("label", { for: "voice", class: "sr" }, "Choisir une voix"),
-      h("select", { id: "voice", on: { change: (e) => { S.settings.voice = e.target.value; save(); say("Bonjour, je suis Magma. Voici ma voix."); } } },
+      h("select", { id: "voice", on: { change: (e) => { S.settings.voice = e.target.value; save(); say("Bonjour, je suis " + hero().name + ". Voici ma voix."); } } },
         h("option", { value: "", selected: !S.settings.voice }, "Voix automatique"),
         vs.map((v) => h("option", { value: v.voiceURI, selected: S.settings.voice === v.voiceURI }, v.name + " (" + v.lang + ")"))))
       : P("Aucune voix française trouvée sur cet appareil. La voix automatique sera utilisée si elle existe."),
     radioGroup("Vitesse", "vr", [[0.7, "Lente"], [0.9, "Normale"], [1.1, "Rapide"]], S.settings.rate, (v) => { S.settings.rate = Number(v); save(); }),
-    speakBtn("Bonjour, je suis Magma. Voici ma voix.", "Tester la voix", "Tester la voix"));
+    speakBtn("Bonjour, je suis " + hero().name + ". Voici ma voix.", "Tester la voix", "Tester la voix"));
 }
 try { if (canSpeak()) speechSynthesis.addEventListener("voiceschanged", () => { const d = $("#dlg"); if (d && d.open && d.querySelector("#voice") === null) openSettings(); }); } catch (e) {}
 
@@ -1581,6 +1628,10 @@ function toggleFS() {
 }
 function refreshFS() { const b = $("#fs"); if (b) b.replaceChildren(ico(fsOn() ? "unfull" : "full"), fsOn() ? "Quitter le plein écran" : "Plein écran"); }
 document.addEventListener("fullscreenchange", refreshFS); document.addEventListener("webkitfullscreenchange", refreshFS);
+function refreshBuddies() {
+  const lg = document.querySelector(".logo svg"); if (lg) lg.replaceWith(buddy(44));
+  document.querySelectorAll(".mascot > svg").forEach((v) => v.replaceWith(buddy()));
+}
 function drawHeader() {
   const top = $("#topbar");
   if (!top.firstChild) {
