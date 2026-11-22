@@ -342,6 +342,18 @@ function doMove(sent, i) {
   if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase sonne juste à la nouvelle place. Un CC se déplace." };
   return { text, verdict: "no", msg: "La phrase sonne faux : ce groupe ne peut pas voyager dans la phrase. Un " + c.fn + " ne se déplace pas comme ça." };
 }
+function pronWhy(c, word) {
+  const q = "« " + c.t + " »";
+  if (c.fn === "COD") {
+    if (word === "les") return q + " est au pluriel, donc on dit « les ».";
+    if (word === "l'") return q + " est " + (c.pron === "la" ? "féminin" : "masculin") + " singulier : « " + c.pron + " » devient « l' » devant un verbe qui commence par une voyelle.";
+    if (word === "la") return q + " est féminin singulier, donc on dit « la ».";
+    return q + " est masculin singulier, donc on dit « le ».";
+  }
+  if (word === "leur") return q + " est au pluriel (plusieurs personnes), donc on dit « leur » ; pour une seule personne, on dirait « lui ».";
+  if (word === "lui") return q + " est au singulier (une seule personne), donc on dit « lui » ; pour plusieurs personnes, on dirait « leur ».";
+  return q + " désigne une chose (pas une personne), donc on dit « y ».";
+}
 function doReplace(sent, i) {
   const c = sent.ch[i];
   if (c.fn !== "COD" && c.fn !== "COI") {
@@ -356,7 +368,8 @@ function doReplace(sent, i) {
   const msg = kind === "COD"
     ? "Ça marche avec « " + word + " » (le, la, l', les) : c'est un COD."
     : "Ça marche avec « " + word + " » (lui, leur, y) : c'est un COI.";
-  return { text, verdict: "ok", msg, pron: word };
+  const why = pronWhy(c, word);
+  return { text, verdict: "ok", msg: msg + " " + why, pron: word, why };
 }
 function doAdd(sent, i) {
   const c = sent.ch[i];
@@ -394,8 +407,8 @@ function explainChunk(sent, i) {
   const c = sent.ch[i];
   const q = "« " + c.t + " »";
   if (c.fn === "CC") return q + " s'efface et se déplace : c'est un CC.";
-  if (c.fn === "COD") { const r = doReplace(sent, i); return q + " ne s'efface pas, ne se déplace pas et se remplace par « " + r.pron + " » : c'est un COD."; }
-  if (c.fn === "COI") { const r = doReplace(sent, i); return q + " se remplace par « " + r.pron + " » : c'est un COI."; }
+  if (c.fn === "COD") { const r = doReplace(sent, i); return q + " ne s'efface pas, ne se déplace pas et se remplace par « " + r.pron + " » : c'est un COD. " + r.why; }
+  if (c.fn === "COI") { const r = doReplace(sent, i); return q + " se remplace par « " + r.pron + " » : c'est un COI. " + r.why; }
   if (c.fn === "S") return q + " est encadré par " + (c.pl ? "ce sont...qui" : "c'est...qui") + " : c'est le sujet.";
   return q + " reste seul quand on met ne...pas autour : c'est le verbe.";
 }
@@ -894,7 +907,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 00. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 10. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1051,7 +1064,7 @@ function cardsView(box, draw) {
 function neutralMsg(tool, c, res) {
   if (tool === "effacer") return res.verdict === "ok" ? "La phrase reste correcte." : res.verdict === "meh" ? "La phrase reste possible, mais on perd une information importante. Ce test n'est pas très sûr : essaie un autre outil." : "La phrase est incomplète ou n'a plus de sens.";
   if (tool === "deplacer") return res.verdict === "ok" ? "La phrase sonne juste à la nouvelle place." : "La phrase sonne faux.";
-  if (tool === "remplacer") return res.verdict === "ok" ? "Ça marche avec « " + res.pron + " »." : "Aucun petit mot (le, la, l', les, lui, leur, y) ne remplace ce groupe.";
+  if (tool === "remplacer") return res.verdict === "ok" ? "Ça marche avec « " + res.pron + " ». " + res.why : "Aucun petit mot (le, la, l', les, lui, leur, y) ne remplace ce groupe.";
   if (res.verdict !== "ok") return "Ce test n'aide pas ici. Essaie un autre outil.";
   return c.fn === "V" ? "Ça marche : le mot est entouré par ne et pas." : c.fn === "S" ? "Ça marche : le groupe est entouré par c'est et qui." : "Ça marche : « et cela se passe » s'ajoute sans problème.";
 }
