@@ -301,7 +301,7 @@ select { font: inherit; letter-spacing: inherit; min-height: 3rem; padding: .3re
 /* ===== MOTEUR : phrases, manipulations, questions (pur, testable sous node) ===== */
 const VOW = /^[aeiouyàâäéèêëîïôöùûüh]/i;
 const FN = {
-  S:   { key: "S",   name: "Sujet",  short: "Sujet",  skill: "sujet", tip: "Je trouve le sujet avec c'est...qui." },
+  S:   { key: "S",   name: "Sujet",  short: "Sujet",  skill: "sujet", tip: "Je trouve le sujet avec c'est...qui ; je le remplace par il, elle, ils, elles." },
   V:   { key: "V",   name: "Verbe",  short: "Verbe",  skill: "verbe", tip: "Je trouve le verbe avec ne...pas." },
   COD: { key: "COD", name: "COD",    short: "COD",    skill: "cod",   tip: "Le COD se remplace par le, la, l', les." },
   COI: { key: "COI", name: "COI",    short: "COI",    skill: "coi",   tip: "Le COI se remplace par lui, leur, y." },
@@ -621,10 +621,28 @@ function pronWhy(c, word) {
   if (word === "lui") return q + " est au singulier (une seule personne), donc on dit « lui » ; pour plusieurs personnes, on dirait « leur ».";
   return q + " désigne une chose (pas une personne), donc on dit « y ».";
 }
+// Pronom personnel sujet : il, elle, ils, elles (genre deviné d'après le déterminant, le nom ou le prénom)
+const FEM_NAMES = new Set("léa inès emma lina jade chloé manon zoé camille louise alice lola sarah clara eva nina lucie julie marie anna sofia maëlle yasmine".split(" "));
+const FEM_NOUN = /(euse|euses|trice|trices|ère|ères|esse|esses|ette|ettes|abeille|abeilles|poule|poules|voisine|voisines|gymnaste|gymnastes|famille|grand-mère|grands-mères|fille|filles|amie|amies)$/i;
+function subjPron(c) {
+  const t = c.t.toLowerCase().replace(/’/g, "'").trim();
+  const first = t.split(/\s+/)[0];
+  let fem;
+  if (c.proper) fem = FEM_NAMES.has(t);
+  else if (c.pl) fem = /^(les|des|ses|mes|tes|ces|leurs)$/.test(first) && FEM_NOUN.test(t);
+  else fem = /^(la|une|ma|ta|sa|cette)$/.test(first) || (first === "l'" || /^l'/.test(first)) && FEM_NOUN.test(t);
+  return c.pl ? (fem ? "elles" : "ils") : (fem ? "elle" : "il");
+}
 function doReplace(sent, i) {
   const c = sent.ch[i];
+  if (c.fn === "S") {
+    const w = subjPron(c);
+    const chs = sent.ch.map((x, k) => (k === i ? { t: w, fn: "P" } : x));
+    const why = "« " + c.t + " » " + (c.proper ? "est un prénom" : "est " + (c.pl ? "pluriel" : "singulier")) + " " + (w === "elle" || w === "elles" ? "et féminin" : (c.pl || c.proper ? "" : "et masculin")) + ", donc on dit « " + w + " ».";
+    return { text: sentText(chs), verdict: "ok", pron: w, why: why.replace(/ +/g, " ").replace(" ,", ","), msg: "Ça marche avec « " + w + " » : un pronom personnel (il, elle, ils, elles) remplace le sujet." };
+  }
   if (c.fn !== "COD" && c.fn !== "COI") {
-    return { text: null, verdict: "no", msg: "Je ne peux pas remplacer ce groupe par le, la, l', les, lui, leur ou y. Ce n'est ni un COD ni un COI." };
+    return { text: null, verdict: "no", msg: "Je ne peux pas remplacer ce groupe par un petit mot (il, elle, le, la, les, lui, leur, y). Ce n'est ni le sujet, ni un COD, ni un COI." };
   }
   const chs = sent.ch.filter((_, k) => k !== i);
   const vi = chs.findIndex((x) => x.fn === "V");
@@ -695,7 +713,7 @@ function explainChunk(sent, i) {
   if (c.fn === "CC") return q + " s'efface et se déplace : c'est un CC.";
   if (c.fn === "COD") { const r = doReplace(sent, i); return q + (c.abs ? " pourrait s'effacer avec ce verbe (la phrase resterait possible, mais incomplète), ne se déplace pas tel quel et se remplace par « " : " ne s'efface pas, ne se déplace pas tel quel et se remplace par « ") + r.pron + " » : c'est un COD. " + r.why; }
   if (c.fn === "COI") { const r = doReplace(sent, i); return q + " se remplace par « " + r.pron + " » : c'est un COI. " + r.why; }
-  if (c.fn === "S") return q + " est encadré par " + (c.pl ? "ce sont...qui" : "c'est...qui") + " : c'est le sujet.";
+  if (c.fn === "S") return q + " est encadré par " + (c.pl ? "ce sont...qui" : "c'est...qui") + " et se remplace par « " + subjPron(c) + " » : c'est le sujet. Il ne s'efface pas et ne se déplace pas.";
   return q + " reste seul quand on met ne...pas autour : c'est le verbe.";
 }
 
@@ -846,7 +864,7 @@ function genQuestion(skill) {
       if (!cands.length) continue;
       const i = pick(cands);
       const c = sent.ch[i];
-      return { type: "fn", skill: FN[c.fn].skill, sent, target: i, prompt: "Quelle est la fonction du groupe encadré ?", options: FN_ORDER.map((k) => ({ id: k, label: FN[k].name, fn: k })), correct: c.fn, exp: explainChunk(sent, i), hint: c.fn === "CC" ? "J'efface le groupe, puis je le déplace." : c.fn === "COD" || c.fn === "COI" ? "Je le remplace par un petit mot : le, la, les, lui, leur, y." : c.fn === "V" ? "Je mets ne...pas autour." : "Je dis c'est...qui." };
+      return { type: "fn", skill: FN[c.fn].skill, sent, target: i, prompt: "Quelle est la fonction du groupe encadré ?", options: FN_ORDER.map((k) => ({ id: k, label: FN[k].name, fn: k })), correct: c.fn, exp: explainChunk(sent, i), hint: c.fn === "CC" ? "J'efface le groupe, puis je le déplace." : c.fn === "COD" || c.fn === "COI" ? "Je le remplace par un petit mot : le, la, les, lui, leur, y." : c.fn === "V" ? "Je mets ne...pas autour." : "Je dis c'est...qui, ou je le remplace par il, elle, ils, elles." };
     }
     if (t === "erase") {
       const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI" && !sent.ch[i].abs);
@@ -909,6 +927,7 @@ const CARDS = [
   { id: "c4", skill: "verbe", f: "À quoi sert l'outil AJOUTER ?", b: "J'ajoute des mots pour tester : ne...pas pour le verbe, c'est...qui pour le sujet, « et cela se passe » pour le CC." },
   { id: "c5", skill: "verbe", f: "Comment trouver le verbe ?", b: "Je mets ne...pas autour : « Le chien ne mord pas ». Le verbe est entre ne et pas. Je peux aussi changer le temps." },
   { id: "c6", skill: "sujet", f: "Comment trouver le sujet ?", b: "J'encadre avec c'est...qui (ou ce sont...qui). Je peux aussi le remplacer par il, elle, ils, elles." },
+  { id: "c25", skill: "sujet", f: "Par quel petit mot remplace-t-on le sujet ?", b: "Par un pronom personnel : il, elle, ils, elles. « Le facteur distribue le courrier » devient « Il distribue le courrier »." },
   { id: "c7", skill: "cc", f: "Comment reconnaître un CC ?", b: "Il s'efface et il se déplace. Il dit quand, où ou comment. Je peux ajouter « et cela se passe »." },
   { id: "c8", skill: "cod", f: "Comment reconnaître un COD ?", b: "Il complète le verbe sans préposition. En général il ne s'efface pas (sauf avec manger, lire, chanter...) et il ne se déplace pas tel quel. Je le remplace par le, la, l', les." },
   { id: "c9", skill: "coi", f: "Comment reconnaître un COI ?", b: "Il complète le verbe avec une préposition (à, de). Je le remplace par lui, leur, y." },
@@ -1332,7 +1351,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 22 h 25. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 22 h 50. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1499,7 +1518,7 @@ function cardsView(box, draw) {
 function neutralMsg(tool, c, res) {
   if (tool === "effacer") return res.verdict === "ok" ? "La phrase reste correcte." : res.verdict === "meh" ? "La phrase reste possible, mais on perd une information importante. Ce test n'est pas très sûr : essaie un autre outil." : "La phrase est incomplète ou n'a plus de sens.";
   if (tool === "deplacer") return res.verdict === "ok" ? "La phrase sonne juste à la nouvelle place." : "La phrase sonne faux.";
-  if (tool === "remplacer") return res.verdict === "ok" ? "Ça marche avec « " + res.pron + " ». " + res.why : "Aucun petit mot (le, la, l', les, lui, leur, y) ne remplace ce groupe.";
+  if (tool === "remplacer") return res.verdict === "ok" ? "Ça marche avec « " + res.pron + " ». " + res.why : "Aucun petit mot (il, elle, ils, elles, le, la, l', les, lui, leur, y) ne remplace ce groupe.";
   if (res.verdict !== "ok") return "Ce test n'aide pas ici. Essaie un autre outil.";
   return c.fn === "V" ? "Ça marche : le mot est entouré par ne et pas." : c.fn === "S" ? "Ça marche : le groupe est entouré par c'est et qui." : "Ça marche : « et cela se passe » s'ajoute sans problème.";
 }
@@ -2229,9 +2248,9 @@ const LESSONS = [
     P("Le sujet dit ", h("b", null, "qui fait l'action"), " ou ", h("b", null, "de qui on parle"), ". Le verbe s'accorde avec lui."),
     h("ol", { class: "steps" },
       h("li", null, h("span", null, "J'encadre avec ", h("b", null, "c'est...qui"), " (ou ", h("b", null, "ce sont...qui"), " au pluriel). Le sujet est entre les deux.")),
-      h("li", null, h("span", null, "Je peux le remplacer par ", h("b", null, "il, elle, ils, elles"), ".")),
+      h("li", null, h("span", null, "Je le remplace par un pronom personnel : ", h("b", null, "il, elle, ils, elles"), ". Ça marche toujours avec le sujet.")),
       h("li", null, h("span", null, "Je teste : il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), "."))),
-    demo(SENT[0], 1, "ajouter"), demo(SENT[1], 0, "ajouter"), demo(SENT[0], 1, "effacer"), demo(SENT[0], 1, "deplacer"),
+    demo(SENT[0], 1, "remplacer"), demo(SENT[1], 0, "remplacer"), demo(SENT[0], 1, "ajouter"), demo(SENT[1], 0, "ajouter"), demo(SENT[0], 1, "effacer"), demo(SENT[0], 1, "deplacer"),
     P(h("b", null, "Attention : "), "si le sujet est au pluriel, le verbe se met au pluriel aussi (les élèves lisent)."),
     h("div", { class: "row" }, fnBadge("S"))] },
   { id: "l3", title: "Le CC (complément de phrase)", skill: "cc", lab: "s2", body: () => [
