@@ -735,13 +735,13 @@ function genQuestion(skill) {
       if (!sn) continue;
       const cand = sn.ch.map((c, i) => i).filter((i) => (sn.ch[i].fn === key) === wantYes);
       const i = pick(cand), c = sn.ch[i], yes = c.fn === key, sent2 = sn;
-      return { type: "isfn", skill, sent: sent2, target: i, prompt: "Le groupe encadré est-il " + ART[key] + " ?", options: [{ id: "o", label: "Oui" }, { id: "n", label: "Non" }], correct: yes ? "o" : "n", exp: explainChunk(sent2, i) + (yes ? "" : " Ce n'est donc pas " + ART[key] + "."), hint: FN[key].tip };
+      return { type: "isfn", skill, sent: sent2, target: i, prompt: "Le groupe encadré est-il " + ART[key] + " ?", options: shuffle([{ id: "o", label: "Oui" }, { id: "n", label: "Non" }]), correct: yes ? "o" : "n", exp: explainChunk(sent2, i) + (yes ? "" : " Ce n'est donc pas " + ART[key] + "."), hint: FN[key].tip };
     }
     if (t === "vf") {
       const pool = VF.filter((v) => skill === "tous" || v.skill === skill);
       if (!pool.length) continue;
-      const v = pick(pool);
-      return { type: "vf", skill: v.skill, prompt: v.q, options: [{ id: "v", label: "Vrai" }, { id: "f", label: "Faux" }], correct: v.a ? "v" : "f", exp: v.exp, hint: "Je pense aux tests : effacer, déplacer, remplacer, ajouter." };
+      const wantT = Math.random() < 0.5, sub = pool.filter((x) => x.a === wantT), v = pick(sub.length ? sub : pool);
+      return { type: "vf", skill: v.skill, prompt: v.q, options: shuffle([{ id: "v", label: "Vrai" }, { id: "f", label: "Faux" }]), correct: v.a ? "v" : "f", exp: v.exp, hint: "Je pense aux tests : effacer, déplacer, remplacer, ajouter." };
     }
     if (t === "fn") {
       const cands = sent.ch.map((c, i) => i).filter((i) => skill === "tous" || FN[sent.ch[i].fn].skill === skill);
@@ -754,18 +754,18 @@ function genQuestion(skill) {
       const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI");
       if (!cands.length) continue;
       const ccs = cands.filter((k) => sent.ch[k].fn === "CC");
-      const i = Math.random() < 0.5 && ccs.length ? pick(ccs) : pick(cands);
+      const nccs = cands.filter((k) => sent.ch[k].fn !== "CC"), i = (Math.random() < 0.5 && ccs.length) || !nccs.length ? pick(ccs.length ? ccs : cands) : pick(nccs);
       const c = sent.ch[i];
       const r = doErase(sent, i);
-      return { type: "erase", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase reste-t-elle correcte ?", options: [{ id: "o", label: "Oui, elle reste correcte" }, { id: "n", label: "Non, elle est incomplète" }], correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
+      return { type: "erase", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase reste-t-elle correcte ?", options: shuffle([{ id: "o", label: "Oui, elle reste correcte" }, { id: "n", label: "Non, elle est incomplète" }]), correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
     }
     if (t === "move") {
       const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn === "CC" || sent.ch[i].fn === "COD");
       if (!cands.length) continue;
-      const i = pick(cands);
+      const mcc = cands.filter((k) => sent.ch[k].fn === "CC"), mco = cands.filter((k) => sent.ch[k].fn !== "CC"), i = pick(mcc.length && mco.length ? (Math.random() < 0.5 ? mcc : mco) : cands);
       const c = sent.ch[i];
       const r = doMove(sent, i);
-      return { type: "move", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "Je déplace le groupe encadré. La phrase sonne-t-elle juste ?", options: [{ id: "o", label: "Oui, elle sonne juste" }, { id: "n", label: "Non, elle sonne faux" }], correct: c.fn === "CC" ? "o" : "n", exp: "« " + r.text + " » " + r.msg, hint: "Je me demande : est-ce qu'on peut le dire comme ça ?" };
+      return { type: "move", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "Je déplace le groupe encadré. La phrase sonne-t-elle juste ?", options: shuffle([{ id: "o", label: "Oui, elle sonne juste" }, { id: "n", label: "Non, elle sonne faux" }]), correct: c.fn === "CC" ? "o" : "n", exp: "« " + r.text + " » " + r.msg, hint: "Je me demande : est-ce qu'on peut le dire comme ça ?" };
     }
     if (t === "pron") {
       const cands = sent.ch.map((c, i) => i).filter((i) => (sent.ch[i].fn === "COD" || sent.ch[i].fn === "COI") && (skill === "tous" || FN[sent.ch[i].fn].skill === skill));
