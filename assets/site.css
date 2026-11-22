@@ -261,3 +261,4 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
 /* Nouveautés : trois lignes visibles, défilement pour les plus anciennes */
 .nouv { overflow-y: auto; max-height: 12.5rem; overscroll-behavior: contain; }
 .nouv:focus-visible { outline: 2px solid var(--c, currentColor); outline-offset: 4px; }
+.card .vig.illu { aspect-ratio: 453 / 296; }
