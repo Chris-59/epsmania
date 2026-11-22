@@ -385,7 +385,7 @@ function doMove(sent, i) {
   // pour un non-CC, on place le groupe tout au début sans virgule (ou à la fin s'il était déjà premier)
   const text = c.fn === "CC" ? sentText(chs) : sentText(chs.map((x) => (x === c ? { ...x, fn: "X" } : x)));
   if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase sonne juste à la nouvelle place. Un CC se déplace." };
-  return { text, verdict: "no", msg: "La phrase sonne faux : ce groupe ne peut pas voyager dans la phrase. Un " + c.fn + " ne se déplace pas comme ça." };
+  return { text, verdict: "no", msg: "La phrase sonne faux : ce groupe ne peut pas voyager dans la phrase. " + ({ V: "Le verbe", S: "Le sujet", COD: "Un COD", COI: "Un COI", CC: "Un CC" }[c.fn] || "Ce groupe") + " ne se déplace pas comme ça." };
 }
 function pronWhy(c, word) {
   const q = "« " + c.t + " »";
@@ -806,7 +806,7 @@ const BADGES = [
   { id: "b4", name: "Détective", desc: "Trouver toutes les fonctions d'une phrase.", ico: "tag", test: () => S.solved >= 1 },
   { id: "b5", name: "Auteur", desc: "Créer 3 phrases.", ico: "build", test: () => S.created >= 3 },
   { id: "b6", name: "Super mémoire", desc: "Connaître 10 cartes mémoire.", ico: "cards", test: () => knownCards() >= 10 },
-  { id: "b7", name: "Élève curieux", desc: "Lire les 6 leçons.", ico: "book", test: () => lessonsDone() >= 6 },
+  { id: "b7", name: "Élève curieux", desc: "Lire les 7 leçons.", ico: "book", test: () => lessonsDone() >= LESSONS.length },
   { id: "b8", name: "Étoiles partout", desc: "Obtenir 3 étoiles à chaque étape.", ico: "star", test: () => SK.every((s) => starsOf(s.k) === 3) },
 ];
 function gain(xp) { S.xp += xp; save(); refreshPill(); checkBadges(); }
@@ -981,7 +981,7 @@ function viewAccueil(root) {
       h("button", { type: "button", class: "btn", on: { click: () => go("apprendre") } }, ico("book"), "Revoir une leçon")),
     h("div", { class: "grid g3" },
       [["parcours", "Mon parcours", "path", "Mes étoiles, mes badges et mes progrès."],
-       ["apprendre", "Apprendre", "book", "Six petites leçons avec des exemples."],
+       ["apprendre", "Apprendre", "book", "Sept petites leçons avec des exemples."],
        ["manipulations", "Les manipulations", "tag", "Je touche un groupe de mots, j'essaie un outil, je trouve sa fonction."],
        ["entrainer", "S'entraîner", "quiz", "Quiz et cartes mémoire pour réviser en jouant."],
        ["creer", "Créer des phrases", "build", "Je construis mes propres phrases avec un verbe, un sujet et des compléments."]]
@@ -992,7 +992,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 45. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 12 h 05. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1438,13 +1438,24 @@ const LESSONS = [
   { id: "l1", title: "Mes quatre outils", skill: null, lab: "s1", body: () => [
     P("Pour comprendre une phrase, je peux la manipuler comme avec des étiquettes de mots. J'ai quatre outils. Un outil me donne un indice. Quand deux outils disent la même chose, je peux avoir confiance."),
     demo(SENT[0], 0, "effacer"), demo(SENT[0], 0, "deplacer"), demo(SENT[0], 3, "remplacer"), demo(SENT[0], 2, "ajouter")] },
-  { id: "l2", title: "Le verbe et le sujet", skill: "verbe", lab: "s1", body: () => [
+  { id: "l2", title: "Le verbe", skill: "verbe", lab: "s1", body: () => [
+    P("Le verbe dit ", h("b", null, "ce qui se passe"), " ou ", h("b", null, "ce que l'on fait"), ". C'est le centre de la phrase : sans lui, il n'y a plus de phrase."),
     h("ol", { class: "steps" },
-      h("li", null, h("span", null, "Je cherche le verbe : je mets ", h("b", null, "ne...pas"), " autour. Le verbe est entre ne et pas.")),
-      h("li", null, h("span", null, "Je cherche le sujet : je dis ", h("b", null, "c'est...qui"), " (ou ", h("b", null, "ce sont...qui"), " au pluriel). Le sujet est entre les deux.")),
-      h("li", null, h("span", null, "Le verbe change quand je change le temps (hier, aujourd'hui, demain)."))),
-    demo(SENT[0], 2, "ajouter"), demo(SENT[0], 1, "ajouter"),
-    h("div", { class: "row" }, fnBadge("V"), fnBadge("S"))] },
+      h("li", null, h("span", null, "Je mets ", h("b", null, "ne...pas"), " autour du mot. Le verbe est entre ne et pas.")),
+      h("li", null, h("span", null, "Je change le temps (hier, aujourd'hui, demain) : ", h("b", null, "le verbe change"), ".")),
+      h("li", null, h("span", null, "Je teste : il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), "."))),
+    demo(SENT[0], 2, "ajouter"), demo(SENT[1], 1, "ajouter"), demo(SENT[0], 2, "effacer"), demo(SENT[0], 2, "deplacer"),
+    P(h("b", null, "Attention : "), "devant une voyelle, « ne » devient « n' » (il n'observe pas)."),
+    h("div", { class: "row" }, fnBadge("V"))] },
+  { id: "l2s", title: "Le sujet", skill: "sujet", lab: "s2", body: () => [
+    P("Le sujet dit ", h("b", null, "qui fait l'action"), " ou ", h("b", null, "de qui on parle"), ". Le verbe s'accorde avec lui."),
+    h("ol", { class: "steps" },
+      h("li", null, h("span", null, "J'encadre avec ", h("b", null, "c'est...qui"), " (ou ", h("b", null, "ce sont...qui"), " au pluriel). Le sujet est entre les deux.")),
+      h("li", null, h("span", null, "Je peux le remplacer par ", h("b", null, "il, elle, ils, elles"), ".")),
+      h("li", null, h("span", null, "Je teste : il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), "."))),
+    demo(SENT[0], 1, "ajouter"), demo(SENT[1], 0, "ajouter"), demo(SENT[0], 1, "effacer"), demo(SENT[0], 1, "deplacer"),
+    P(h("b", null, "Attention : "), "si le sujet est au pluriel, le verbe se met au pluriel aussi (les volcanologues observent)."),
+    h("div", { class: "row" }, fnBadge("S"))] },
   { id: "l3", title: "Le CC (complément de phrase)", skill: "cc", lab: "s2", body: () => [
     P("Le CC donne une information en plus : ", h("b", null, "quand ?"), ", ", h("b", null, "où ?"), " ou ", h("b", null, "comment ?"), ". On l'appelle aussi complément de phrase."),
     h("ol", { class: "steps" },
@@ -1492,7 +1503,7 @@ const LESSONS = [
 
 function viewApprendre(root) {
   const holder = h("div");
-  put(root, ...title("Apprendre", "Six petites leçons. Je lis à mon rythme, je peux écouter, et je dis « J'ai compris » à la fin."), pictoStrip([["eye", "Je lis"], ["speaker", "J'écoute"], ["tag", "J'essaie"], ["check", "J'ai compris"]]), holder);
+  put(root, ...title("Apprendre", "Sept petites leçons. Je lis à mon rythme, je peux écouter, et je dis « J'ai compris » à la fin."), pictoStrip([["eye", "Je lis"], ["speaker", "J'écoute"], ["tag", "J'essaie"], ["check", "J'ai compris"]]), holder);
   draw();
   function draw(focus) {
     const L = LESSONS[UI.lesson], done = !!S.lessons[L.id];
