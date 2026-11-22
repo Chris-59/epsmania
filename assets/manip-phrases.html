@@ -278,7 +278,7 @@ const startsVowel = (t) => VOW.test(t);
 /* --- Banque de phrases vérifiées (ordre d'affichage). kind : t temps, l lieu, m manière --- */
 const C = (t, fn, o = {}) => Object.assign({ t, fn }, o);
 const SENT = [
-  { id: "s1", ch: [C("chaque matin", "CC", { kind: "t" }), C("le facteur", "S"), C("livre", "V"), C("le courrier", "COD", { pron: "le" }), C("aux habitants", "COI", { pron: "leur" })] },
+  { id: "s1", ch: [C("chaque matin", "CC", { kind: "t" }), C("le facteur", "S"), C("distribue", "V"), C("le courrier", "COD", { pron: "le" }), C("aux habitants", "COI", { pron: "leur" })] },
   { id: "s2", ch: [C("les enfants", "S", { pl: true }), C("arrosent", "V"), C("les fleurs", "COD", { pron: "les" }), C("chaque jour", "CC", { kind: "t" })] },
   { id: "s3", ch: [C("les joueurs", "S", { pl: true }), C("ramassent", "V"), C("les ballons", "COD", { pron: "les" }), C("sur le terrain", "CC", { kind: "l" })] },
   { id: "s4", ch: [C("dans la cour", "CC", { kind: "l" }), C("les élèves", "S", { pl: true }), C("ramassent", "V"), C("les feuilles", "COD", { pron: "les" })] },
@@ -347,7 +347,7 @@ const THEMES = [
     ["ressembler", "ressemble", "ressemblent", null, [["à son père", "lui"], ["à sa mère", "lui"], ["à leurs parents", "leur"]]],
   ], [["la nuit", "t"], ["au printemps", "t"], ["chaque matin", "t"], ["dans la forêt", "l"], ["près de la rivière", "l"], ["sans bruit", "m"], ["rapidement", "m"]]),
   mkTheme("ville", "En ville", [P1("le facteur"), P1("la boulangère"), P1("le pompier"), PL("les commerçants"), PL("les habitants"), PL("les pompiers")], [
-    ["livrer", "livre", "livrent", [["le colis", "le"], ["la lettre", "la"], ["les journaux", "les"]], [["aux habitants", "leur"], ["à la voisine", "lui"], ["au maire", "lui"]]],
+    ["apporter", "apporte", "apportent", [["le colis", "le"], ["la lettre", "la"], ["les journaux", "les"]], [["aux habitants", "leur"], ["à la voisine", "lui"], ["au maire", "lui"]]],
     ["vendre", "vend", "vendent", [["le pain", "le"], ["la farine", "la"], ["les gâteaux", "les"]], [["aux clients", "leur"], ["à une voisine", "lui"]]],
     ["réparer", "répare", "réparent", [["la route", "la"], ["le pont", "le"], ["les toits", "les"]]],
     ["éteindre", "éteint", "éteignent", [["le feu", "le"], ["la lumière", "la"], ["les flammes", "les"]]],
@@ -653,23 +653,23 @@ function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) {
 
 const VF = [
   { q: "Un CC peut presque toujours s'effacer et se déplacer.", a: true, skill: "cc", exp: "Oui : j'efface, je déplace, et la phrase reste correcte." },
-  { q: "On peut remplacer un COD par le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : « Le facteur livre le courrier » devient « Le facteur le livre »." },
+  { q: "On peut remplacer un COD par le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : « Le facteur distribue le courrier » devient « Le facteur le distribue »." },
   { q: "Un COI se remplace souvent par lui, leur ou y.", a: true, skill: "coi", exp: "Oui : « Il parle aux touristes » devient « Il leur parle »." },
   { q: "Le COD se déplace facilement dans la phrase.", a: false, skill: "cod", exp: "Non : le COD ne se déplace pas. Ce sont les CC qui voyagent." },
   { q: "Pour trouver le verbe, je peux mettre ne...pas autour.", a: true, skill: "verbe", exp: "Oui : « Le chien ne mord pas ». Le verbe est entre ne et pas." },
-  { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le facteur qui livre ». Le sujet est entre c'est et qui." },
+  { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le facteur qui distribue ». Le sujet est entre c'est et qui." },
   { q: "Un CC complète le verbe comme un COD.", a: false, skill: "cc", exp: "Non : le CC donne une information en plus (quand, où, comment). On peut l'effacer." },
   { q: "Un COI est souvent introduit par à ou de.", a: true, skill: "coi", exp: "Oui : « à sa sœur », « aux élèves » (à + les). Je teste avec lui, leur, y." },
-  { q: "Le verbe change quand je change le temps (hier, aujourd'hui, demain).", a: true, skill: "verbe", exp: "Oui : le verbe se conjugue. Hier il livrait, aujourd'hui il livre." },
+  { q: "Le verbe change quand je change le temps (hier, aujourd'hui, demain).", a: true, skill: "verbe", exp: "Oui : le verbe se conjugue. Hier il distribuait, aujourd’hui il distribue." },
   { q: "Pour trouver le verbe, je cherche le mot le plus long de la phrase.", a: false, skill: "verbe", exp: "Non : la longueur ne dit rien. Je mets ne...pas autour du mot." },
   { q: "On peut effacer le verbe et garder une phrase correcte.", a: false, skill: "verbe", exp: "Non : sans verbe, il n'y a plus de phrase." },
   { q: "Un verbe peut dire un état (être, rester, sembler), pas seulement une action.", a: true, skill: "verbe", exp: "Oui : être, rester, sembler sont des verbes d'état." },
   { q: "Le sujet peut être formé de plusieurs mots.", a: true, skill: "sujet", exp: "Oui : « les élèves », « le facteur », « Léa »." },
-  { q: "Le sujet est toujours le premier mot de la phrase.", a: false, skill: "sujet", exp: "Non : un CC peut venir avant (« Chaque matin, le facteur livre... »)." },
+  { q: "Le sujet est toujours le premier mot de la phrase.", a: false, skill: "sujet", exp: "Non : un CC peut venir avant (« Chaque matin, le facteur distribue... »)." },
   { q: "Le sujet peut s'effacer sans problème.", a: false, skill: "sujet", exp: "Non : sans sujet, on ne sait plus qui fait l'action." },
   { q: "Quand le sujet est au pluriel, je peux dire ce sont...qui.", a: true, skill: "sujet", exp: "Oui : « Ce sont les enfants qui obéissent »." },
   { q: "Si un test hésite, je peux en faire un deuxième.", a: true, skill: "cod", exp: "Oui : deux tests qui disent la même chose, c'est plus sûr." },
-  { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le facteur livre aux habitants » : on se demande quoi. Le COD ne s'efface pas." },
+  { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le facteur distribue aux habitants » : on se demande quoi. Le COD ne s'efface pas." },
 ];
 
 
