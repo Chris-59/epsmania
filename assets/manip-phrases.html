@@ -123,8 +123,10 @@ button.chunk[aria-pressed="true"] { border-style: solid; border-color: var(--ink
 .verdict { display: flex; gap: .7rem; align-items: flex-start; border: 3px solid var(--vc, var(--line)); border-radius: 14px; padding: .8rem 1rem; background: var(--surf); }
 .verdict svg { width: 1.8rem; height: 1.8rem; flex: none; color: var(--vc); margin-top: .1rem; }
 .demohead { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; margin-bottom: .4rem; }
+.stampbar { display: flex; gap: .6rem; flex: none; }
+.stamp.tool { --vc: var(--ink); border-style: dashed; }
 .demohead h3 { margin: .3rem 0 0; flex: 1 1 auto; min-width: 0; }
-@media (max-width: 480px) { .stamp { min-width: 0; width: 5.6rem; max-width: 5.6rem; font-size: .78rem; padding: .35rem .3rem .4rem; box-sizing: border-box; overflow-wrap: anywhere; } .stamp svg { width: 1.9rem !important; height: 1.9rem !important; } }
+@media (max-width: 480px) { .demohead { flex-direction: column-reverse; align-items: stretch; } .stampbar { justify-content: flex-end; } .stamp { min-width: 0; width: 6.6rem; max-width: 6.6rem; font-size: .76rem; padding: .35rem .2rem .4rem; box-sizing: border-box; } .stamp svg { width: 1.9rem !important; height: 1.9rem !important; } }
 .stamp { display: inline-flex; flex-direction: column; align-items: center; gap: .1rem; min-width: 5.6rem; padding: .45rem .8rem .5rem; border: 4px solid var(--vc); border-radius: 16px; background: var(--surf); box-shadow: 0 0 0 3px var(--surf), 0 0 0 6px var(--vc); font-weight: 800; font-size: .95rem; line-height: 1.15; text-align: center; margin: 6px 6px 6px 0; flex: none; color: var(--ink); }
 .stamp svg { width: 2.4rem !important; height: 2.4rem !important; color: var(--vc); stroke-width: 3; }
 .v-ok { --vc: var(--ok); } .v-no { --vc: var(--ko); } .v-meh { --vc: var(--meh); }
@@ -821,6 +823,7 @@ function radioGroup(legend, name, items, current, onchange) {
 function title(text, sub) { return [h("h1", { id: "title", tabindex: "-1" }, text), sub ? h("p", { class: "muted" }, sub) : null].filter(Boolean); }
 function vTag(v) { const [l, i, c] = VERD[v]; return h("span", { class: "pill " + c, style: "border-color:var(--vc);color:var(--ink)" }, ico(i), l); }
 function stamp(v) { const [l, i, c] = VERD[v]; return h("span", { class: "stamp " + c, role: "img", "aria-label": l }, ico(i), h("span", null, l)); }
+function toolStamp(tool) { return h("span", { class: "stamp tool", role: "img", "aria-label": TOOL_LABEL[tool] }, ico(TOOL_ICON[tool]), h("span", null, TOOL_LABEL[tool])); }
 function verdictBox(res, extra) {
   const [l, i, c] = VERD[res.verdict];
   return h("div", { class: "verdict " + c, role: "status" }, ico(i), h("div", null, h("p", { class: "res" }, l), h("p", { style: "margin:0" }, res.msg), extra));
@@ -890,7 +893,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 40. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 50. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1316,8 +1319,8 @@ function demo(sent, i, tool) {
   const r = TOOLS[tool](sent, i), c = sent.ch[i];
   return h("div", { class: "card demo", style: "margin:.6rem 0" },
     h("div", { class: "demohead" },
-      h("h3", null, h("span", { class: "row", style: "gap:.4rem" }, ico(TOOL_ICON[tool]), TOOL_LABEL[tool] + " le groupe « " + c.t + " »")),
-      stamp(r.verdict)),
+      h("h3", null, TOOL_LABEL[tool] + " le groupe « " + c.t + " »"),
+      h("div", { class: "stampbar" }, toolStamp(tool), stamp(r.verdict))),
     P(h("b", null, "Avant : "), plain(sent)),
     r.text ? P(h("b", null, "Après : "), "« " + r.text + " »") : null,
     h("p", { class: "muted small", style: "margin:0" }, r.msg));
