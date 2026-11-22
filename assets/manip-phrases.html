@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="fr" data-skin="auto" data-read="0">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manip'Phrases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Plan : un volcan accueillant (Magma) sur fond bleu nuit, lave ambrée en accent.
+   Mise en page : grandes zones tactiles, cartes à contour franc, une seule colonne lisible.
+   Les fonctions grammaticales ont couleur + forme + nom : jamais la couleur seule. */
+:root {
+  --bg: #F2F5FC; --surf: #FFFFFF; --surf2: #E8EDF8; --ink: #141B34; --ink2: #424C6B; --line: #8E9BBD;
+  --brand: #1F2A5C; --accent: #FFB020; --accent-ink: #141B34; --ok: #17703A; --ko: #A8231B; --meh: #7A5200;
+  --focus: #0A57D6; --mark: #FFF1C9;
+  --c-S: #B71C1C; --c-V: #17703A; --c-COD: #1558C0; --c-COI: #6A32B0; --c-CC: #08707F;
+  --font-body: "Lexend", Verdana, "Segoe UI", Arial, sans-serif;
+  --font-display: "Fredoka", "Lexend", Verdana, Arial, sans-serif;
+  --fs: 1; --ls: 0; --lh: 1.6; --shadow: 0 2px 0 rgba(20,27,52,.18);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="auto"] { --bg:#11162A; --surf:#1B2242; --surf2:#252E57; --ink:#F2F5FF; --ink2:#C3CCE8; --line:#6B79A8; --brand:#9DB1FF; --focus:#FFD54A; --mark:#4A3A10;
+    --ok:#6FD98F; --ko:#FF8F86; --meh:#FFC857; --c-S:#FF8A80; --c-V:#6FD98F; --c-COD:#82B5FF; --c-COI:#CBA0FF; --c-CC:#5ED4E6; --shadow:0 2px 0 rgba(0,0,0,.4); color-scheme: dark; }
+}
+:root[data-skin="dark"] { --bg:#11162A; --surf:#1B2242; --surf2:#252E57; --ink:#F2F5FF; --ink2:#C3CCE8; --line:#6B79A8; --brand:#9DB1FF; --focus:#FFD54A; --mark:#4A3A10;
+  --ok:#6FD98F; --ko:#FF8F86; --meh:#FFC857; --c-S:#FF8A80; --c-V:#6FD98F; --c-COD:#82B5FF; --c-COI:#CBA0FF; --c-CC:#5ED4E6; --shadow:0 2px 0 rgba(0,0,0,.4); color-scheme: dark; }
+:root[data-skin="hc"] { --bg:#000; --surf:#000; --surf2:#1A1A1A; --ink:#FFF; --ink2:#FFF; --line:#FFF; --brand:#FFD400; --accent:#FFD400; --accent-ink:#000; --focus:#00E5FF; --mark:#333300;
+  --ok:#5CFF8F; --ko:#FF7A7A; --meh:#FFD400; --c-S:#FF6B6B; --c-V:#5CFF8F; --c-COD:#6BB6FF; --c-COI:#E0B0FF; --c-CC:#4DEBFF; --shadow:none; color-scheme: dark; }
+:root[data-read="1"] { --font-body: "Atkinson Hyperlegible", Verdana, Arial, sans-serif; --font-display: "Atkinson Hyperlegible", Verdana, Arial, sans-serif; --ls: .04em; --lh: 1.85; }
+
+* { box-sizing: border-box; }
+html { font-size: calc(18px * var(--fs)); height: 100%; }
+body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: var(--lh); letter-spacing: var(--ls); word-spacing: calc(var(--ls) * 3); }
+:root[data-read="1"] body { text-align: left; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.25; margin: 0 0 .6rem; text-wrap: balance; }
+h1 { font-size: 1.9rem; } h2 { font-size: 1.45rem; } h3 { font-size: 1.15rem; }
+p { margin: 0 0 .8rem; max-width: 62ch; }
+a { color: var(--brand); }
+:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: .5rem; top: -4rem; background: var(--accent); color: var(--accent-ink); padding: .6rem 1rem; border-radius: 10px; z-index: 50; font-weight: 600; }
+.skip:focus { top: .5rem; }
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+header.top { border-bottom: 3px solid var(--line); background: var(--surf); }
+.top-row { display: flex; align-items: center; gap: .8rem; padding: .6rem 0; flex-wrap: wrap; }
+.logo { display: flex; align-items: center; gap: .6rem; font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; color: var(--ink); text-decoration: none; }
+.logo small { display: block; font-family: var(--font-body); font-size: .72rem; font-weight: 400; color: var(--ink2); }
+.spacer { flex: 1; }
+nav.main { background: var(--bg); border-bottom: 3px solid var(--line); }
+nav.main ul { list-style: none; margin: 0; padding: .5rem 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.navbtn { display: flex; align-items: center; gap: .5rem; min-height: 3rem; padding: .35rem .9rem; border: 3px solid var(--line); border-radius: 14px; background: var(--surf); color: var(--ink); font: inherit; font-weight: 500; cursor: pointer; text-decoration: none; letter-spacing: inherit; }
+.navbtn svg { width: 1.4rem; height: 1.4rem; flex: none; }
+.navbtn[aria-current="page"] { border-color: var(--brand); background: var(--surf2); box-shadow: inset 0 -5px 0 var(--accent); font-weight: 600; }
+main { padding: 1.2rem 0 4rem; outline: none; }
+main:focus, #title:focus { outline: none; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 3rem; padding: .5rem 1.1rem; border-radius: 14px; border: 3px solid var(--brand); background: var(--surf); color: var(--ink); font: inherit; font-weight: 500; cursor: pointer; letter-spacing: inherit; text-decoration: none; box-shadow: var(--shadow); }
+.btn:hover { background: var(--surf2); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent-ink); font-weight: 600; }
+:root[data-skin="hc"] .btn.primary { border-color: #000; }
+.btn.primary:hover { filter: brightness(1.05); }
+.btn.ghost { border-color: var(--line); box-shadow: none; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+.pill svg, .opt svg, .choice svg { width: 1.2rem; height: 1.2rem; flex: none; }
+.btn svg { width: 1.2rem; height: 1.2rem; flex: none; }
+.row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.grid { display: grid; gap: 1rem; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.card { background: var(--surf); border: 3px solid var(--line); border-radius: 18px; padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+.card.brand { border-color: var(--brand); }
+.muted { color: var(--ink2); }
+.small { font-size: .85rem; }
+.pill { display: inline-flex; align-items: center; gap: .35rem; padding: .1rem .7rem; border: 2px solid var(--line); border-radius: 999px; font-size: .85rem; background: var(--surf); }
+
+/* Magma, la mascotte */
+.mascot { display: flex; align-items: flex-end; gap: .8rem; }
+.mascot svg { width: 84px; height: 84px; flex: none; }
+.bubble { position: relative; background: var(--surf); border: 3px solid var(--brand); border-radius: 18px; padding: .7rem 1rem; max-width: 60ch; }
+.bubble::before { content: ""; position: absolute; left: -12px; bottom: 18px; width: 18px; height: 18px; background: var(--surf); border-left: 3px solid var(--brand); border-bottom: 3px solid var(--brand); transform: rotate(45deg); }
+.bubble p { margin: 0; }
+
+/* cartes d'accueil */
+.tile { display: flex; flex-direction: column; gap: .4rem; text-decoration: none; color: var(--ink); background: var(--surf); border: 3px solid var(--line); border-radius: 18px; padding: 1.1rem; min-height: 9.5rem; box-shadow: var(--shadow); cursor: pointer; font: inherit; text-align: left; letter-spacing: inherit; }
+.tile:hover { border-color: var(--brand); background: var(--surf2); }
+.tile svg { width: 2.6rem; height: 2.6rem; color: var(--brand); }
+.tile b { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; }
+
+/* écussons de fonctions */
+.fnbadge { display: inline-flex; align-items: center; gap: .45rem; min-height: 3rem; padding: .3rem .9rem; border: 3px solid var(--fc, var(--line)); border-radius: 14px 14px 22px 22px; background: var(--surf); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; letter-spacing: inherit; }
+.fnbadge svg { width: 1.45rem; height: 1.45rem; color: var(--fc); flex: none; }
+.fnbadge:hover { background: var(--surf2); }
+.fnbadge[aria-pressed="true"] { background: var(--surf2); box-shadow: inset 0 -5px 0 var(--fc); }
+.fnbadge.plain { cursor: default; }
+.f-S { --fc: var(--c-S); } .f-V { --fc: var(--c-V); } .f-COD { --fc: var(--c-COD); } .f-COI { --fc: var(--c-COI); } .f-CC { --fc: var(--c-CC); }
+
+/* phrases et groupes de mots */
+.sent { display: flex; flex-wrap: wrap; gap: .5rem .5rem; align-items: flex-start; font-size: 1.2rem; }
+.chunkwrap { display: flex; flex-direction: column; align-items: center; gap: .15rem; }
+.chunk { display: inline-block; padding: .3rem .8rem; border: 3px dashed var(--line); border-radius: 12px; background: var(--surf); color: var(--ink); font: inherit; font-size: inherit; letter-spacing: inherit; min-height: 2.8rem; }
+button.chunk { cursor: pointer; }
+button.chunk:hover { background: var(--surf2); }
+button.chunk[aria-pressed="true"] { border-style: solid; border-color: var(--ink); background: var(--mark); box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--ink); }
+.chunk.tagged { border-style: solid; border-color: var(--fc); }
+.chunk.target { border-style: solid; border-color: var(--ink); background: var(--mark); font-weight: 600; text-decoration: underline wavy var(--ink2); text-underline-offset: 6px; }
+.chunk.ghost { border-style: dotted; color: var(--ink2); background: transparent; }
+.chunk.pron { border-style: solid; border-color: var(--ink); background: var(--mark); font-weight: 600; }
+.tagrow { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; font-weight: 600; color: var(--ink); }
+.tagrow svg { width: 1rem; height: 1rem; color: var(--fc); }
+.punct { align-self: flex-end; padding-bottom: .3rem; font-size: 1.2rem; }
+
+/* outils */
+.tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .6rem; }
+.tool { display: flex; align-items: center; gap: .6rem; min-height: 3.4rem; padding: .4rem .9rem; border: 3px solid var(--brand); border-radius: 14px 14px 14px 26px; background: var(--surf); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; letter-spacing: inherit; }
+.tool svg { width: 1.5rem; height: 1.5rem; flex: none; color: var(--brand); }
+.tool[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent-ink); }
+.tool[aria-pressed="true"] svg { color: var(--accent-ink); }
+.tool[disabled] { opacity: .45; cursor: not-allowed; }
+.verdict { display: flex; gap: .7rem; align-items: flex-start; border: 3px solid var(--vc, var(--line)); border-radius: 14px; padding: .8rem 1rem; background: var(--surf); }
+.verdict svg { width: 1.8rem; height: 1.8rem; flex: none; color: var(--vc); margin-top: .1rem; }
+.v-ok { --vc: var(--ok); } .v-no { --vc: var(--ko); } .v-meh { --vc: var(--meh); }
+.verdict .res { font-size: 1.15rem; font-weight: 600; margin: 0 0 .25rem; }
+
+/* quiz */
+.opts { display: grid; gap: .6rem; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-top: 1rem; }
+.opt { display: flex; align-items: center; gap: .6rem; min-height: 3.4rem; padding: .5rem 1rem; border: 3px solid var(--line); border-radius: 14px; background: var(--surf); color: var(--ink); font: inherit; font-weight: 500; cursor: pointer; text-align: left; letter-spacing: inherit; }
+.opt:hover { border-color: var(--brand); background: var(--surf2); }
+.opt.right { border-color: var(--ok); background: var(--surf2); font-weight: 600; }
+.opt.wrong { border-color: var(--ko); }
+.opt .mark { margin-left: auto; display: inline-flex; align-items: center; gap: .3rem; font-size: .85rem; font-weight: 600; }
+.opt .mark svg { width: 1.3rem; height: 1.3rem; }
+.progress { height: 14px; border: 3px solid var(--line); border-radius: 999px; background: var(--surf); overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--accent); }
+.stars { display: inline-flex; gap: .15rem; }
+.stars svg { width: 1.5rem; height: 1.5rem; }
+.stars .on { color: var(--accent); fill: var(--accent); stroke: var(--ink); }
+.stars .off { color: var(--line); fill: none; }
+
+/* cartes mémoire */
+.flash { min-height: 14rem; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 1rem; padding: 1.6rem; }
+.flash .q { font-family: var(--font-display); font-size: 1.45rem; }
+.flash .a { font-size: 1.15rem; border-top: 3px dashed var(--line); padding-top: 1rem; }
+
+/* parcours */
+.path { list-style: none; padding: 0; margin: 0; display: grid; gap: .9rem; }
+.station { display: grid; grid-template-columns: auto 1fr auto; gap: .9rem; align-items: center; background: var(--surf); border: 3px solid var(--line); border-radius: 18px; padding: .9rem 1.1rem; }
+.station.next { border-color: var(--brand); box-shadow: 0 0 0 4px var(--accent); }
+.station .num { width: 3rem; height: 3rem; border: 3px solid var(--fc, var(--brand)); border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 600; }
+.station .num svg { width: 1.5rem; height: 1.5rem; color: var(--fc, var(--brand)); }
+.badges { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .7rem; padding: 0; list-style: none; margin: 0; }
+.badgecard { display: flex; gap: .7rem; align-items: center; padding: .7rem .9rem; border: 3px dashed var(--line); border-radius: 14px; background: var(--surf); color: var(--ink2); }
+.badgecard.on { border-style: solid; border-color: var(--ok); color: var(--ink); }
+.badgecard svg { width: 2rem; height: 2rem; flex: none; }
+
+/* formulaires */
+fieldset { border: 3px solid var(--line); border-radius: 14px; padding: .8rem 1rem 1rem; margin: 0 0 1rem; }
+legend { font-weight: 600; padding: 0 .4rem; }
+.choices { display: flex; flex-wrap: wrap; gap: .5rem; }
+.choice { display: inline-flex; align-items: center; gap: .5rem; min-height: 3rem; padding: .3rem .9rem; border: 3px solid var(--line); border-radius: 14px; background: var(--surf); cursor: pointer; }
+.choice:has(input:checked) { border-color: var(--brand); background: var(--surf2); box-shadow: inset 0 -5px 0 var(--accent); font-weight: 600; }
+.choice input { width: 1.25rem; height: 1.25rem; accent-color: var(--brand); }
+input[type="text"] { font: inherit; letter-spacing: inherit; min-height: 3rem; padding: .4rem .8rem; border: 3px solid var(--line); border-radius: 12px; background: var(--surf); color: var(--ink); width: 100%; max-width: 26rem; }
+dialog { border: 4px solid var(--brand); border-radius: 20px; background: var(--bg); color: var(--ink); max-width: min(640px, calc(100vw - 24px)); width: 100%; padding: 1.2rem; font-family: var(--font-body); }
+dialog::backdrop { background: rgba(10, 14, 30, .6); }
+.tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+.tab { min-height: 3rem; padding: .3rem 1rem; border: 3px solid var(--line); border-radius: 14px 14px 4px 4px; background: var(--surf); color: var(--ink); font: inherit; font-weight: 500; cursor: pointer; letter-spacing: inherit; }
+.tab[aria-pressed="true"] { border-color: var(--brand); background: var(--surf2); box-shadow: inset 0 -5px 0 var(--accent); font-weight: 600; }
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; }
+.steps li { counter-increment: s; display: flex; gap: .8rem; align-items: flex-start; }
+.steps li::before { content: counter(s); flex: none; width: 2.2rem; height: 2.2rem; display: grid; place-items: center; border: 3px solid var(--brand); border-radius: 50%; font-weight: 600; font-family: var(--font-display); }
+table.cmp { border-collapse: collapse; width: 100%; font-size: .95rem; }
+table.cmp th, table.cmp td { border: 3px solid var(--line); padding: .5rem .7rem; text-align: left; vertical-align: top; }
+.overflow { overflow-x: auto; }
+.out { font-size: 1.25rem; font-weight: 600; margin: .3rem 0 .7rem; max-width: 60ch; }
+.toast { position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 40; max-width: min(520px, calc(100vw - 24px)); background: var(--surf); border: 4px solid var(--brand); border-radius: 18px; padding: .8rem 1.1rem; box-shadow: 0 6px 24px rgba(0,0,0,.35); display: flex; gap: .7rem; align-items: center; }
+.toast[hidden] { display: none; }
+.toast svg { width: 2rem; height: 2rem; color: var(--brand); flex: none; }
+.xl { font-size: 2.2rem; font-family: var(--font-display); font-weight: 600; }
+textarea.bilan { width: 100%; min-height: 8rem; font: inherit; font-size: .9rem; padding: .6rem; border: 3px solid var(--line); border-radius: 12px; background: var(--surf); color: var(--ink); }
+select { font: inherit; letter-spacing: inherit; min-height: 3rem; padding: .3rem .6rem; border: 3px solid var(--line); border-radius: 12px; background: var(--surf); color: var(--ink); max-width: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-motion="1"] .pop { animation: pop .35s ease-out; }
+  @keyframes pop { 0% { transform: scale(.85); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
+}
+@media (max-width: 560px) { .station { grid-template-columns: auto 1fr; } .station .act { grid-column: 1 / -1; } h1 { font-size: 1.6rem; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="top"><div class="wrap top-row" id="topbar"></div></header>
+<nav class="main" aria-label="Espaces de l’application"><div class="wrap"><ul id="navlist" style="list-style:none;margin:0;padding:.5rem 0;display:flex;flex-wrap:wrap;gap:.5rem"></ul></div></nav>
+<div class="wrap"><main id="main" tabindex="-1"></main></div>
+<div id="live" class="sr" aria-live="polite" role="status"></div>
+<div id="toast" class="toast" hidden></div>
+<dialog id="dlg" aria-labelledby="dlgt"></dialog>
+<script>
+/* ===== MOTEUR : phrases, manipulations, questions (pur, testable sous node) ===== */
+const VOW = /^[aeiouyàâäéèêëîïôöùûüh]/i;
+const FN = {
+  S:   { key: "S",   name: "Sujet",  short: "Sujet",  skill: "sujet", tip: "Je trouve le sujet avec c'est...qui." },
+  V:   { key: "V",   name: "Verbe",  short: "Verbe",  skill: "verbe", tip: "Je trouve le verbe avec ne...pas." },
+  COD: { key: "COD", name: "COD",    short: "COD",    skill: "cod",   tip: "Le COD se remplace par le, la, l', les." },
+  COI: { key: "COI", name: "COI",    short: "COI",    skill: "coi",   tip: "Le COI se remplace par lui, leur, y." },
+  CC:  { key: "CC",  name: "CC",     short: "CC",     skill: "cc",    tip: "Le CC s'efface et se déplace." },
+};
+const FN_ORDER = ["S", "V", "COD", "COI", "CC"];
+const FN_LONG = { S: "le sujet", V: "le verbe", COD: "un COD", COI: "un COI", CC: "un CC" };
+
+const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+const startsVowel = (t) => VOW.test(t);
+
+/* --- Banque de phrases vérifiées (ordre d'affichage). kind : t temps, l lieu, m manière --- */
+const C = (t, fn, o = {}) => Object.assign({ t, fn }, o);
+const SENT = [
+  { id: "s1", ch: [C("hier", "CC", { kind: "t" }), C("le guide", "S"), C("montre", "V"), C("le cratère", "COD", { pron: "le" }), C("aux visiteurs", "COI", { pron: "leur" })] },
+  { id: "s2", ch: [C("les volcanologues", "S", { pl: true }), C("observent", "V"), C("les volcans", "COD", { pron: "les" }), C("en permanence", "CC", { kind: "t" })] },
+  { id: "s3", ch: [C("les scientifiques", "S", { pl: true }), C("comptent", "V"), C("1 500 volcans en activité", "COD", { pron: "les" }), C("dans le monde", "CC", { kind: "l" })] },
+  { id: "s4", ch: [C("en France", "CC", { kind: "l" }), C("les touristes", "S", { pl: true }), C("visitent", "V"), C("les volcans éteints", "COD", { pron: "les" })] },
+  { id: "s5", ch: [C("chaque jour", "CC", { kind: "t" }), C("les habitants", "S", { pl: true }), C("surveillent", "V"), C("le cratère", "COD", { pron: "le" })] },
+  { id: "s6", ch: [C("le maire", "S"), C("explique", "V"), C("le danger", "COD", { pron: "le" }), C("aux habitants", "COI", { pron: "leur" })] },
+  { id: "s7", ch: [C("pendant l'éruption", "CC", { kind: "t" }), C("les enfants", "S", { pl: true }), C("obéissent", "V"), C("aux consignes", "COI", { pron: "y" })] },
+  { id: "s8", ch: [C("ce matin", "CC", { kind: "t" }), C("Léa", "S", { proper: true }), C("envoie", "V"), C("la lettre", "COD", { pron: "la" }), C("à sa grand-mère", "COI", { pron: "lui" })] },
+  { id: "s9", ch: [C("le soir", "CC", { kind: "t" }), C("le volcanologue", "S"), C("téléphone", "V"), C("à son collègue", "COI", { pron: "lui" })] },
+  { id: "s10", ch: [C("la nuit", "CC", { kind: "t" }), C("les villageois", "S", { pl: true }), C("quittent", "V"), C("le village", "COD", { pron: "le" })] },
+  { id: "s11", ch: [C("les élèves", "S", { pl: true }), C("ouvrent", "V"), C("leurs cahiers", "COD", { pron: "les" }), C("en silence", "CC", { kind: "m" })] },
+  { id: "s12", ch: [C("samedi", "CC", { kind: "t" }), C("Max", "S", { proper: true }), C("offre", "V"), C("le cadeau", "COD", { pron: "le" }), C("à sa sœur", "COI", { pron: "lui" })] },
+  { id: "s13", ch: [C("le chien", "S"), C("mord", "V"), C("le facteur", "COD", { pron: "le" }), C("dans la rue", "CC", { kind: "l" })] },
+  { id: "s14", ch: [C("chaque matin", "CC", { kind: "t" }), C("la boulangère", "S"), C("prépare", "V"), C("le pain", "COD", { pron: "le" })] },
+  { id: "s15", ch: [C("le guide", "S"), C("parle", "V"), C("aux touristes", "COI", { pron: "leur" }), C("calmement", "CC", { kind: "m" })] },
+  { id: "s16", ch: [C("les pompiers", "S", { pl: true }), C("protègent", "V"), C("les habitants", "COD", { pron: "les" }), C("pendant l'éruption", "CC", { kind: "t" })] },
+];
+
+/* --- Cadres pour l'atelier de création --- */
+const SUBJ = [
+  { t: "le guide" }, { t: "la maîtresse" }, { t: "Léa", proper: true }, { t: "Max", proper: true }, { t: "le volcanologue" }, { t: "le maire" },
+  { t: "les habitants", pl: true }, { t: "les élèves", pl: true }, { t: "les volcanologues", pl: true }, { t: "les enfants", pl: true }, { t: "les touristes", pl: true },
+];
+const FRAMES = [
+  { id: "observer", v: ["observe", "observent"], cod: [["le volcan", "le"], ["le cratère", "le"], ["la fumée", "la"], ["les cendres", "les"]] },
+  { id: "surveiller", v: ["surveille", "surveillent"], cod: [["le cratère", "le"], ["le village", "le"], ["la montagne", "la"], ["les touristes", "les"]] },
+  { id: "visiter", v: ["visite", "visitent"], cod: [["le musée", "le"], ["la grotte", "la"], ["les villages", "les"]] },
+  { id: "étudier", v: ["étudie", "étudient"], cod: [["les cendres", "les"], ["la lave", "la"], ["les roches", "les"]] },
+  { id: "quitter", v: ["quitte", "quittent"], cod: [["le village", "le"], ["la maison", "la"], ["la salle", "la"]] },
+  { id: "photographier", v: ["photographie", "photographient"], cod: [["le volcan", "le"], ["la lave", "la"], ["les cratères", "les"]] },
+  { id: "montrer", v: ["montre", "montrent"], cod: [["le cratère", "le"], ["la carte", "la"], ["les photos", "les"]], coi: [["aux visiteurs", "leur"], ["à son frère", "lui"], ["au maire", "lui"]] },
+  { id: "expliquer", v: ["explique", "expliquent"], cod: [["le danger", "le"], ["la règle", "la"], ["les consignes", "les"]], coi: [["aux habitants", "leur"], ["à Léa", "lui"], ["aux enfants", "leur"]] },
+  { id: "offrir", v: ["offre", "offrent"], cod: [["le cadeau", "le"], ["la fleur", "la"], ["les livres", "les"]], coi: [["à sa sœur", "lui"], ["à ses amis", "leur"], ["à son voisin", "lui"]] },
+  { id: "envoyer", v: ["envoie", "envoient"], cod: [["la lettre", "la"], ["les messages", "les"], ["le colis", "le"]], coi: [["à sa grand-mère", "lui"], ["à ses cousins", "leur"], ["à son ami", "lui"]] },
+  { id: "parler", v: ["parle", "parlent"], coi: [["aux visiteurs", "leur"], ["à la maîtresse", "lui"], ["à ses voisins", "leur"]] },
+  { id: "téléphoner", v: ["téléphone", "téléphonent"], coi: [["à son collègue", "lui"], ["à sa tante", "lui"], ["aux pompiers", "leur"]] },
+  { id: "obéir", v: ["obéit", "obéissent"], coi: [["aux consignes", "y"], ["au guide", "lui"], ["aux règles", "y"]] },
+];
+const CC_OPTS = [
+  ["hier", "t"], ["ce matin", "t"], ["chaque jour", "t"], ["samedi", "t"], ["la nuit", "t"], ["pendant l'éruption", "t"],
+  ["en France", "l"], ["près du cratère", "l"], ["dans le village", "l"],
+  ["avec attention", "m"], ["en silence", "m"], ["calmement", "m"],
+];
+
+/* --- Construction d'une phrase à partir du cadre --- */
+function buildSentence({ frame, subj, cod, coi, cc, ccPos }) {
+  const ch = [];
+  const f = FRAMES.find((x) => x.id === frame);
+  if (!f || !subj) return null;
+  const ccChunk = cc ? C(cc.t, "CC", { kind: cc.kind || "x", own: !!cc.own }) : null;
+  if (ccChunk && ccPos !== "end") ch.push(ccChunk);
+  ch.push(C(subj.t, "S", { pl: !!subj.pl, proper: !!subj.proper }));
+  ch.push(C(f.v[subj.pl ? 1 : 0], "V"));
+  if (cod) ch.push(C(cod[0], "COD", { pron: cod[1] }));
+  if (coi) ch.push(C(coi[0], "COI", { pron: coi[1] }));
+  if (ccChunk && ccPos === "end") ch.push(ccChunk);
+  return { id: "perso", ch };
+}
+
+/* --- Texte --- */
+function sentText(chs) {
+  let s = "";
+  chs.forEach((c, i) => {
+    let t = c.t;
+    if (c.fn === "CC" && i === 0 && chs.length > 1) t += ",";
+    s += t + (c.glue ? "" : " ");
+  });
+  return cap(s.trim()) + ".";
+}
+const plain = (sent) => sentText(sent.ch);
+const idx = (sent, fn) => sent.ch.findIndex((c) => c.fn === fn);
+const subjChunk = (sent) => sent.ch.find((c) => c.fn === "S");
+const verbChunk = (sent) => sent.ch.find((c) => c.fn === "V");
+
+/* --- Les 4 manipulations (résultats : { text, verdict: ok|no|meh, msg }) --- */
+function pronChunk(pron, verb) {
+  if ((pron === "le" || pron === "la") && startsVowel(verb.t)) return { t: "l'", fn: "P", glue: true };
+  return { t: pron, fn: "P" };
+}
+function doErase(sent, i) {
+  const c = sent.ch[i];
+  const chs = sent.ch.filter((_, k) => k !== i);
+  const text = sentText(chs);
+  if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase tient debout. Un CC s'efface sans problème." };
+  if (c.fn === "COD") return { text, verdict: "no", msg: "La phrase est incomplète : il manque l'information importante. Un COD ne s'efface pas." };
+  if (c.fn === "COI") return { text, verdict: "meh", msg: "La phrase peut rester possible, mais on perd une information importante. Ce test n'est pas sûr pour un COI : je préfère remplacer par lui, leur, y." };
+  if (c.fn === "S") return { text, verdict: "no", msg: "La phrase n'est plus correcte : il n'y a plus personne qui agit. Le sujet ne s'efface pas." };
+  return { text, verdict: "no", msg: "La phrase n'est plus une phrase : il n'y a plus de verbe. Le verbe ne s'efface pas." };
+}
+function doMove(sent, i) {
+  const c = sent.ch[i];
+  const rest = sent.ch.filter((_, k) => k !== i);
+  let chs;
+  if (c.fn === "CC") chs = i === 0 ? [...rest, c] : [c, ...rest];
+  else chs = i === 0 ? [...rest, c] : [c, ...rest];
+  // pour un non-CC, on place le groupe tout au début sans virgule (ou à la fin s'il était déjà premier)
+  const text = c.fn === "CC" ? sentText(chs) : sentText(chs.map((x) => (x === c ? { ...x, fn: "X" } : x)));
+  if (c.fn === "CC") return { text, verdict: "ok", msg: "La phrase sonne juste à la nouvelle place. Un CC se déplace." };
+  return { text, verdict: "no", msg: "La phrase sonne faux : ce groupe ne peut pas voyager dans la phrase. Un " + c.fn + " ne se déplace pas comme ça." };
+}
+function doReplace(sent, i) {
+  const c = sent.ch[i];
+  if (c.fn !== "COD" && c.fn !== "COI") {
+    return { text: null, verdict: "no", msg: "Je ne peux pas remplacer ce groupe par le, la, l', les, lui, leur ou y. Ce n'est ni un COD ni un COI." };
+  }
+  const chs = sent.ch.filter((_, k) => k !== i);
+  const vi = chs.findIndex((x) => x.fn === "V");
+  chs.splice(vi, 0, pronChunk(c.pron, chs[vi]));
+  const word = c.pron === "le" || c.pron === "la" ? (startsVowel(chs[vi + 1].t) ? "l'" : c.pron) : c.pron;
+  const text = sentText(chs);
+  const kind = c.fn === "COD" ? "COD" : "COI";
+  const msg = kind === "COD"
+    ? "Ça marche avec « " + word + " » (le, la, l', les) : c'est un COD."
+    : "Ça marche avec « " + word + " » (lui, leur, y) : c'est un COI.";
+  return { text, verdict: "ok", msg, pron: word };
+}
+function doAdd(sent, i) {
+  const c = sent.ch[i];
+  if (c.fn === "V") {
+    const chs = [...sent.ch];
+    const v = chs[i];
+    const neg = startsVowel(v.t) ? { t: "n'", fn: "P", glue: true } : { t: "ne", fn: "P" };
+    chs.splice(i, 1, neg, v, { t: "pas", fn: "P" });
+    return { text: sentText(chs), verdict: "ok", msg: "Je mets ne devant le verbe et pas après : le mot encadré est le verbe." };
+  }
+  if (c.fn === "S") {
+    const first = sent.ch[0];
+    const rest = sent.ch.filter((x) => x.fn !== "S" && !(x === first && first.fn === "CC"));
+    const lead = first.fn === "CC" ? first.t + ", " : "";
+    const body = (c.pl ? "ce sont " : "c'est ") + c.t + " qui " + rest.map((x) => x.t).join(" ");
+    const text = cap(lead + body).replace(/^(.)/, (m) => m.toUpperCase()) + ".";
+    return { text, verdict: "ok", msg: "« " + (c.pl ? "Ce sont" : "C'est") + " ... qui » encadre le sujet : ça marche." };
+  }
+  if (c.fn === "CC") {
+    const rest = sent.ch.filter((_, k) => k !== i);
+    const base = sentText(rest).replace(/\.$/, "");
+    let add;
+    if (c.kind === "m") add = ", et " + (subjChunk(sent).pl ? "ils le font " : "il le fait ") + c.t;
+    else if (c.kind === "x") add = ", et cela se passe " + c.t;
+    else add = ", et cela se passe " + c.t;
+    return { text: base + add + ".", verdict: "ok", msg: c.kind === "m" ? "« Et il le fait... » marche : c'est un CC." : "« Et cela se passe... » marche : c'est un CC." };
+  }
+  return { text: null, verdict: "meh", msg: "Ce test n'aide pas ici. Pour un " + c.fn + ", j'utilise plutôt « remplacer »." };
+}
+const TOOLS = { effacer: doErase, deplacer: doMove, remplacer: doReplace, ajouter: doAdd };
+const TOOL_LABEL = { effacer: "Effacer", deplacer: "Déplacer", remplacer: "Remplacer", ajouter: "Ajouter" };
+
+/* --- Explication d'un groupe (pour le quiz) --- */
+function explainChunk(sent, i) {
+  const c = sent.ch[i];
+  const q = "« " + c.t + " »";
+  if (c.fn === "CC") return q + " s'efface et se déplace : c'est un CC.";
+  if (c.fn === "COD") { const r = doReplace(sent, i); return q + " ne s'efface pas, ne se déplace pas et se remplace par « " + r.pron + " » : c'est un COD."; }
+  if (c.fn === "COI") { const r = doReplace(sent, i); return q + " se remplace par « " + r.pron + " » : c'est un COI."; }
+  if (c.fn === "S") return q + " est encadré par " + (c.pl ? "ce sont...qui" : "c'est...qui") + " : c'est le sujet.";
+  return q + " reste seul quand on met ne...pas autour : c'est le verbe.";
+}
+
+/* --- Générateur de questions --- */
+const rnd = (n) => Math.floor(Math.random() * n);
+const pick = (a) => a[rnd(a.length)];
+function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+
+const VF = [
+  { q: "Un CC peut presque toujours s'effacer et se déplacer.", a: true, skill: "cc", exp: "Oui : j'efface, je déplace, et la phrase reste correcte." },
+  { q: "On peut remplacer un COD par le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : « Le guide montre le cratère » devient « Le guide le montre »." },
+  { q: "Un COI se remplace souvent par lui, leur ou y.", a: true, skill: "coi", exp: "Oui : « Il parle aux touristes » devient « Il leur parle »." },
+  { q: "Le COD se déplace facilement dans la phrase.", a: false, skill: "cod", exp: "Non : le COD ne se déplace pas. Ce sont les CC qui voyagent." },
+  { q: "Pour trouver le verbe, je peux mettre ne...pas autour.", a: true, skill: "verbe", exp: "Oui : « Le guide ne montre pas ». Le verbe est entre ne et pas." },
+  { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le guide qui montre ». Le sujet est entre c'est et qui." },
+  { q: "Un CC complète le verbe comme un COD.", a: false, skill: "cc", exp: "Non : le CC donne une information en plus (quand, où, comment). On peut l'effacer." },
+  { q: "Un COI est souvent introduit par à ou de.", a: true, skill: "coi", exp: "Oui : « à sa sœur », « aux visiteurs » (à + les). Je teste avec lui, leur, y." },
+  { q: "Si un test hésite, je peux en faire un deuxième.", a: true, skill: "cod", exp: "Oui : deux tests qui disent la même chose, c'est plus sûr." },
+  { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le guide montre aux visiteurs » : on se demande quoi. Le COD ne s'efface pas." },
+];
+
+function genQuestion(skill) {
+  // skill : tous | verbe | sujet | cc | cod | coi
+  const types = ["fn", "fn", "erase", "move", "pron", "verb", "subj", "vf"];
+  for (let tries = 0; tries < 40; tries++) {
+    const t = pick(types);
+    const sent = pick(SENT);
+    if (t === "vf") {
+      const pool = VF.filter((v) => skill === "tous" || v.skill === skill);
+      if (!pool.length) continue;
+      const v = pick(pool);
+      return { type: "vf", skill: v.skill, prompt: v.q, options: [{ id: "v", label: "Vrai" }, { id: "f", label: "Faux" }], correct: v.a ? "v" : "f", exp: v.exp, hint: "Je pense aux tests : effacer, déplacer, remplacer, ajouter." };
+    }
+    if (t === "fn") {
+      const cands = sent.ch.map((c, i) => i).filter((i) => skill === "tous" || FN[sent.ch[i].fn].skill === skill);
+      if (!cands.length) continue;
+      const i = pick(cands);
+      const c = sent.ch[i];
+      return { type: "fn", skill: FN[c.fn].skill, sent, target: i, prompt: "Quelle est la fonction du groupe encadré ?", options: FN_ORDER.map((k) => ({ id: k, label: FN[k].name, fn: k })), correct: c.fn, exp: explainChunk(sent, i), hint: c.fn === "CC" ? "J'efface le groupe, puis je le déplace." : c.fn === "COD" || c.fn === "COI" ? "Je le remplace par un petit mot : le, la, les, lui, leur, y." : c.fn === "V" ? "Je mets ne...pas autour." : "Je dis c'est...qui." };
+    }
+    if (t === "erase") {
+      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI" && (skill === "tous" || FN[sent.ch[i].fn].skill === skill));
+      if (!cands.length) continue;
+      const i = pick(cands);
+      const c = sent.ch[i];
+      const r = doErase(sent, i);
+      return { type: "erase", skill: FN[c.fn].skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase tient-elle encore debout ?", options: [{ id: "o", label: "Oui, elle tient debout" }, { id: "n", label: "Non, elle est incomplète" }], correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
+    }
+    if (t === "move") {
+      const cands = sent.ch.map((c, i) => i).filter((i) => (skill === "tous" || FN[sent.ch[i].fn].skill === skill) && (sent.ch[i].fn === "CC" || sent.ch[i].fn === "COD"));
+      if (!cands.length) continue;
+      const i = pick(cands);
+      const c = sent.ch[i];
+      const r = doMove(sent, i);
+      return { type: "move", skill: FN[c.fn].skill, sent, target: i, prompt: "Je déplace le groupe encadré. La phrase sonne-t-elle juste ?", options: [{ id: "o", label: "Oui, elle sonne juste" }, { id: "n", label: "Non, elle sonne faux" }], correct: c.fn === "CC" ? "o" : "n", exp: "« " + r.text + " » " + r.msg, hint: "Je me demande : est-ce qu'on peut le dire comme ça ?" };
+    }
+    if (t === "pron") {
+      const cands = sent.ch.map((c, i) => i).filter((i) => (sent.ch[i].fn === "COD" || sent.ch[i].fn === "COI") && (skill === "tous" || FN[sent.ch[i].fn].skill === skill));
+      if (!cands.length) continue;
+      const i = pick(cands);
+      const c = sent.ch[i];
+      const r = doReplace(sent, i);
+      const all = c.fn === "COD" ? ["le", "la", "l'", "les"] : ["lui", "leur", "y"];
+      const wrongPool = c.fn === "COD" ? ["lui", "leur", "y", "le", "la", "l'", "les"] : ["le", "la", "les", "lui", "leur", "y"];
+      const correct = r.pron;
+      let opts = [correct];
+      for (const w of shuffle(wrongPool)) { if (opts.length >= 4) break; if (!opts.includes(w) && w !== correct) opts.push(w); }
+      opts = shuffle(opts);
+      return { type: "pron", skill: FN[c.fn].skill, sent, target: i, prompt: "Je remplace le groupe encadré par un petit mot. Lequel ?", options: opts.map((w) => ({ id: w, label: w })), correct, exp: "« " + r.text + " » " + r.msg, hint: c.fn === "COD" ? "Pour un COD : le, la, l', les." : "Pour un COI : lui, leur, y." };
+    }
+    if (t === "verb") {
+      if (skill !== "tous" && skill !== "verbe") continue;
+      const opts = shuffle(sent.ch.map((c) => c)).slice(0, 4);
+      const vc = verbChunk(sent);
+      if (!opts.includes(vc)) opts[0] = vc;
+      const o2 = shuffle(opts);
+      const r = doAdd(sent, idx(sent, "V"));
+      return { type: "verb", skill: "verbe", sent, prompt: "Je mets la phrase à la forme négative avec ne...pas. Quel groupe est le verbe ?", options: o2.map((c) => ({ id: c.t, label: c.t })), correct: vc.t, exp: "« " + r.text + " » " + r.msg, hint: "Le verbe se met entre ne et pas." };
+    }
+    if (t === "subj") {
+      if (skill !== "tous" && skill !== "sujet") continue;
+      const opts = shuffle(sent.ch.map((c) => c)).slice(0, 4);
+      const sc = subjChunk(sent);
+      if (!opts.includes(sc)) opts[0] = sc;
+      const o2 = shuffle(opts);
+      const r = doAdd(sent, idx(sent, "S"));
+      return { type: "subj", skill: "sujet", sent, prompt: "Je dis c'est...qui devant la phrase. Quel groupe est le sujet ?", options: o2.map((c) => ({ id: c.t, label: c.t })), correct: sc.t, exp: "« " + r.text + " » " + r.msg, hint: "Le sujet est entre c'est et qui." };
+    }
+  }
+  return null;
+}
+
+/* --- Cartes mémoire --- */
+const CARDS = [
+  { id: "c1", skill: "cc", f: "À quoi sert l'outil EFFACER ?", b: "J'enlève un groupe de mots. Si la phrase tient encore debout, c'est peut-être un CC." },
+  { id: "c2", skill: "cc", f: "À quoi sert l'outil DÉPLACER ?", b: "Je change un groupe de place. Si la phrase sonne juste, c'est un CC." },
+  { id: "c3", skill: "cod", f: "À quoi sert l'outil REMPLACER ?", b: "Je mets un petit mot à la place du groupe : le, la, l', les pour un COD ; lui, leur, y pour un COI." },
+  { id: "c4", skill: "verbe", f: "À quoi sert l'outil AJOUTER ?", b: "J'ajoute des mots pour tester : ne...pas pour le verbe, c'est...qui pour le sujet, « et cela se passe » pour le CC." },
+  { id: "c5", skill: "verbe", f: "Comment trouver le verbe ?", b: "Je mets ne...pas autour : « Le guide ne montre pas ». Le verbe est entre ne et pas. Je peux aussi changer le temps." },
+  { id: "c6", skill: "sujet", f: "Comment trouver le sujet ?", b: "J'encadre avec c'est...qui (ou ce sont...qui). Je peux aussi le remplacer par il, elle, ils, elles." },
+  { id: "c7", skill: "cc", f: "Comment reconnaître un CC ?", b: "Il s'efface et il se déplace. Il dit quand, où ou comment. Je peux ajouter « et cela se passe »." },
+  { id: "c8", skill: "cod", f: "Comment reconnaître un COD ?", b: "Il complète le verbe sans préposition. Il ne s'efface pas et ne se déplace pas. Je le remplace par le, la, l', les." },
+  { id: "c9", skill: "coi", f: "Comment reconnaître un COI ?", b: "Il complète le verbe avec une préposition (à, de). Je le remplace par lui, leur, y." },
+  { id: "c10", skill: "cod", f: "Quels petits mots remplacent un COD ?", b: "le, la, l', les." },
+  { id: "c11", skill: "coi", f: "Quels petits mots remplacent un COI ?", b: "lui, leur, y." },
+  { id: "c12", skill: "cc", f: "Que veut dire CC ?", b: "Complément circonstanciel (on dit aussi complément de phrase)." },
+  { id: "c13", skill: "cod", f: "Que veut dire COD ?", b: "Complément d'objet direct : il complète le verbe sans préposition." },
+  { id: "c14", skill: "coi", f: "Que veut dire COI ?", b: "Complément d'objet indirect : il complète le verbe avec une préposition (à, de)." },
+  { id: "c15", skill: "cc", f: "Quels deux gestes pour reconnaître un CC ?", b: "J'efface, puis je déplace. Si les deux marchent, c'est un CC." },
+  { id: "c16", skill: "verbe", f: "Je mets « Les enfants obéissent » à la forme négative.", b: "Les enfants n'obéissent pas. Devant une voyelle, ne devient n'." },
+  { id: "c17", skill: "cod", f: "Si j'hésite, que fais-je ?", b: "Je fais un deuxième test. Quand deux tests disent la même chose, je peux avoir confiance." },
+  { id: "c18", skill: "tous", f: "Dans quel ordre je cherche ?", b: "1. le verbe, 2. le sujet, 3. j'efface et je déplace (CC), 4. je remplace (COD ou COI)." },
+];
+// cartes exemples générées à partir des phrases (une fonction par carte)
+[["s1", 3], ["s2", 3], ["s5", 0], ["s6", 3], ["s7", 3], ["s9", 2], ["s12", 4], ["s13", 3]].forEach(([sid, i], n) => {
+  const s = SENT.find((x) => x.id === sid);
+  const c = s.ch[i];
+  CARDS.push({ id: "e" + (n + 1), skill: FN[c.fn].skill, f: "Dans « " + plain(s) + " », quelle est la fonction de « " + c.t + " » ?", b: FN[c.fn].name + ". " + explainChunk(s, i) });
+});
+
+/* --- Étoiles de parcours --- */
+function starsFor(n, k) {
+  if (!n) return 0;
+  const a = k / n;
+  if (n >= 10 && a >= 0.85) return 3;
+  if (n >= 6 && a >= 0.7) return 2;
+  if (n >= 3 && a >= 0.5) return 1;
+  return 0;
+}
+const starsByCount = (n, steps) => (n >= steps[2] ? 3 : n >= steps[1] ? 2 : n >= steps[0] ? 1 : 0);
+
+if (typeof module !== "undefined") {
+  module.exports = { SENT, FRAMES, SUBJ, CC_OPTS, CARDS, VF, FN, buildSentence, sentText, plain, doErase, doMove, doReplace, doAdd, explainChunk, genQuestion, starsFor, starsByCount, shuffle };
+}
+/* ===== OUTILS DOM ===== */
+const $ = (s, r = document) => r.querySelector(s);
+function add(e, kids) { for (const k of kids.flat(Infinity)) { if (k == null || k === false) continue; e.append(k.nodeType ? k : document.createTextNode(String(k))); } }
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "on") { for (const ev in v) e.addEventListener(ev, v[ev]); }
+    else if (typeof v === "boolean" && k in e) e[k] = v;
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  add(e, kids);
+  return e;
+}
+const IC = {
+  home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  quiz: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
+  cards: '<rect x="3" y="7" width="14" height="12" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>',
+  build: '<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  tag: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/>',
+  book: '<path d="M3 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H3z"/><path d="M21 5h-7a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h7z"/>',
+  path: '<path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/>',
+  gear: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  speaker: '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
+  check: '<path d="M4 12l5 5L20 6"/>',
+  cross: '<path d="M6 6l12 12M18 6L6 18"/>',
+  ask: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><path d="M12 17h.01"/>',
+  erase: '<path d="M3 15l9-9 8 8-6 6H7z"/><path d="M9 9l8 8"/>',
+  move: '<path d="M5 12h14M15 8l4 4-4 4M9 8l-4 4 4 4"/>',
+  replace: '<path d="M4 8h14M14 4l4 4-4 4"/><path d="M20 16H6M10 12l-4 4 4 4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  star: '<path d="M12 3l2.7 6 6.3.6-4.8 4.2 1.5 6.2L12 16.8 6.3 20l1.5-6.2L3 9.6 9.3 9z"/>',
+  bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
+  play: '<path d="M7 4l13 8-13 8z"/>',
+  flip: '<path d="M4 4v6h6M20 20v-6h-6"/><path d="M5.5 15a8 8 0 0 0 14 2M18.5 9a8 8 0 0 0-14-2"/>',
+  trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 13v4M8 21h8M9 17h6"/>',
+  dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/>',
+  save: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  next: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  sh_S: '<circle cx="12" cy="12" r="8" fill="currentColor" stroke="none"/>',
+  sh_V: '<rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" stroke="none"/>',
+  sh_COD: '<path d="M12 3l10 17H2z" fill="currentColor" stroke="none"/>',
+  sh_COI: '<path d="M12 2l10 10-10 10L2 12z" fill="currentColor" stroke="none"/>',
+  sh_CC: '<path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.3l7.1-.7z" fill="currentColor" stroke="none"/>',
+};
+function ico(n) {
+  const t = document.createElement("template");
+  t.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[n] + "</svg>";
+  return t.content.firstChild;
+}
+function magma(size) {
+  const t = document.createElement("template");
+  t.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false" style="color:var(--ink)' + (size ? ";width:" + size + "px;height:" + size + "px" : "") + '">' +
+    '<path d="M42 30c-2-9 4-12 3-20 7 4 10 10 6 16 4-2 6-6 5-10 6 6 6 15 0 19z" fill="#FFB020" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>' +
+    '<path d="M12 88L36 30h28l24 58z" fill="#B5532E" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>' +
+    '<path d="M36 30h28l-2 7H38z" fill="#FFB020" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>' +
+    '<circle cx="42" cy="56" r="6.5" fill="#fff" stroke="currentColor" stroke-width="2.5"/><circle cx="58" cy="56" r="6.5" fill="#fff" stroke="currentColor" stroke-width="2.5"/>' +
+    '<circle cx="43.5" cy="57" r="3" fill="#141B34"/><circle cx="59.5" cy="57" r="3" fill="#141B34"/>' +
+    '<path d="M42 71c4 6 12 6 16 0" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>';
+  return t.content.firstChild;
+}
+
+/* ===== DONNÉES DE L'APPLICATION ===== */
+const SK = [
+  { k: "verbe", fn: "V", name: "Le verbe" },
+  { k: "sujet", fn: "S", name: "Le sujet" },
+  { k: "cc", fn: "CC", name: "Le CC" },
+  { k: "cod", fn: "COD", name: "Le COD" },
+  { k: "coi", fn: "COI", name: "Le COI" },
+];
+const SKN = Object.fromEntries(SK.map((s) => [s.k, s]));
+const TOOL_ICON = { effacer: "erase", deplacer: "move", remplacer: "replace", ajouter: "plus" };
+const TOOL_HELP = { effacer: "j'enlève le groupe", deplacer: "je change le groupe de place", remplacer: "je mets un petit mot à la place", ajouter: "j'ajoute des mots pour tester" };
+const VERD = { ok: ["Ça marche", "check", "v-ok"], no: ["Ça ne marche pas", "cross", "v-no"], meh: ["Je ne suis pas sûr", "ask", "v-meh"] };
+
+/* ===== MÉMOIRE LOCALE (avec secours si le stockage est bloqué) ===== */
+const KEY = "manip-phrases-v1";
+const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false } };
+function loadStore() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
+let S = (function () {
+  const l = loadStore() || {};
+  const o = JSON.parse(JSON.stringify(DEF));
+  for (const k in o) if (l[k] !== undefined) o[k] = k === "settings" ? Object.assign(o.settings, l.settings) : l[k];
+  return o;
+})();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function applySettings() {
+  const r = document.documentElement, t = S.settings;
+  r.dataset.skin = t.skin; r.dataset.read = t.read ? "1" : "0"; r.dataset.motion = t.motion ? "1" : "0";
+  r.style.setProperty("--fs", t.size);
+}
+
+/* ===== PROGRESSION ===== */
+const st = (k) => S.stats[k] || { n: 0, k: 0 };
+const starsOf = (k) => { const s = st(k); return starsFor(s.n, s.k); };
+const totals = () => SK.reduce((a, s) => ({ n: a.n + st(s.k).n, k: a.k + st(s.k).k }), { n: 0, k: 0 });
+const knownCards = () => CARDS.filter((c) => (S.flash[c.id] || 0) >= 2).length;
+const lessonsDone = () => LESSONS.filter((l) => S.lessons[l.id]).length;
+const LEVELS = ["Apprenti détective", "Détective", "Explorateur des phrases", "Expert des phrases", "Maître des phrases"];
+const level = () => Math.min(Math.floor(S.xp / 60), LEVELS.length - 1);
+const BADGES = [
+  { id: "b1", name: "Premier pas", desc: "Répondre à une première question.", ico: "play", test: () => totals().n >= 1 },
+  { id: "b2", name: "Dix bonnes réponses", desc: "Donner 10 bonnes réponses.", ico: "check", test: () => totals().k >= 10 },
+  { id: "b3", name: "Cinquante bonnes réponses", desc: "Donner 50 bonnes réponses.", ico: "trophy", test: () => totals().k >= 50 },
+  { id: "b4", name: "Détective", desc: "Trouver toutes les fonctions d'une phrase.", ico: "tag", test: () => S.solved >= 1 },
+  { id: "b5", name: "Auteur", desc: "Créer 3 phrases.", ico: "build", test: () => S.created >= 3 },
+  { id: "b6", name: "Super mémoire", desc: "Connaître 10 cartes mémoire.", ico: "cards", test: () => knownCards() >= 10 },
+  { id: "b7", name: "Élève curieux", desc: "Lire les 6 leçons.", ico: "book", test: () => lessonsDone() >= 6 },
+  { id: "b8", name: "Étoiles partout", desc: "Obtenir 3 étoiles à chaque étape.", ico: "star", test: () => SK.every((s) => starsOf(s.k) === 3) },
+];
+function gain(xp) { S.xp += xp; save(); refreshPill(); checkBadges(); }
+function checkBadges() {
+  BADGES.forEach((b) => { if (!S.badges[b.id] && b.test()) { S.badges[b.id] = 1; save(); toast("Nouveau badge : " + b.name, b.ico); } });
+}
+function recordAnswer(skill, ok) {
+  const s = S.stats[skill] || (S.stats[skill] = { n: 0, k: 0 });
+  s.n++; if (ok) s.k++;
+  gain(ok ? 10 : 2);
+}
+
+/* ===== SON, VOIX, ANNONCES ===== */
+let AC;
+function beep(good) {
+  if (!S.settings.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const seq = good ? [[523, 0], [784, 0.12]] : [[330, 0], [294, 0.12]];
+    seq.forEach(([f, d]) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = "sine"; o.frequency.value = f; g.gain.value = 0.07;
+      o.connect(g); g.connect(AC.destination);
+      o.start(AC.currentTime + d); o.stop(AC.currentTime + d + 0.14);
+    });
+  } catch (e) {}
+}
+const canSpeak = () => { try { return "speechSynthesis" in window; } catch (e) { return false; } };
+function say(text) {
+  if (!canSpeak()) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = "fr-FR"; u.rate = 0.9; speechSynthesis.speak(u); } catch (e) {}
+}
+function announce(msg) { const l = $("#live"); l.textContent = ""; setTimeout(() => { l.textContent = msg; }, 40); }
+let toastTimer;
+function toast(msg, icon) {
+  const t = $("#toast"); t.replaceChildren(ico(icon || "star"), h("span", null, msg)); t.hidden = false;
+  announce(msg); clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 6000);
+}
+const speakBtn = (getText, label) => canSpeak() ? h("button", { type: "button", class: "btn ghost", "aria-label": label || "Écouter", on: { click: () => say(typeof getText === "function" ? getText() : getText) } }, ico("speaker"), "Écouter") : null;
+
+/* ===== COMPOSANTS COMMUNS ===== */
+function chunkNode(c, o = {}) {
+  const fnk = FN[c.fn] ? c.fn : null;
+  const cls = "chunk" + (o.tagged && fnk ? " tagged f-" + fnk : "") + (o.target ? " target" : "") + (o.ghost ? " ghost" : "");
+  const wrap = h("div", { class: "chunkwrap" });
+  let el;
+  if (o.onclick) el = h("button", { type: "button", class: cls, "aria-pressed": o.pressed ? "true" : "false", on: { click: o.onclick } }, c.t);
+  else el = h("span", { class: cls }, c.t, o.target ? h("span", { class: "sr" }, " (groupe à analyser)") : null);
+  wrap.append(el);
+  if (o.tagged && fnk) wrap.append(h("span", { class: "tagrow f-" + fnk }, ico("sh_" + fnk), FN[fnk].name));
+  return wrap;
+}
+function sentNode(sent, o = {}) {
+  const box = h("div", { class: "sent", role: "group", "aria-label": "Phrase : " + plain(sent) });
+  sent.ch.forEach((c, i) => {
+    const cc = i === 0 ? Object.assign({}, c, { t: cap(c.t) }) : c;
+    box.append(chunkNode(cc, {
+      tagged: o.tagged || (o.found && o.found[i]),
+      target: o.target === i,
+      pressed: o.sel === i,
+      onclick: o.onpick ? () => o.onpick(i) : null,
+    }));
+    if (i === 0 && c.fn === "CC" && sent.ch.length > 1) box.append(h("span", { class: "punct", "aria-hidden": "true" }, ","));
+  });
+  box.append(h("span", { class: "punct", "aria-hidden": "true" }, "."));
+  return box;
+}
+function fnBadge(k, o = {}) {
+  const attrs = { type: "button", class: "fnbadge f-" + k, on: o.onclick ? { click: o.onclick } : null };
+  if (!o.onclick) { attrs.class += " plain"; return h("span", { class: attrs.class }, ico("sh_" + k), FN[k].name); }
+  return h("button", attrs, ico("sh_" + k), FN[k].name);
+}
+function starsNode(n) {
+  return h("span", { class: "stars", role: "img", "aria-label": n + " étoile" + (n > 1 ? "s" : "") + " sur 3" },
+    [0, 1, 2].map((i) => { const s = ico("star"); s.setAttribute("class", i < n ? "on" : "off"); return s; }));
+}
+function radioGroup(legend, name, items, current, onchange) {
+  return h("fieldset", null, h("legend", null, legend),
+    h("div", { class: "choices" }, items.map(([val, label, icon]) =>
+      h("label", { class: "choice" },
+        h("input", { type: "radio", name, value: String(val), checked: String(val) === String(current), on: { change: () => onchange(val) } }),
+        icon ? ico(icon) : null, h("span", null, label)))));
+}
+function title(text, sub) { return [h("h1", { id: "title", tabindex: "-1" }, text), sub ? h("p", { class: "muted" }, sub) : null].filter(Boolean); }
+function vTag(v) { const [l, i, c] = VERD[v]; return h("span", { class: "pill " + c, style: "border-color:var(--vc);color:var(--ink)" }, ico(i), l); }
+function verdictBox(res, extra) {
+  const [l, i, c] = VERD[res.verdict];
+  return h("div", { class: "verdict " + c, role: "status" }, ico(i), h("div", null, h("p", { class: "res" }, l), h("p", { style: "margin:0" }, res.msg), extra));
+}
+function askDialog(titleText, text, okLabel, onOk) {
+  const d = $("#dlg");
+  d.replaceChildren(h("h2", null, titleText), h("p", null, text), h("div", { class: "row" },
+    h("button", { type: "button", class: "btn primary", on: { click: () => { closeDlg(); onOk(); } } }, okLabel),
+    h("button", { type: "button", class: "btn", on: { click: closeDlg } }, "Annuler")));
+  openDlg();
+}
+function openDlg() { const d = $("#dlg"); try { d.showModal(); } catch (e) { d.setAttribute("open", ""); } }
+function closeDlg() { const d = $("#dlg"); try { d.close(); } catch (e) { d.removeAttribute("open"); } }
+function refreshPill() { const p = $("#pill"); if (p) p.replaceChildren(ico("star"), "Niveau " + (level() + 1) + " · " + S.xp + " points"); }
+
+function fill(el, ...kids) { el.replaceChildren(...kids.flat(Infinity).filter(Boolean)); }
+/* ===== ÉTAT DE L'INTERFACE ===== */
+const UI = { tab: "quiz", quizSkill: "tous", quizLen: 8, quiz: null, deck: null, skillCards: "tous", lab: null, custom: null, at: null, lesson: 0 };
+const freshLab = (sent, key) => ({ key, sent, sel: null, tool: null, res: null, found: {}, wrong: 0, tip: null, done: false });
+const go = (name) => { location.hash = name; };
+
+/* ======================================================= ACCUEIL */
+function nextStep() {
+  for (const s of SK) if (starsOf(s.k) < 3) return s;
+  return null;
+}
+function viewAccueil(root) {
+  const t = totals();
+  const hello = S.name ? "Bonjour " + S.name + " !" : "Bonjour !";
+  const nxt = nextStep();
+  const msg = t.n === 0
+    ? "Je suis Magma, le petit volcan. Avec mes quatre outils, tu vas devenir un as des phrases. On commence quand tu veux !"
+    : nxt ? "Bravo pour ton travail. Prochaine étape : " + nxt.name.toLowerCase() + ". On y va ?" : "Tu as 3 étoiles partout. Tu peux encore créer des phrases ou t'amuser avec les étiquettes !";
+  const nameIn = h("input", { type: "text", id: "nm", value: S.name, maxlength: "20", autocomplete: "off" });
+  root.append(
+    ...title(hello),
+    h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, msg))),
+    h("div", { class: "row", style: "margin:1rem 0" },
+      h("button", { type: "button", class: "btn primary", on: { click: () => { if (nxt) { UI.quizSkill = nxt.k; UI.tab = "quiz"; UI.quiz = null; } go("entrainer"); } } }, ico("play"), nxt ? "Continuer : " + nxt.name.toLowerCase() : "S'entraîner"),
+      h("button", { type: "button", class: "btn", on: { click: () => go("apprendre") } }, ico("book"), "Revoir une leçon")),
+    h("div", { class: "grid g3" },
+      [["entrainer", "S'entraîner", "quiz", "Quiz et cartes mémoire pour réviser en jouant."],
+       ["creer", "Créer des phrases", "build", "Je construis mes propres phrases avec un verbe, un sujet et des compléments."],
+       ["etiquettes", "Les étiquettes", "tag", "Je touche un groupe de mots, j'essaie un outil, je trouve sa fonction."],
+       ["apprendre", "Apprendre", "book", "Six petites leçons avec des exemples."],
+       ["parcours", "Mon parcours", "path", "Mes étoiles, mes badges et mes progrès."]]
+        .map(([r, n, i, d]) => h("a", { class: "tile", href: "#" + r }, ico(i), h("b", null, n), h("span", { class: "muted small" }, d)))),
+    h("div", { class: "card", style: "margin-top:1.2rem" },
+      h("h2", null, "Mon prénom"),
+      h("p", { class: "muted small" }, "Facultatif. Il reste dans ton navigateur, sur cet appareil."),
+      h("div", { class: "row" },
+        h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
+        h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 09 h 50. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+  );
+}
+
+/* ======================================================= S'ENTRAÎNER */
+function viewEntrainer(root) {
+  const body = h("div");
+  const tabs = h("ul", { class: "tabs", role: "list" },
+    [["quiz", "Quiz", "quiz"], ["cartes", "Cartes mémoire", "cards"]].map(([k, l, i]) =>
+      h("li", null, h("button", { type: "button", class: "tab", "aria-pressed": UI.tab === k ? "true" : "false", on: { click: () => { UI.tab = k; draw(); } } }, l))));
+  root.append(...title("S'entraîner"), tabs, body);
+  function draw(focus) {
+    tabs.querySelectorAll(".tab").forEach((b, i) => b.setAttribute("aria-pressed", String((i === 0 ? "quiz" : "cartes") === UI.tab)));
+    body.replaceChildren();
+    if (UI.tab === "quiz") quizView(body, draw); else cardsView(body, draw);
+    if (focus) { const f = $(focus, body); if (f) f.focus(); }
+  }
+  draw();
+}
+const skillOpts = () => [["tous", "Un peu de tout", null], ...SK.map((s) => [s.k, s.name, "sh_" + s.fn])];
+
+function startQuiz(skill, len) {
+  const list = [], seen = new Set();
+  let guard = 0;
+  while (list.length < len && guard++ < 600) {
+    const q = genQuestion(skill);
+    if (!q) break;
+    const key = q.type + "|" + q.prompt + "|" + (q.sent ? plain(q.sent) : "") + "|" + q.target;
+    if (seen.has(key)) continue;
+    seen.add(key); list.push(q);
+  }
+  UI.quiz = { skill, list, i: 0, right: 0, sel: null, hint: false, weak: {} };
+}
+function quizView(box, draw) {
+  const Q = UI.quiz;
+  if (!Q) {
+    box.append(
+      h("p", null, "Je réponds à des questions courtes. Pas de chrono, pas de points en moins : je peux prendre mon temps et demander un indice."),
+      radioGroup("Qu'est-ce que je travaille ?", "qs", skillOpts(), UI.quizSkill, (v) => { UI.quizSkill = v; }),
+      radioGroup("Combien de questions ?", "ql", [[5, "5 questions"], [8, "8 questions"], [12, "12 questions"]], UI.quizLen, (v) => { UI.quizLen = Number(v); }),
+      h("button", { type: "button", class: "btn primary", on: { click: () => { startQuiz(UI.quizSkill, UI.quizLen); if (!UI.quiz.list.length) { UI.quiz = null; toast("Pas de question pour ce choix.", "ask"); return; } draw("#qtitle"); } } }, ico("play"), "C'est parti !"));
+    return;
+  }
+  if (Q.i >= Q.list.length) return quizEnd(box, draw);
+  const q = Q.list[Q.i], answered = Q.sel !== null, ok = answered && Q.sel === q.correct;
+  const labelOf = (id) => q.options.find((o) => o.id === id).label;
+  box.append(
+    h("div", { class: "row", style: "justify-content:space-between" },
+      h("span", { class: "pill" }, "Question " + (Q.i + 1) + " sur " + Q.list.length),
+      h("button", { type: "button", class: "btn ghost", on: { click: () => { UI.quiz = null; draw(); } } }, "Arrêter")),
+    h("div", { class: "progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(Q.list.length), "aria-valuenow": String(Q.i), "aria-label": "Avancement du quiz", style: "margin:.6rem 0 1rem" }, h("i", { style: "width:" + Math.round((Q.i / Q.list.length) * 100) + "%" })),
+    h("div", { class: "card brand" },
+      h("h2", { id: "qtitle", tabindex: "-1" }, q.prompt),
+      q.sent ? sentNode(q.sent, { target: q.target }) : null,
+      h("div", { class: "row", style: "margin-top:.8rem" },
+        speakBtn(() => q.prompt + " " + (q.sent ? plain(q.sent) : "") + (q.target != null ? " Le groupe à analyser est : " + q.sent.ch[q.target].t : "")),
+        !answered ? h("button", { type: "button", class: "btn ghost", on: { click: () => { Q.hint = true; S.hints++; save(); draw("#hint"); } } }, ico("bulb"), "Un indice") : null),
+      Q.hint && !answered ? h("p", { id: "hint", tabindex: "-1", style: "margin-top:.6rem" }, h("b", null, "Indice : "), q.hint) : null,
+      h("div", { class: "opts", role: "group", "aria-label": "Réponses possibles" },
+        q.options.map((o) => {
+          const right = answered && o.id === q.correct, wrong = answered && Q.sel === o.id && !right;
+          return h("button", { type: "button", class: "opt" + (right ? " right" : "") + (wrong ? " wrong" : ""), "aria-disabled": answered ? "true" : null,
+            on: { click: () => { if (answered) return; answer(o.id); } } },
+            o.fn ? ico("sh_" + o.fn) : null, h("span", null, o.label),
+            right ? h("span", { class: "mark" }, ico("check"), "Bonne réponse") : wrong ? h("span", { class: "mark" }, "Ton choix") : null);
+        })),
+      answered ? h("div", { class: "verdict " + (ok ? "v-ok" : "v-no"), role: "status", style: "margin-top:1rem" },
+        ico(ok ? "check" : "cross"),
+        h("div", null, h("p", { class: "res" }, ok ? "Bravo, c'est la bonne réponse !" : "Pas encore. La bonne réponse est « " + labelOf(q.correct) + " »."), h("p", { style: "margin:0" }, q.exp))) : null,
+      answered ? h("div", { class: "row", style: "margin-top:1rem" },
+        h("button", { type: "button", id: "nextq", class: "btn primary", on: { click: () => { Q.i++; Q.sel = null; Q.hint = false; draw("#qtitle"); } } }, Q.i + 1 < Q.list.length ? "Question suivante" : "Voir mon résultat", ico("next")),
+        canSpeak() ? h("button", { type: "button", class: "btn ghost", on: { click: () => say(q.exp) } }, ico("speaker"), "Écouter l'explication") : null) : null));
+  function answer(id) {
+    const good = id === q.correct;
+    Q.sel = id; if (good) Q.right++; else Q.weak[q.skill] = (Q.weak[q.skill] || 0) + 1;
+    recordAnswer(q.skill, good); beep(good);
+    draw("#nextq");
+  }
+  if (!answered && S.settings.auto && Q._said !== Q.i) { Q._said = Q.i; say(q.prompt + " " + (q.sent ? plain(q.sent) : "")); }
+}
+function quizEnd(box, draw) {
+  const Q = UI.quiz, n = Q.list.length, k = Q.right;
+  const ratio = k / n, sessionStars = ratio >= 0.85 ? 3 : ratio >= 0.65 ? 2 : ratio >= 0.4 ? 1 : 0;
+  if (!Q.saved) {
+    Q.saved = true;
+    S.history.push({ d: new Date().toLocaleDateString("fr-FR"), skill: Q.skill === "tous" ? "Un peu de tout" : SKN[Q.skill].name, n, k });
+    S.history = S.history.slice(-12); save(); checkBadges();
+  }
+  const weak = Object.entries(Q.weak).sort((a, b) => b[1] - a[1])[0];
+  const msg = sessionStars === 3 ? "Magnifique ! Tu maîtrises bien ces manipulations." : sessionStars >= 1 ? "Beau travail ! Chaque question te rend plus fort." : "Tu as essayé, c'est ça qui compte. Relis la leçon et recommence : tu vas y arriver.";
+  box.append(
+    h("div", { class: "card brand" },
+      h("h2", { id: "qtitle", tabindex: "-1" }, "Résultat : " + k + " bonne" + (k > 1 ? "s" : "") + " réponse" + (k > 1 ? "s" : "") + " sur " + n),
+      h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, msg))),
+      h("p", { style: "margin-top:1rem" }, "Ma série : ", starsNode(sessionStars)),
+      weak ? h("p", null, "À revoir : ", h("a", { href: "#apprendre", on: { click: () => { UI.lesson = Math.max(0, LESSONS.findIndex((l) => l.skill === weak[0])); } } }, "la leçon sur " + SKN[weak[0]].name.toLowerCase())) : null,
+      h("div", { class: "row", style: "margin-top:1rem" },
+        h("button", { type: "button", class: "btn primary", on: { click: () => { startQuiz(Q.skill, UI.quizLen); draw("#qtitle"); } } }, ico("play"), "Rejouer"),
+        h("button", { type: "button", class: "btn", on: { click: () => { UI.quiz = null; draw(); } } }, "Changer de série"),
+        h("a", { class: "btn", href: "#parcours" }, ico("path"), "Mon parcours"))));
+}
+
+/* ----- Cartes mémoire ----- */
+function cardsView(box, draw) {
+  let D = UI.deck;
+  if (!D) {
+    box.append(
+      h("p", null, "Je lis la question, je réfléchis, puis je retourne la carte. Je dis si je le savais ou si je veux la revoir."),
+      radioGroup("Quelles cartes ?", "cs", skillOpts(), UI.skillCards, (v) => { UI.skillCards = v; }),
+      h("button", { type: "button", class: "btn primary", on: { click: () => {
+        const pool = CARDS.filter((c) => UI.skillCards === "tous" || c.skill === UI.skillCards || c.skill === "tous");
+        const sorted = shuffle(pool).sort((a, b) => (S.flash[a.id] || 0) - (S.flash[b.id] || 0));
+        UI.deck = { list: sorted, i: 0, flipped: false, known: 0 }; draw("#ctitle");
+      } } }, ico("play"), "Commencer les cartes"));
+    return;
+  }
+  if (D.i >= D.list.length) {
+    box.append(h("div", { class: "card brand" },
+      h("h2", { id: "ctitle", tabindex: "-1" }, "Série terminée !"),
+      h("p", null, D.known + " carte" + (D.known > 1 ? "s" : "") + " sue" + (D.known > 1 ? "s" : "") + " sur " + D.list.length + ". Les cartes à revoir reviendront en premier la prochaine fois."),
+      h("div", { class: "row" },
+        h("button", { type: "button", class: "btn primary", on: { click: () => { UI.deck = null; draw(); } } }, "Recommencer"),
+        h("a", { class: "btn", href: "#parcours" }, ico("path"), "Mon parcours"))));
+    return;
+  }
+  const c = D.list[D.i], lvl = S.flash[c.id] || 0;
+  box.append(
+    h("div", { class: "row", style: "justify-content:space-between" },
+      h("span", { class: "pill" }, "Carte " + (D.i + 1) + " sur " + D.list.length),
+      h("span", { class: "pill" }, lvl >= 2 ? "Carte connue" : lvl === 1 ? "Presque connue" : "Nouvelle carte"),
+      h("button", { type: "button", class: "btn ghost", on: { click: () => { UI.deck = null; draw(); } } }, "Arrêter")),
+    h("div", { class: "card brand flash", style: "margin-top:.8rem" },
+      h("h2", { id: "ctitle", tabindex: "-1", class: "q" }, c.f),
+      D.flipped ? h("p", { class: "a", role: "status" }, h("b", null, "Réponse : "), c.b) : null,
+      h("div", { class: "row", style: "justify-content:center" },
+        speakBtn(() => c.f + (D.flipped ? " " + c.b : "")),
+        !D.flipped ? h("button", { type: "button", class: "btn primary", on: { click: () => { D.flipped = true; draw("#know"); } } }, ico("flip"), "Retourner la carte") : null)),
+    D.flipped ? h("div", { class: "row", style: "margin-top:1rem" },
+      h("button", { type: "button", id: "know", class: "btn primary", on: { click: () => rate(2) } }, ico("check"), "Je le savais"),
+      h("button", { type: "button", class: "btn", on: { click: () => rate(0) } }, ico("flip"), "Je veux la revoir")) : null);
+  function rate(l) {
+    S.flash[c.id] = l === 2 ? 2 : Math.max(0, lvl > 0 ? 1 : 0);
+    if (l === 2) D.known++;
+    gain(l === 2 ? 3 : 1);
+    D.i++; D.flipped = false; draw("#ctitle");
+  }
+}
+
+/* ======================================================= ÉTIQUETTES */
+function viewEtiquettes(root) {
+  if (UI.custom && UI.customFresh) { UI.lab = freshLab(UI.custom, "custom"); UI.customFresh = false; }
+  if (!UI.lab) UI.lab = freshLab(SENT[0], "s1");
+  const holder = h("div");
+  root.append(...title("Les étiquettes", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), holder);
+  draw();
+
+  function pickSentence(key) {
+    if (key === "custom" && UI.custom) UI.lab = freshLab(UI.custom, "custom");
+    else UI.lab = freshLab(SENT.find((s) => s.id === key) || SENT[0], key);
+    draw("#sentgrp");
+  }
+  function draw(focus) {
+    const L = UI.lab, sent = L.sent, nFound = Object.keys(L.found).length, total = sent.ch.length;
+    const sel = h("select", { id: "selsent", on: { change: (e) => pickSentence(e.target.value) } },
+      UI.custom ? h("option", { value: "custom", selected: L.key === "custom" }, "Ma phrase : " + plain(UI.custom)) : null,
+      SENT.map((s) => h("option", { value: s.id, selected: L.key === s.id }, plain(s))));
+    const step = L.done ? "Bravo, la phrase est résolue !" : L.sel === null ? "Étape 1 : touche un groupe de mots." : L.res ? "Étape 3 : à ton avis, quelle est sa fonction ?" : "Étape 2 : choisis un outil pour tester ce groupe.";
+    const c = L.sel !== null ? sent.ch[L.sel] : null;
+    fill(holder,
+      h("div", { class: "row" },
+        h("label", { for: "selsent", class: "sr" }, "Choisir une phrase"), sel,
+        h("button", { type: "button", class: "btn", on: { click: () => { const pool = SENT.filter((s) => s.id !== L.key); pickSentence(pool[rnd(pool.length)].id); } } }, ico("dice"), "Au hasard"),
+        speakBtn(() => plain(sent), "Écouter la phrase")),
+      h("div", { class: "row", style: "margin:.8rem 0 .4rem; justify-content:space-between" },
+        h("span", { class: "pill" }, "Fonctions trouvées : " + nFound + " sur " + total),
+        h("p", { style: "margin:0;font-weight:600" }, step)),
+      h("div", { class: "progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(total), "aria-valuenow": String(nFound), "aria-label": "Fonctions trouvées" }, h("i", { style: "width:" + Math.round((nFound / total) * 100) + "%" })),
+      h("div", { class: "card", style: "margin:1rem 0" }, h("div", { id: "sentgrp", tabindex: "-1" }, sentNode(sent, { sel: L.sel, found: L.found, onpick: (i) => { L.sel = i; L.tool = null; L.res = null; L.tip = null; draw("#tools button"); } }))),
+      h("div", { id: "tools", class: "tools", role: "group", "aria-label": "Outils" },
+        Object.keys(TOOLS).map((t) => h("button", { type: "button", class: "tool", "aria-pressed": L.tool === t ? "true" : "false", disabled: L.sel === null,
+          on: { click: () => useTool(t) } }, ico(TOOL_ICON[t]), TOOL_LABEL[t]))),
+      h("p", { class: "muted small" }, Object.keys(TOOLS).map((t) => TOOL_LABEL[t] + " : " + TOOL_HELP[t] + ". ").join("")),
+      c && L.res ? h("div", { style: "margin-top:1rem" },
+        h("h2", null, TOOL_LABEL[L.tool] + " « " + c.t + " »"),
+        L.res.text ? h("p", { class: "out" }, "« " + L.res.text + " »") : null,
+        verdictBox(L.res)) : null,
+      c && !L.found[L.sel] ? h("div", { class: "card brand", style: "margin-top:1rem" },
+        h("h2", null, "Quelle est la fonction de « " + c.t + " » ?"),
+        h("div", { class: "row" }, FN_ORDER.map((k) => fnBadge(k, { onclick: () => guess(k) }))),
+        L.msg ? h("p", { role: "status", style: "margin-top:.8rem" }, L.msg) : null,
+        h("div", { class: "row", style: "margin-top:.6rem" }, h("button", { type: "button", class: "btn ghost", on: { click: () => { L.msg = "Coup de pouce : " + FN[c.fn].tip; S.hints++; save(); draw("#sentgrp"); } } }, ico("bulb"), "Un coup de pouce"))) : null,
+      L.done ? h("div", { class: "card brand", style: "margin-top:1rem" },
+        h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, "Bravo, détective ! Tu as trouvé toutes les fonctions. +15 points."))),
+        h("div", { class: "row", style: "margin-top:.8rem" },
+          h("button", { type: "button", id: "nextsent", class: "btn primary", on: { click: () => { const pool = SENT.filter((s) => s.id !== L.key); pickSentence(pool[rnd(pool.length)].id); } } }, ico("next"), "Phrase suivante"))) : null);
+    if (focus) { const f = $(focus, holder); if (f) f.focus(); }
+  }
+  function useTool(t) {
+    const L = UI.lab;
+    L.tool = t; L.res = TOOLS[t](L.sent, L.sel); L.msg = null;
+    announce(TOOL_LABEL[t] + " : " + VERD[L.res.verdict][0]);
+    draw("#tools button[aria-pressed=true]");
+  }
+  function guess(k) {
+    const L = UI.lab, c = L.sent.ch[L.sel];
+    if (k === c.fn) {
+      L.found[L.sel] = true; L.sel = null; L.tool = null; L.res = null; L.msg = null; L.wrong = 0;
+      gain(3); beep(true);
+      const all = Object.keys(L.found).length === L.sent.ch.length;
+      if (all && !L.done) { L.done = true; S.solved++; gain(15); save(); checkBadges(); announce("Bravo ! Toutes les fonctions sont trouvées."); draw("#nextsent"); }
+      else { announce("Bravo, c'est la bonne fonction."); draw("#sentgrp"); }
+    } else {
+      L.wrong++; beep(false);
+      L.msg = "Pas encore. Teste un autre outil, puis réessaie." + (L.wrong >= 2 ? " Coup de pouce : " + FN[c.fn].tip : "");
+      announce(L.msg); draw("#sentgrp");
+    }
+  }
+}
+
+/* ======================================================= CRÉER */
+function viewCreer(root) {
+  if (!UI.at) UI.at = { frame: "observer", subj: 0, cod: 0, coi: -1, cc: 0, ccPos: "start", ccText: "", ccKind: "t" };
+  const A = UI.at;
+  const holder = h("div"), preview = h("div");
+  root.append(...title("Créer des phrases", "Je choisis un verbe, un sujet et des compléments. La phrase se construit toute seule."), holder);
+  function frame() { return FRAMES.find((f) => f.id === A.frame); }
+  draw();
+  function current() {
+    const f = frame();
+    const cod = f.cod && A.cod >= 0 ? f.cod[A.cod] : null, coi = f.coi && A.coi >= 0 ? f.coi[A.coi] : null;
+    const txt = A.ccText.trim().replace(/[.,;!?]+$/, "");
+    let cc = null;
+    if (txt) cc = { t: txt, kind: A.ccKind, own: true };
+    else if (A.cc >= 0) cc = { t: CC_OPTS[A.cc][0], kind: CC_OPTS[A.cc][1] };
+    return buildSentence({ frame: A.frame, subj: SUBJ[A.subj], cod, coi, cc, ccPos: A.ccPos });
+  }
+  function drawPreview() {
+    const sent = current();
+    fill(preview,
+      h("div", { class: "card brand" },
+        h("h2", null, "Ma phrase"),
+        sentNode(sent, { tagged: true }),
+        h("p", { class: "out", style: "margin-top:.8rem" }, plain(sent)),
+        h("div", { class: "row" },
+          speakBtn(() => plain(sent), "Écouter ma phrase"),
+          h("button", { type: "button", class: "btn primary", on: { click: () => { UI.custom = sent; UI.customFresh = true; UI.lab = null; go("etiquettes"); } } }, ico("tag"), "La tester avec les étiquettes"),
+          h("button", { type: "button", class: "btn", on: { click: () => keep(sent) } }, ico("save"), "Garder dans mon carnet"))));
+  }
+  function keep(sent) {
+    const txt = plain(sent);
+    if (S.notebook.some((n) => sentText(n.ch) === txt)) { toast("Cette phrase est déjà dans ton carnet.", "ask"); return; }
+    if (S.notebook.length >= 12) { toast("Ton carnet est plein (12 phrases). Supprime une phrase pour continuer.", "ask"); return; }
+    S.notebook.push({ ch: sent.ch }); S.created++; gain(5); save(); toast("Phrase gardée dans ton carnet.", "save"); draw("#nbtitle");
+  }
+  function draw(focus) {
+    const f = frame();
+    fill(holder,
+      h("div", { class: "grid g2" },
+        h("div", null,
+          radioGroup("Le verbe", "fr", FRAMES.map((x) => [x.id, x.id, "sh_V"]), A.frame, (v) => {
+            A.frame = v; const nf = frame();
+            A.cod = nf.cod ? 0 : -1; A.coi = nf.coi ? (nf.cod ? -1 : 0) : -1; draw("input[name=fr]:checked");
+          }),
+          radioGroup("Le sujet", "su", SUBJ.map((x, i) => [i, x.t, "sh_S"]), A.subj, (v) => { A.subj = Number(v); draw("input[name=su]:checked"); }),
+          f.cod ? radioGroup("Le COD (complète le verbe)", "co", f.cod.map((x, i) => [i, x[0], "sh_COD"]), A.cod, (v) => { A.cod = Number(v); draw("input[name=co]:checked"); }) : null,
+          f.coi ? radioGroup("Le COI (avec à, aux...)", "ci", [...(f.cod ? [[-1, "Pas de COI"]] : []), ...f.coi.map((x, i) => [i, x[0], "sh_COI"])], A.coi, (v) => { A.coi = Number(v); draw("input[name=ci]:checked"); }) : null),
+        h("div", null,
+          radioGroup("Le CC (quand, où, comment ?)", "cc", [[-1, "Pas de CC"], ...CC_OPTS.map((x, i) => [i, x[0], "sh_CC"])], A.cc, (v) => { A.cc = Number(v); A.ccText = ""; draw("input[name=cc]:checked"); }),
+          h("fieldset", null, h("legend", null, "Ou j'invente mon CC"),
+            h("div", { class: "row" },
+              h("label", { for: "cctxt", class: "sr" }, "Mon propre CC"),
+              h("input", { type: "text", id: "cctxt", value: A.ccText, maxlength: "40", placeholder: "par exemple : dans la cour", autocomplete: "off", on: { input: (e) => { A.ccText = e.target.value; drawPreview(); } } }),
+              h("label", { for: "cckind", class: "sr" }, "Type de mon CC"),
+              h("select", { id: "cckind", on: { change: (e) => { A.ccKind = e.target.value; drawPreview(); } } },
+                [["t", "Quand ?"], ["l", "Où ?"], ["m", "Comment ?"]].map(([v, l]) => h("option", { value: v, selected: A.ccKind === v }, l))))),
+          radioGroup("Où je mets le CC ?", "cp", [["start", "Au début"], ["end", "À la fin"]], A.ccPos, (v) => { A.ccPos = v; draw("input[name=cp]:checked"); }))),
+      preview,
+      h("div", { style: "margin-top:1.5rem" },
+        h("h2", { id: "nbtitle", tabindex: "-1" }, "Mon carnet de phrases"),
+        S.notebook.length ? h("ul", { style: "list-style:none;padding:0;display:grid;gap:.6rem" }, S.notebook.map((n, i) => {
+          const s = { id: "carnet", ch: n.ch }, txt = plain(s);
+          return h("li", { class: "card", style: "display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between" },
+            h("span", { style: "font-weight:500" }, txt),
+            h("span", { class: "row" },
+              h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = s; UI.customFresh = true; UI.lab = null; go("etiquettes"); } } }, ico("tag"), "Tester", h("span", { class: "sr" }, " " + txt)),
+              h("button", { type: "button", class: "btn ghost", on: { click: () => { S.notebook.splice(i, 1); save(); draw("#nbtitle"); } } }, ico("trash"), "Supprimer", h("span", { class: "sr" }, " " + txt))));
+        })) : h("p", { class: "muted" }, "Mon carnet est vide. Je peux y garder jusqu'à 12 phrases.")));
+    drawPreview();
+    if (focus) { const e = $(focus, holder); if (e) e.focus(); }
+  }
+}
+/* ======================================================= APPRENDRE */
+const P = (...x) => h("p", null, ...x);
+function demo(sent, i, tool) {
+  const r = TOOLS[tool](sent, i), c = sent.ch[i];
+  return h("div", { class: "card", style: "margin:.6rem 0" },
+    h("h3", null, h("span", { class: "row", style: "gap:.4rem" }, ico(TOOL_ICON[tool]), TOOL_LABEL[tool] + " le groupe « " + c.t + " »")),
+    P(h("b", null, "Avant : "), plain(sent)),
+    r.text ? P(h("b", null, "Après : "), "« " + r.text + " » ", vTag(r.verdict)) : P(vTag(r.verdict)),
+    h("p", { class: "muted small", style: "margin:0" }, r.msg));
+}
+const L_ELI = () => buildSentence({ frame: "observer", subj: SUBJ[0], cod: ["le volcan", "le"], coi: null, cc: null, ccPos: "start" });
+const LESSONS = [
+  { id: "l1", title: "Mes quatre outils", skill: null, lab: "s1", body: () => [
+    P("Pour comprendre une phrase, je peux la manipuler comme avec des étiquettes. J'ai quatre outils. Un outil me donne un indice. Quand deux outils disent la même chose, je peux avoir confiance."),
+    demo(SENT[0], 0, "effacer"), demo(SENT[0], 0, "deplacer"), demo(SENT[0], 3, "remplacer"), demo(SENT[0], 2, "ajouter")] },
+  { id: "l2", title: "Le verbe et le sujet", skill: "verbe", lab: "s1", body: () => [
+    h("ol", { class: "steps" },
+      h("li", null, h("span", null, "Je cherche le verbe : je mets ", h("b", null, "ne...pas"), " autour. Le verbe est entre ne et pas.")),
+      h("li", null, h("span", null, "Je cherche le sujet : je dis ", h("b", null, "c'est...qui"), " (ou ", h("b", null, "ce sont...qui"), " au pluriel). Le sujet est entre les deux.")),
+      h("li", null, h("span", null, "Le verbe change quand je change le temps (hier, aujourd'hui, demain)."))),
+    demo(SENT[0], 2, "ajouter"), demo(SENT[0], 1, "ajouter"),
+    h("div", { class: "row" }, fnBadge("V"), fnBadge("S"))] },
+  { id: "l3", title: "Le CC (complément de phrase)", skill: "cc", lab: "s2", body: () => [
+    P("Le CC donne une information en plus : ", h("b", null, "quand ?"), ", ", h("b", null, "où ?"), " ou ", h("b", null, "comment ?"), ". On l'appelle aussi complément de phrase."),
+    h("ol", { class: "steps" },
+      h("li", null, h("span", null, "Je l'", h("b", null, "efface"), " : la phrase tient encore debout.")),
+      h("li", null, h("span", null, "Je le ", h("b", null, "déplace"), " : la phrase sonne toujours juste.")),
+      h("li", null, h("span", null, "J'ajoute « ", h("b", null, "et cela se passe"), " » ou « ", h("b", null, "et il le fait"), " » : ça marche."))),
+    demo(SENT[1], 3, "effacer"), demo(SENT[1], 3, "deplacer"), demo(SENT[1], 3, "ajouter"),
+    h("div", { class: "row" }, fnBadge("CC"))] },
+  { id: "l4", title: "Le COD (complément d'objet direct)", skill: "cod", lab: "s1", body: () => [
+    P("Le COD complète le verbe, ", h("b", null, "sans petit mot"), " entre les deux (pas de à, pas de de). Il répond à « qui ? » ou « quoi ? » après le verbe."),
+    h("ol", { class: "steps" },
+      h("li", null, h("span", null, "Je le ", h("b", null, "remplace"), " par ", h("b", null, "le, la, l', les"), ".")),
+      h("li", null, h("span", null, "Je teste : il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), "."))),
+    demo(SENT[0], 3, "remplacer"), demo(SENT[0], 3, "effacer"), demo(SENT[0], 3, "deplacer"),
+    P(h("b", null, "Attention : "), "devant une voyelle ou un h, « le » et « la » deviennent « l' »."),
+    demo(L_ELI(), 2, "remplacer"),
+    h("div", { class: "row" }, fnBadge("COD"))] },
+  { id: "l5", title: "Le COI (complément d'objet indirect)", skill: "coi", lab: "s8", body: () => [
+    P("Le COI complète le verbe avec un petit mot : ", h("b", null, "à"), " (aux = à les) ou ", h("b", null, "de"), ". Il répond à « à qui ? » ou « à quoi ? »."),
+    h("ol", { class: "steps" },
+      h("li", null, h("span", null, "Pour une personne, je le remplace par ", h("b", null, "lui"), " (un seul) ou ", h("b", null, "leur"), " (plusieurs).")),
+      h("li", null, h("span", null, "Pour une chose, je le remplace souvent par ", h("b", null, "y"), ".")),
+      h("li", null, h("span", null, "Effacer n'est pas un test sûr pour un COI : je préfère remplacer."))),
+    demo(SENT[7], 4, "remplacer"), demo(SENT[0], 4, "remplacer"), demo(SENT[6], 3, "remplacer"), demo(SENT[7], 4, "effacer"),
+    h("div", { class: "row" }, fnBadge("COI"))] },
+  { id: "l6", title: "Je compare tout", skill: null, lab: "s16", body: () => [
+    h("div", { class: "overflow" }, h("table", { class: "cmp" },
+      h("caption", { class: "sr" }, "Comparaison des cinq fonctions"),
+      h("thead", null, h("tr", null, ["Fonction", "Mon test", "S'efface ?", "Se déplace ?", "Se remplace par"].map((x) => h("th", { scope: "col" }, x)))),
+      h("tbody", null, [
+        ["V", "ne...pas autour", "Non", "Non", "Je change le temps"],
+        ["S", "c'est...qui", "Non", "Non", "il, elle, ils, elles"],
+        ["CC", "et cela se passe", "Oui", "Oui", "Rien à remplacer"],
+        ["COD", "le, la, l', les", "Non", "Non", "le, la, l', les"],
+        ["COI", "lui, leur, y", "Pas sûr", "Non", "lui, leur, y"],
+      ].map(([k, ...r]) => h("tr", null, h("th", { scope: "row" }, fnBadge(k)), r.map((x) => h("td", null, x))))))),
+    h("h3", { style: "margin-top:1.2rem" }, "Mon ordre de recherche"),
+    h("ol", { class: "steps" },
+      h("li", null, h("span", null, "Je cherche le ", h("b", null, "verbe"), " (ne...pas).")),
+      h("li", null, h("span", null, "Je cherche le ", h("b", null, "sujet"), " (c'est...qui).")),
+      h("li", null, h("span", null, "J'efface et je déplace : si ça marche, c'est un ", h("b", null, "CC"), ".")),
+      h("li", null, h("span", null, "Je remplace : le, la, l', les, c'est un ", h("b", null, "COD"), " ; lui, leur, y, c'est un ", h("b", null, "COI"), "."))),
+    P("Si j'hésite, je fais un deuxième test.")] },
+];
+
+function viewApprendre(root) {
+  const holder = h("div");
+  root.append(...title("Apprendre", "Six petites leçons. Je lis à mon rythme, je peux écouter, et je dis « J'ai compris » à la fin."), holder);
+  draw();
+  function draw(focus) {
+    const L = LESSONS[UI.lesson], done = !!S.lessons[L.id];
+    fill(holder,
+      h("ul", { class: "tabs", role: "list" }, LESSONS.map((l, i) =>
+        h("li", null, h("button", { type: "button", class: "tab", "aria-pressed": i === UI.lesson ? "true" : "false", on: { click: () => { UI.lesson = i; draw("#ltitle"); } } },
+          (i + 1) + ". " + l.title.replace(/ \(.*\)/, ""), S.lessons[l.id] ? h("span", { class: "sr" }, " (lue)") : null)))),
+      h("div", { class: "card brand" },
+        h("h2", { id: "ltitle", tabindex: "-1" }, L.title),
+        h("div", { class: "row", style: "margin-bottom:.6rem" },
+          speakBtn(() => holder.querySelector("#lbody").innerText, "Écouter la leçon"),
+          done ? h("span", { class: "pill v-ok", style: "border-color:var(--ok)" }, ico("check"), "Leçon lue") : null),
+        h("div", { id: "lbody" }, L.body()),
+        h("div", { class: "row", style: "margin-top:1rem" },
+          h("button", { type: "button", class: "btn primary", "aria-pressed": done ? "true" : "false", on: { click: () => {
+            if (!S.lessons[L.id]) { S.lessons[L.id] = 1; gain(5); toast("Leçon terminée. +5 points", "book"); } else { delete S.lessons[L.id]; save(); }
+            draw("#ltitle"); } } }, ico("check"), done ? "J'ai compris (cliquer pour annuler)" : "J'ai compris"),
+          h("button", { type: "button", class: "btn", on: { click: () => { const s = SENT.find((x) => x.id === L.lab) || SENT[0]; UI.custom = null; UI.lab = freshLab(s, s.id); go("etiquettes"); } } }, ico("tag"), "Essayer avec les étiquettes"),
+          L.skill ? h("button", { type: "button", class: "btn", on: { click: () => { UI.quizSkill = L.skill; UI.tab = "quiz"; UI.quiz = null; go("entrainer"); } } }, ico("quiz"), "M'entraîner") : null),
+        h("div", { class: "row", style: "margin-top:.8rem" },
+          UI.lesson > 0 ? h("button", { type: "button", class: "btn ghost", on: { click: () => { UI.lesson--; draw("#ltitle"); } } }, "Leçon précédente") : null,
+          UI.lesson < LESSONS.length - 1 ? h("button", { type: "button", class: "btn ghost", on: { click: () => { UI.lesson++; draw("#ltitle"); } } }, "Leçon suivante", ico("next")) : null)));
+    if (focus) { const f = $(focus, holder); if (f) f.focus(); }
+  }
+}
+
+/* ======================================================= PARCOURS */
+function bilanText() {
+  const t = totals();
+  const lines = ["Bilan Manip'Phrases" + (S.name ? " de " + S.name : ""), "Niveau " + (level() + 1) + " (" + LEVELS[level()] + "), " + S.xp + " points",
+    "Réponses : " + t.k + " bonnes sur " + t.n];
+  SK.forEach((s) => { const x = st(s.k); lines.push(s.name + " : " + starsOf(s.k) + " étoile(s) sur 3 (" + x.k + "/" + x.n + ")"); });
+  lines.push("Leçons lues : " + lessonsDone() + "/" + LESSONS.length, "Cartes connues : " + knownCards() + "/" + CARDS.length, "Phrases résolues : " + S.solved, "Phrases créées : " + S.created, "Indices demandés : " + S.hints);
+  return lines.join("\n");
+}
+function viewParcours(root) {
+  const t = totals(), nxt = nextStep();
+  const pct = Math.round(((S.xp % 60) / 60) * 100);
+  const bil = h("textarea", { class: "bilan", readonly: true, "aria-label": "Mon bilan, à montrer à la maîtresse", rows: "9", on: { focus: (e) => e.target.select() } }, bilanText());
+  const copyMsg = h("span", { role: "status", class: "muted small" });
+  root.append(...title("Mon parcours", "Cinq étapes pour devenir un expert. Je gagne des étoiles en répondant juste, sans pression."),
+    h("div", { class: "card brand", style: "margin-bottom:1rem" },
+      h("div", { class: "mascot" }, magma(), h("div", null,
+        h("p", { class: "xl", style: "margin:0" }, "Niveau " + (level() + 1) + " · " + LEVELS[level()]),
+        h("p", { style: "margin:0 0 .4rem" }, S.xp + " points · " + t.k + " bonnes réponses sur " + t.n),
+        h("div", { class: "progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "60", "aria-valuenow": String(S.xp % 60), "aria-label": "Avancement vers le niveau suivant", style: "min-width:220px" }, h("i", { style: "width:" + pct + "%" }))))),
+    h("ol", { class: "path" }, SK.map((s, i) => {
+      const x = st(s.k), n = starsOf(s.k), isNext = nxt && nxt.k === s.k;
+      const li = LESSONS.find((l) => l.skill === s.k);
+      return h("li", { class: "station f-" + s.fn + (isNext ? " next" : "") },
+        h("span", { class: "num", "aria-hidden": "true" }, ico("sh_" + s.fn)),
+        h("div", null,
+          h("h2", { style: "margin:0" }, "Étape " + (i + 1) + " : " + s.name, isNext ? h("span", { class: "pill", style: "margin-left:.5rem" }, "Prochaine étape") : null),
+          h("p", { style: "margin:.2rem 0" }, starsNode(n), " ", h("span", { class: "muted small" }, x.n ? x.k + " bonnes réponses sur " + x.n : "Pas encore commencé")),
+          li && S.lessons[li.id] ? h("span", { class: "pill" }, ico("book"), "Leçon lue") : null),
+        h("div", { class: "act row" },
+          h("button", { type: "button", class: "btn primary", on: { click: () => { UI.quizSkill = s.k; UI.tab = "quiz"; UI.quiz = null; go("entrainer"); } } }, ico("play"), "Jouer", h("span", { class: "sr" }, " : " + s.name.toLowerCase())),
+          h("button", { type: "button", class: "btn", on: { click: () => { UI.lesson = Math.max(0, LESSONS.findIndex((l) => l.skill === s.k)); go("apprendre"); } } }, ico("book"), "Leçon", h("span", { class: "sr" }, " : " + s.name.toLowerCase()))));
+    })),
+    h("h2", { style: "margin-top:1.6rem" }, "Mes badges"),
+    h("ul", { class: "badges" }, BADGES.map((b) => h("li", { class: "badgecard" + (S.badges[b.id] ? " on" : "") },
+      ico(b.ico), h("div", null, h("b", null, b.name), h("br"), h("span", { class: "small" }, b.desc), h("br"), h("span", { class: "small", style: "font-weight:600" }, S.badges[b.id] ? "Gagné" : "À gagner"))))),
+    h("h2", { style: "margin-top:1.6rem" }, "Mon carnet de bord"),
+    S.history.length ? h("div", { class: "overflow" }, h("table", { class: "cmp" },
+      h("thead", null, h("tr", null, ["Date", "Série", "Résultat"].map((x) => h("th", { scope: "col" }, x)))),
+      h("tbody", null, [...S.history].reverse().map((e) => h("tr", null, h("td", null, e.d), h("td", null, e.skill), h("td", null, e.k + " sur " + e.n)))))) : h("p", { class: "muted" }, "Mes séries de quiz apparaîtront ici."),
+    h("details", { class: "card", style: "margin-top:1.2rem" },
+      h("summary", { style: "cursor:pointer;font-weight:600;min-height:2.5rem" }, "Mon bilan à montrer à la maîtresse"),
+      bil,
+      h("div", { class: "row", style: "margin-top:.6rem" },
+        h("button", { type: "button", class: "btn", on: { click: () => { try { navigator.clipboard.writeText(bil.value).then(() => { copyMsg.textContent = "Bilan copié."; }, () => { copyMsg.textContent = "Copie impossible : sélectionne le texte et copie-le."; bil.select(); }); } catch (e) { copyMsg.textContent = "Copie impossible : sélectionne le texte et copie-le."; bil.select(); } } } }, ico("copy"), "Copier mon bilan"), copyMsg)),
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mes résultats restent dans ce navigateur, sur cet appareil. Rien n'est envoyé sur Internet."),
+    h("div", { style: "margin-top:.6rem" }, h("button", { type: "button", class: "btn ghost", on: { click: () => askDialog("Effacer ma progression ?", "Mes étoiles, mes badges, mes points et mon carnet seront effacés. Je ne pourrai pas les retrouver.", "Oui, tout effacer", () => {
+      S = JSON.parse(JSON.stringify(DEF)); save(); applySettings(); UI.quiz = null; UI.deck = null; UI.lab = null; UI.at = null; UI.custom = null; render(); announce("Progression effacée."); }) } }, ico("trash"), "Effacer ma progression")));
+}
+
+/* ======================================================= RÉGLAGES */
+function openSettings() {
+  const t = S.settings;
+  const set = (k, v) => { t[k] = v; save(); applySettings(); };
+  const chk = (label, key, help) => h("label", { class: "choice", style: "display:flex;margin-bottom:.5rem" },
+    h("input", { type: "checkbox", checked: !!t[key], on: { change: (e) => set(key, e.target.checked) } }), h("span", null, label, help ? h("span", { class: "muted small" }, " — " + help) : null));
+  const d = $("#dlg");
+  d.replaceChildren(
+    h("h2", null, "Mes réglages"),
+    radioGroup("Apparence", "sk", [["auto", "Automatique"], ["light", "Clair"], ["dark", "Sombre"], ["hc", "Contraste fort"]], t.skin, (v) => set("skin", v)),
+    radioGroup("Taille des lettres", "sz", [[1, "Normale"], [1.15, "Grande"], [1.3, "Très grande"]], t.size, (v) => set("size", Number(v))),
+    h("fieldset", null, h("legend", null, "Confort"),
+      chk("Lecture facilitée", "read", "lettres plus lisibles et plus espacées"),
+      chk("Animations", "motion", "petits mouvements quand je réponds"),
+      chk("Sons", "sound", "petits sons de réussite"),
+      chk("Lire les questions à voix haute", "auto", canSpeak() ? "dans le quiz" : "non disponible sur cet appareil")),
+    h("button", { type: "button", class: "btn primary", on: { click: closeDlg } }, "Fermer"));
+  openDlg();
+}
+
+/* ======================================================= ROUTEUR ET DÉMARRAGE */
+const ROUTES = { accueil: viewAccueil, entrainer: viewEntrainer, creer: viewCreer, etiquettes: viewEtiquettes, apprendre: viewApprendre, parcours: viewParcours };
+const NAV = [["accueil", "Accueil", "home"], ["entrainer", "S'entraîner", "quiz"], ["creer", "Créer", "build"], ["etiquettes", "Étiquettes", "tag"], ["apprendre", "Apprendre", "book"], ["parcours", "Mon parcours", "path"]];
+function drawHeader() {
+  const top = $("#topbar");
+  if (!top.firstChild) {
+    top.append(
+      h("a", { class: "logo", href: "#accueil" }, magma(44), h("span", null, "Manip'Phrases", h("small", null, "Les manipulations syntaxiques en jouant"))),
+      h("span", { class: "spacer" }),
+      h("span", { id: "pill", class: "pill" }),
+      h("button", { type: "button", class: "btn", on: { click: openSettings } }, ico("gear"), "Réglages"));
+    refreshPill();
+  }
+  $("#navlist").replaceChildren(...NAV.map(([r, n, i]) => h("li", null, h("a", { class: "navbtn", href: "#" + r, "aria-current": UI.route === r ? "page" : null }, ico(i), n))));
+}
+function render() {
+  const r = (location.hash || "#accueil").slice(1);
+  UI.route = ROUTES[r] ? r : "accueil";
+  drawHeader();
+  const main = $("#main");
+  main.replaceChildren();
+  ROUTES[UI.route](main);
+  document.title = "Manip'Phrases";
+  const t = $("#title"); if (t) t.focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", render);
+applySettings();
+$(".skip").addEventListener("click", (e) => { e.preventDefault(); $("#main").focus(); });
+render();
+</script>
+</body></html>
