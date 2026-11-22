@@ -839,6 +839,7 @@ function openDlg() { const d = $("#dlg"); try { d.showModal(); } catch (e) { d.s
 function closeDlg() { const d = $("#dlg"); try { d.close(); } catch (e) { d.removeAttribute("open"); } }
 function refreshPill() { const p = $("#pill"); if (p) p.replaceChildren(ico("star"), "Niveau " + (level() + 1) + " · " + S.xp + " points"); }
 
+function put(el, ...kids) { el.append(...kids.flat(Infinity).filter((x) => x != null && x !== false)); }
 function fill(el, ...kids) { el.replaceChildren(...kids.flat(Infinity).filter(Boolean)); }
 
 /* Pictogrammes d'aide (CUA : plusieurs façons de comprendre, d'agir et de s'engager) */
@@ -857,7 +858,7 @@ const PICTOS = [
   ["gear", "Mes réglages", "Je choisis mon confort : couleurs, taille, voix."], ["check", "Bonne réponse", "Retour clair, jamais de punition."],
 ];
 /* ===== ÉTAT DE L'INTERFACE ===== */
-const UI = { tab: "quiz", quizSkill: "tous", quizLen: 8, quiz: null, deck: null, skillCards: "tous", lab: null, custom: null, at: null, lesson: 0 };
+const UI = { tab: "quiz", quizSkill: "tous", quizLen: 8, quiz: null, deck: null, skillCards: "tous", cardsLen: 10, lab: null, custom: null, at: null, lesson: 0 };
 const freshLab = (sent, key) => ({ key, sent, sel: null, tool: null, res: null, found: {}, wrong: 0, tip: null, done: false });
 const go = (name) => { location.hash = name; };
 
@@ -874,7 +875,7 @@ function viewAccueil(root) {
     ? "Je suis Magma, le petit volcan. Avec mes quatre outils, tu vas devenir un as des phrases. On commence quand tu veux !"
     : nxt ? "Bravo pour ton travail. Prochaine étape : " + nxt.name.toLowerCase() + ". On y va ?" : "Tu as 3 étoiles partout. Tu peux encore créer des phrases ou t'amuser avec les étiquettes !";
   const nameIn = h("input", { type: "text", id: "nm", value: S.name, maxlength: "20", autocomplete: "off" });
-  root.append(
+  put(root, 
     ...title(hello),
     h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, msg))),
     h("div", { class: "row", style: "margin:1rem 0" },
@@ -893,7 +894,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 50. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 11 h 00. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -931,7 +932,7 @@ function startQuiz(skill, len) {
 function quizView(box, draw) {
   const Q = UI.quiz;
   if (!Q) {
-    box.append(
+    put(box, 
       h("p", null, "Je réponds à des questions courtes. Pas de chrono, pas de points en moins : je peux prendre mon temps et demander un indice."),
       radioGroup("Qu'est-ce que je travaille ?", "qs", skillOpts(), UI.quizSkill, (v) => { UI.quizSkill = v; }),
       radioGroup("Combien de questions ?", "ql", [[5, "5 questions"], [8, "8 questions"], [12, "12 questions"]], UI.quizLen, (v) => { UI.quizLen = Number(v); }),
@@ -941,7 +942,7 @@ function quizView(box, draw) {
   if (Q.i >= Q.list.length) return quizEnd(box, draw);
   const q = Q.list[Q.i], answered = Q.sel !== null, ok = answered && Q.sel === q.correct;
   const labelOf = (id) => q.options.find((o) => o.id === id).label;
-  box.append(
+  put(box, 
     h("div", { class: "row", style: "justify-content:space-between" },
       h("span", { class: "pill" }, "Question " + (Q.i + 1) + " sur " + Q.list.length),
       h("button", { type: "button", class: "btn ghost", on: { click: () => { UI.quiz = null; draw(); } } }, "Arrêter")),
@@ -985,7 +986,7 @@ function quizEnd(box, draw) {
   }
   const weak = Object.entries(Q.weak).sort((a, b) => b[1] - a[1])[0];
   const msg = sessionStars === 3 ? "Magnifique ! Tu maîtrises bien ces manipulations." : sessionStars >= 1 ? "Beau travail ! Chaque question te rend plus fort." : "Tu as essayé, c'est ça qui compte. Relis la leçon et recommence : tu vas y arriver.";
-  box.append(
+  put(box, 
     h("div", { class: "card brand" },
       h("h2", { id: "qtitle", tabindex: "-1" }, "Résultat : " + k + " bonne" + (k > 1 ? "s" : "") + " réponse" + (k > 1 ? "s" : "") + " sur " + n),
       h("div", { class: "mascot" }, magma(), h("div", { class: "bubble" }, h("p", null, msg))),
@@ -1001,18 +1002,20 @@ function quizEnd(box, draw) {
 function cardsView(box, draw) {
   let D = UI.deck;
   if (!D) {
-    box.append(
+    put(box, 
       h("p", null, "Je lis la question, je réfléchis, puis je retourne la carte. Je dis si je le savais ou si je veux la revoir."),
       radioGroup("Quelles cartes ?", "cs", skillOpts(), UI.skillCards, (v) => { UI.skillCards = v; }),
+      radioGroup("Combien de cartes ?", "cl", [[5, "5 cartes"], [10, "10 cartes"], [15, "15 cartes"], [0, "Toutes les cartes"]], UI.cardsLen, (v) => { UI.cardsLen = Number(v); }),
       h("button", { type: "button", class: "btn primary", on: { click: () => {
         const pool = CARDS.filter((c) => UI.skillCards === "tous" || c.skill === UI.skillCards || c.skill === "tous");
-        const sorted = shuffle(pool).sort((a, b) => (S.flash[a.id] || 0) - (S.flash[b.id] || 0));
+        let sorted = shuffle(pool).sort((a, b) => (S.flash[a.id] || 0) - (S.flash[b.id] || 0));
+        if (UI.cardsLen > 0) sorted = shuffle(sorted.slice(0, UI.cardsLen));
         UI.deck = { list: sorted, i: 0, flipped: false, known: 0 }; draw("#ctitle");
       } } }, ico("play"), "Commencer les cartes"));
     return;
   }
   if (D.i >= D.list.length) {
-    box.append(h("div", { class: "card brand" },
+    put(box, h("div", { class: "card brand" },
       h("h2", { id: "ctitle", tabindex: "-1" }, "Série terminée !"),
       h("p", null, D.known + " carte" + (D.known > 1 ? "s" : "") + " sue" + (D.known > 1 ? "s" : "") + " sur " + D.list.length + ". Les cartes à revoir reviendront en premier la prochaine fois."),
       h("div", { class: "row" },
@@ -1021,7 +1024,7 @@ function cardsView(box, draw) {
     return;
   }
   const c = D.list[D.i], lvl = S.flash[c.id] || 0;
-  box.append(
+  put(box, 
     h("div", { class: "row", style: "justify-content:space-between" },
       h("span", { class: "pill" }, "Carte " + (D.i + 1) + " sur " + D.list.length),
       h("span", { class: "pill" }, lvl >= 2 ? "Carte connue" : lvl === 1 ? "Presque connue" : "Nouvelle carte"),
@@ -1056,7 +1059,7 @@ function viewManipulations(root) {
   if (UI.custom && UI.customFresh) { UI.lab = freshLab(UI.custom, "custom"); UI.customFresh = false; }
   if (!UI.lab) UI.lab = freshLab(SENT[0], "s1");
   const holder = h("div");
-  root.append(...title("Les manipulations", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), pictoStrip([["hand", "Je touche un groupe"], ["erase", "J'essaie un outil"], ["tag", "Je trouve sa fonction"]]), holder);
+  put(root, ...title("Les manipulations", "Touche un groupe de mots, essaie un outil, puis dis quelle est sa fonction. Trouve toutes les fonctions de la phrase !"), pictoStrip([["hand", "Je touche un groupe"], ["erase", "J'essaie un outil"], ["tag", "Je trouve sa fonction"]]), holder);
   draw();
 
   function pickSentence(key) {
@@ -1127,7 +1130,7 @@ function viewCreer(root) {
   if (!UI.at) UI.at = { frame: "observer", subj: 0, cod: 0, coi: -1, cc: 0, ccPos: "start", ccText: "", ccKind: "t" };
   const A = UI.at;
   const holder = h("div"), preview = h("div");
-  root.append(...title("Créer des phrases", "Je choisis un verbe, un sujet et des compléments. La phrase se construit toute seule."), pictoStrip([["hand", "Je choisis"], ["build", "Ma phrase se construit"], ["speaker", "Je l'écoute"], ["tag", "Je la teste"]]), holder);
+  put(root, ...title("Créer des phrases", "Je choisis un verbe, un sujet et des compléments. La phrase se construit toute seule."), pictoStrip([["hand", "Je choisis"], ["build", "Ma phrase se construit"], ["speaker", "Je l'écoute"], ["tag", "Je la teste"]]), holder);
   function frame() { return FRAMES.find((f) => f.id === A.frame); }
   draw();
   function current() {
@@ -1250,7 +1253,7 @@ function csvText() {
 function viewEnseignant(root) {
   UI.ens = UI.ens || { sel: null, msg: "" };
   const holder = h("div");
-  root.append(...title("Espace enseignant", "Je suis l'évolution de mes élèves. Les données restent sur cet appareil : rien n'est envoyé sur Internet."), holder);
+  put(root, ...title("Espace enseignant", "Je suis l'évolution de mes élèves. Les données restent sur cet appareil : rien n'est envoyé sur Internet."), holder);
   draw();
   function draw(focus) {
     const E = UI.ens, names = Object.keys(CLASSE.pupils).sort(), pupils = names.map((k) => CLASSE.pupils[k]);
@@ -1384,7 +1387,7 @@ const LESSONS = [
 
 function viewApprendre(root) {
   const holder = h("div");
-  root.append(...title("Apprendre", "Six petites leçons. Je lis à mon rythme, je peux écouter, et je dis « J'ai compris » à la fin."), pictoStrip([["eye", "Je lis"], ["speaker", "J'écoute"], ["tag", "J'essaie"], ["check", "J'ai compris"]]), holder);
+  put(root, ...title("Apprendre", "Six petites leçons. Je lis à mon rythme, je peux écouter, et je dis « J'ai compris » à la fin."), pictoStrip([["eye", "Je lis"], ["speaker", "J'écoute"], ["tag", "J'essaie"], ["check", "J'ai compris"]]), holder);
   draw();
   function draw(focus) {
     const L = LESSONS[UI.lesson], done = !!S.lessons[L.id];
@@ -1429,7 +1432,7 @@ function viewParcours(root) {
   const pct = Math.round(((S.xp % 60) / 60) * 100);
   const bil = h("textarea", { class: "bilan", readonly: true, "aria-label": "Mon bilan, à montrer à la maîtresse", rows: "9", on: { focus: (e) => e.target.select() } }, bilanText());
   const copyMsg = h("span", { role: "status", class: "muted small" });
-  root.append(...title("Mon parcours", "Cinq étapes pour devenir un expert. Je gagne des étoiles en répondant juste, sans pression."),
+  put(root, ...title("Mon parcours", "Cinq étapes pour devenir un expert. Je gagne des étoiles en répondant juste, sans pression."),
     h("div", { class: "card brand", style: "margin-bottom:1rem" },
       h("div", { class: "mascot" }, magma(), h("div", null,
         h("p", { class: "xl", style: "margin:0" }, "Niveau " + (level() + 1) + " · " + LEVELS[level()]),
