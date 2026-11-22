@@ -394,6 +394,7 @@ function explainChunk(sent, i) {
 }
 
 /* --- Générateur de questions --- */
+const SKN2 = { verbe: "V", sujet: "S", cc: "CC", cod: "COD", coi: "COI" };
 const rnd = (n) => Math.floor(Math.random() * n);
 const pick = (a) => a[rnd(a.length)];
 function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; }
@@ -407,16 +408,80 @@ const VF = [
   { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le guide qui montre ». Le sujet est entre c'est et qui." },
   { q: "Un CC complète le verbe comme un COD.", a: false, skill: "cc", exp: "Non : le CC donne une information en plus (quand, où, comment). On peut l'effacer." },
   { q: "Un COI est souvent introduit par à ou de.", a: true, skill: "coi", exp: "Oui : « à sa sœur », « aux visiteurs » (à + les). Je teste avec lui, leur, y." },
+  { q: "Le verbe change quand je change le temps (hier, aujourd'hui, demain).", a: true, skill: "verbe", exp: "Oui : le verbe se conjugue. Hier il montrait, aujourd'hui il montre." },
+  { q: "Pour trouver le verbe, je cherche le mot le plus long de la phrase.", a: false, skill: "verbe", exp: "Non : la longueur ne dit rien. Je mets ne...pas autour du mot." },
+  { q: "On peut effacer le verbe et garder une phrase correcte.", a: false, skill: "verbe", exp: "Non : sans verbe, il n'y a plus de phrase." },
+  { q: "Un verbe peut dire un état (être, rester, sembler), pas seulement une action.", a: true, skill: "verbe", exp: "Oui : être, rester, sembler sont des verbes d'état." },
+  { q: "Le sujet peut être formé de plusieurs mots.", a: true, skill: "sujet", exp: "Oui : « les volcanologues », « le maire »." },
+  { q: "Le sujet est toujours le premier mot de la phrase.", a: false, skill: "sujet", exp: "Non : un CC peut venir avant (« Hier, le guide montre... »)." },
+  { q: "Le sujet peut s'effacer sans problème.", a: false, skill: "sujet", exp: "Non : sans sujet, on ne sait plus qui fait l'action." },
+  { q: "Quand le sujet est au pluriel, je peux dire ce sont...qui.", a: true, skill: "sujet", exp: "Oui : « Ce sont les enfants qui obéissent »." },
   { q: "Si un test hésite, je peux en faire un deuxième.", a: true, skill: "cod", exp: "Oui : deux tests qui disent la même chose, c'est plus sûr." },
   { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le guide montre aux visiteurs » : on se demande quoi. Le COD ne s'efface pas." },
 ];
 
+
+/* --- Aides pour les questions de forme négative et de c'est...qui --- */
+function negVariants(sent) {
+  const vi = idx(sent, "V"), si = idx(sent, "S"), v = sent.ch[vi];
+  const ne = startsVowel(v.t) ? { t: "n'", fn: "P", glue: true } : { t: "ne", fn: "P" };
+  const pas = { t: "pas", fn: "P" }, neW = { t: "ne", fn: "P" };
+  const mk = (f) => sentText(f(sent.ch.slice()));
+  const good = mk((c) => { c.splice(vi, 1, ne, v, pas); return c; });
+  const bad = [
+    mk((c) => { c.splice(vi, 1, v, pas); return c; }),
+    mk((c) => { c.splice(vi, 1, v, pas); c.splice(si, 0, neW); return c; }),
+    mk((c) => { c.splice(vi, 1, neW, v); c.push(pas); return c; }),
+  ].filter((t, k, a) => t !== good && a.indexOf(t) === k);
+  return { good, bad };
+}
+function cquiText(sent, i) {
+  const c = sent.ch[i], first = sent.ch[0];
+  const hasLead = first.fn === "CC" && i !== 0;
+  const rest = sent.ch.filter((x, k) => k !== i && !(k === 0 && hasLead));
+  const pl = c.pl || /^(les|des|ses|leurs|mes|ces|\d)/i.test(c.t);
+  return cap((hasLead ? first.t + ", " : "") + (pl ? "ce sont " : "c'est ") + c.t + " qui " + rest.map((x) => x.t).join(" ")) + ".";
+}
+const ART = { S: "le sujet", V: "le verbe", COD: "un COD", COI: "un COI", CC: "un CC" };
+
 function genQuestion(skill) {
   // skill : tous | verbe | sujet | cc | cod | coi
-  const types = ["fn", "fn", "erase", "move", "pron", "verb", "subj", "vf"];
+  const TYPES = {
+    tous: ["fn", "fn", "erase", "move", "pron", "verb", "subj", "neg", "cqui", "vf"],
+    verbe: ["verb", "neg", "neg", "isfn", "vf"],
+    sujet: ["subj", "cqui", "cqui", "isfn", "vf"],
+    cc: ["isfn", "erase", "move", "vf"],
+    cod: ["isfn", "erase", "move", "pron", "vf"],
+    coi: ["isfn", "pron", "pron", "vf"],
+  };
+  const types = TYPES[skill] || TYPES.tous;
   for (let tries = 0; tries < 40; tries++) {
     const t = pick(types);
     const sent = pick(SENT);
+    if (t === "neg") {
+      if (skill !== "tous" && skill !== "verbe") continue;
+      const nv = negVariants(sent);
+      if (nv.bad.length < 2) continue;
+      const opts = shuffle([nv.good, ...nv.bad.slice(0, 3)]);
+      return { type: "neg", skill: "verbe", sent, prompt: "Je mets cette phrase à la forme négative. Quelle phrase est correcte ?", options: opts.map((x) => ({ id: x, label: x })), correct: nv.good, exp: "On met ne devant le verbe et pas juste après : « " + nv.good + " »", hint: "Le verbe se met entre ne et pas." };
+    }
+    if (t === "cqui") {
+      if (skill !== "tous" && skill !== "sujet") continue;
+      const si = idx(sent, "S"), others = sent.ch.map((c, i) => i).filter((i) => i !== si && sent.ch[i].fn !== "V");
+      if (others.length < 2) continue;
+      const good = cquiText(sent, si);
+      const opts = shuffle([good, ...shuffle(others).slice(0, 3).map((i) => cquiText(sent, i))]);
+      return { type: "cqui", skill: "sujet", sent, prompt: "Je cherche le sujet avec c'est...qui. Quelle phrase est la bonne ?", options: opts.map((x) => ({ id: x, label: x })), correct: good, exp: "Le sujet est « " + sent.ch[si].t + " » : « " + good + " »", hint: "Le sujet est le groupe qui fait l'action." };
+    }
+    if (t === "isfn") {
+      if (skill === "tous") continue;
+      const key = SKN2[skill], wantYes = Math.random() < 0.5;
+      const has = (sn, f) => sn.ch.some((c) => (f ? c.fn === key : c.fn !== key));
+      const sn = pick(SENT.filter((x) => has(x, wantYes)));
+      const cand = sn.ch.map((c, i) => i).filter((i) => (sn.ch[i].fn === key) === wantYes);
+      const i = pick(cand), c = sn.ch[i], yes = c.fn === key, sent2 = sn;
+      return { type: "isfn", skill, sent: sent2, target: i, prompt: "Le groupe encadré est-il " + ART[key] + " ?", options: [{ id: "o", label: "Oui" }, { id: "n", label: "Non" }], correct: yes ? "o" : "n", exp: explainChunk(sent2, i) + (yes ? "" : " Ce n'est donc pas " + ART[key] + "."), hint: FN[key].tip };
+    }
     if (t === "vf") {
       const pool = VF.filter((v) => skill === "tous" || v.skill === skill);
       if (!pool.length) continue;
@@ -431,20 +496,21 @@ function genQuestion(skill) {
       return { type: "fn", skill: FN[c.fn].skill, sent, target: i, prompt: "Quelle est la fonction du groupe encadré ?", options: FN_ORDER.map((k) => ({ id: k, label: FN[k].name, fn: k })), correct: c.fn, exp: explainChunk(sent, i), hint: c.fn === "CC" ? "J'efface le groupe, puis je le déplace." : c.fn === "COD" || c.fn === "COI" ? "Je le remplace par un petit mot : le, la, les, lui, leur, y." : c.fn === "V" ? "Je mets ne...pas autour." : "Je dis c'est...qui." };
     }
     if (t === "erase") {
-      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI" && (skill === "tous" || FN[sent.ch[i].fn].skill === skill));
+      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn !== "COI");
       if (!cands.length) continue;
-      const i = pick(cands);
+      const ccs = cands.filter((k) => sent.ch[k].fn === "CC");
+      const i = Math.random() < 0.5 && ccs.length ? pick(ccs) : pick(cands);
       const c = sent.ch[i];
       const r = doErase(sent, i);
-      return { type: "erase", skill: FN[c.fn].skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase tient-elle encore debout ?", options: [{ id: "o", label: "Oui, elle tient debout" }, { id: "n", label: "Non, elle est incomplète" }], correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
+      return { type: "erase", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "J'efface le groupe encadré. La phrase tient-elle encore debout ?", options: [{ id: "o", label: "Oui, elle tient debout" }, { id: "n", label: "Non, elle est incomplète" }], correct: c.fn === "CC" ? "o" : "n", exp: "Sans le groupe : « " + r.text + " » " + r.msg, hint: "Je lis la phrase sans le groupe, à voix haute." };
     }
     if (t === "move") {
-      const cands = sent.ch.map((c, i) => i).filter((i) => (skill === "tous" || FN[sent.ch[i].fn].skill === skill) && (sent.ch[i].fn === "CC" || sent.ch[i].fn === "COD"));
+      const cands = sent.ch.map((c, i) => i).filter((i) => sent.ch[i].fn === "CC" || sent.ch[i].fn === "COD");
       if (!cands.length) continue;
       const i = pick(cands);
       const c = sent.ch[i];
       const r = doMove(sent, i);
-      return { type: "move", skill: FN[c.fn].skill, sent, target: i, prompt: "Je déplace le groupe encadré. La phrase sonne-t-elle juste ?", options: [{ id: "o", label: "Oui, elle sonne juste" }, { id: "n", label: "Non, elle sonne faux" }], correct: c.fn === "CC" ? "o" : "n", exp: "« " + r.text + " » " + r.msg, hint: "Je me demande : est-ce qu'on peut le dire comme ça ?" };
+      return { type: "move", skill: skill === "tous" ? FN[c.fn].skill : skill, sent, target: i, prompt: "Je déplace le groupe encadré. La phrase sonne-t-elle juste ?", options: [{ id: "o", label: "Oui, elle sonne juste" }, { id: "n", label: "Non, elle sonne faux" }], correct: c.fn === "CC" ? "o" : "n", exp: "« " + r.text + " » " + r.msg, hint: "Je me demande : est-ce qu'on peut le dire comme ça ?" };
     }
     if (t === "pron") {
       const cands = sent.ch.map((c, i) => i).filter((i) => (sent.ch[i].fn === "COD" || sent.ch[i].fn === "COI") && (skill === "tous" || FN[sent.ch[i].fn].skill === skill));
@@ -803,7 +869,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 03. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 10 h 08. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
