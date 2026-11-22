@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Plan : un volcan accueillant (Magma) sur fond bleu nuit, lave ambrée en accent.
+/* Plan : un compagnon au choix sur fond bleu nuit, ambre en accent.
    Mise en page : grandes zones tactiles, cartes à contour franc, une seule colonne lisible.
    Les fonctions grammaticales ont couleur + forme + nom : jamais la couleur seule. */
 :root {
@@ -84,6 +84,14 @@ main:focus, #title:focus { outline: none; }
 .hero span { font-size: .85rem; color: var(--ink2); }
 .hero[aria-pressed="true"] { border-color: var(--ink); background: var(--surf2); box-shadow: 0 0 0 3px var(--surf), 0 0 0 6px var(--ink); }
 .hero:focus-visible { outline: 4px solid var(--focus, #1E5AFF); outline-offset: 3px; }
+.cutline { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem; margin: .6rem 0; font-size: 1.3rem; }
+.cutline .cw { padding: .3rem .5rem; border: 2px solid var(--line); border-radius: 10px; background: var(--surf); font-weight: 600; }
+.cutline .cut { min-width: 2.6rem; min-height: 2.6rem; display: inline-flex; align-items: center; justify-content: center; border: 2px dashed var(--line); border-radius: 12px; background: transparent; color: var(--ink); font: inherit; font-size: 1.4rem; cursor: pointer; }
+.cutline .cut[aria-pressed="true"] { border: 3px solid var(--ink); background: var(--surf2); }
+.cutline .cut:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+.fnrow { display: flex; flex-direction: column; gap: .4rem; padding: .7rem; border: 2px solid var(--line); border-radius: 14px; background: var(--surf); }
+.fnrow .fnl { font-weight: 700; font-size: 1.1rem; }
+.warn { padding: .7rem 1rem; border: 3px solid var(--meh, #B7791F); border-radius: 12px; background: var(--surf); margin: .8rem 0 0; }
 /* Compagnon choisi par l'élève */
 .mascot { display: flex; align-items: flex-end; gap: .8rem; }
 .mascot svg { width: 84px; height: 84px; flex: none; }
@@ -249,49 +257,108 @@ const startsVowel = (t) => VOW.test(t);
 /* --- Banque de phrases vérifiées (ordre d'affichage). kind : t temps, l lieu, m manière --- */
 const C = (t, fn, o = {}) => Object.assign({ t, fn }, o);
 const SENT = [
-  { id: "s1", ch: [C("hier", "CC", { kind: "t" }), C("le guide", "S"), C("montre", "V"), C("le cratère", "COD", { pron: "le" }), C("aux visiteurs", "COI", { pron: "leur" })] },
-  { id: "s2", ch: [C("les volcanologues", "S", { pl: true }), C("observent", "V"), C("les volcans", "COD", { pron: "les" }), C("en permanence", "CC", { kind: "t" })] },
-  { id: "s3", ch: [C("les scientifiques", "S", { pl: true }), C("comptent", "V"), C("1 500 volcans en activité", "COD", { pron: "les" }), C("dans le monde", "CC", { kind: "l" })] },
-  { id: "s4", ch: [C("en France", "CC", { kind: "l" }), C("les touristes", "S", { pl: true }), C("visitent", "V"), C("les volcans éteints", "COD", { pron: "les" })] },
-  { id: "s5", ch: [C("chaque jour", "CC", { kind: "t" }), C("les habitants", "S", { pl: true }), C("surveillent", "V"), C("le cratère", "COD", { pron: "le" })] },
-  { id: "s6", ch: [C("le maire", "S"), C("explique", "V"), C("le danger", "COD", { pron: "le" }), C("aux habitants", "COI", { pron: "leur" })] },
-  { id: "s7", ch: [C("pendant l'éruption", "CC", { kind: "t" }), C("les enfants", "S", { pl: true }), C("obéissent", "V"), C("aux consignes", "COI", { pron: "y" })] },
-  { id: "s8", ch: [C("ce matin", "CC", { kind: "t" }), C("Léa", "S", { proper: true }), C("envoie", "V"), C("la lettre", "COD", { pron: "la" }), C("à sa grand-mère", "COI", { pron: "lui" })] },
-  { id: "s9", ch: [C("le soir", "CC", { kind: "t" }), C("le volcanologue", "S"), C("téléphone", "V"), C("à son collègue", "COI", { pron: "lui" })] },
-  { id: "s10", ch: [C("la nuit", "CC", { kind: "t" }), C("les villageois", "S", { pl: true }), C("quittent", "V"), C("le village", "COD", { pron: "le" })] },
+  { id: "s1", ch: [C("chaque matin", "CC", { kind: "t" }), C("le facteur", "S"), C("livre", "V"), C("le courrier", "COD", { pron: "le" }), C("aux habitants", "COI", { pron: "leur" })] },
+  { id: "s2", ch: [C("les enfants", "S", { pl: true }), C("arrosent", "V"), C("les fleurs", "COD", { pron: "les" }), C("chaque jour", "CC", { kind: "t" })] },
+  { id: "s3", ch: [C("les joueurs", "S", { pl: true }), C("ramassent", "V"), C("les ballons", "COD", { pron: "les" }), C("sur le terrain", "CC", { kind: "l" })] },
+  { id: "s4", ch: [C("dans la cour", "CC", { kind: "l" }), C("les élèves", "S", { pl: true }), C("ramassent", "V"), C("les feuilles", "COD", { pron: "les" })] },
+  { id: "s5", ch: [C("le dimanche", "CC", { kind: "t" }), C("les voisins", "S", { pl: true }), C("nettoient", "V"), C("le jardin", "COD", { pron: "le" })] },
+  { id: "s6", ch: [C("la maîtresse", "S"), C("explique", "V"), C("le problème", "COD", { pron: "le" }), C("aux élèves", "COI", { pron: "leur" })] },
+  { id: "s7", ch: [C("pendant le match", "CC", { kind: "t" }), C("les joueurs", "S", { pl: true }), C("obéissent", "V"), C("aux règles", "COI", { pron: "y" })] },
+  { id: "s8", ch: [C("chaque semaine", "CC", { kind: "t" }), C("Léa", "S", { proper: true }), C("envoie", "V"), C("la lettre", "COD", { pron: "la" }), C("à sa grand-mère", "COI", { pron: "lui" })] },
+  { id: "s9", ch: [C("le soir", "CC", { kind: "t" }), C("le pompier", "S"), C("téléphone", "V"), C("à sa sœur", "COI", { pron: "lui" })] },
+  { id: "s10", ch: [C("le samedi", "CC", { kind: "t" }), C("les touristes", "S", { pl: true }), C("visitent", "V"), C("le château", "COD", { pron: "le" })] },
   { id: "s11", ch: [C("les élèves", "S", { pl: true }), C("ouvrent", "V"), C("leurs cahiers", "COD", { pron: "les" }), C("en silence", "CC", { kind: "m" })] },
   { id: "s12", ch: [C("samedi", "CC", { kind: "t" }), C("Max", "S", { proper: true }), C("offre", "V"), C("le cadeau", "COD", { pron: "le" }), C("à sa sœur", "COI", { pron: "lui" })] },
   { id: "s13", ch: [C("le chien", "S"), C("mord", "V"), C("le facteur", "COD", { pron: "le" }), C("dans la rue", "CC", { kind: "l" })] },
   { id: "s14", ch: [C("chaque matin", "CC", { kind: "t" }), C("la boulangère", "S"), C("prépare", "V"), C("le pain", "COD", { pron: "le" })] },
   { id: "s15", ch: [C("le guide", "S"), C("parle", "V"), C("aux touristes", "COI", { pron: "leur" }), C("calmement", "CC", { kind: "m" })] },
-  { id: "s16", ch: [C("les pompiers", "S", { pl: true }), C("protègent", "V"), C("les habitants", "COD", { pron: "les" }), C("pendant l'éruption", "CC", { kind: "t" })] },
+  { id: "s16", ch: [C("les pompiers", "S", { pl: true }), C("protègent", "V"), C("les habitants", "COD", { pron: "les" }), C("pendant la tempête", "CC", { kind: "t" })] },
+  { id: "s17", ch: [C("le dimanche", "CC", { kind: "t" }), C("la voisine", "S"), C("apporte", "V"), C("la tarte", "COD", { pron: "la" }), C("à son ami", "COI", { pron: "lui" })] },
+  { id: "s18", ch: [C("les musiciens", "S", { pl: true }), C("jouent", "V"), C("le morceau", "COD", { pron: "le" }), C("avec passion", "CC", { kind: "m" })] },
+  { id: "s19", ch: [C("au gymnase", "CC", { kind: "l" }), C("la gymnaste", "S"), C("obéit", "V"), C("au signal", "COI", { pron: "y" })] },
+  { id: "s20", ch: [C("les commerçants", "S", { pl: true }), C("vendent", "V"), C("les fruits", "COD", { pron: "les" }), C("aux clients", "COI", { pron: "leur" }), C("sur la place", "CC", { kind: "l" })] },
+  { id: "s21", ch: [C("le soir", "CC", { kind: "t" }), C("le papa", "S"), C("raconte", "V"), C("l'histoire", "COD", { pron: "la" }), C("aux enfants", "COI", { pron: "leur" })] },
+  { id: "s22", ch: [C("le chat", "S"), C("attrape", "V"), C("les souris", "COD", { pron: "les" }), C("dans le jardin", "CC", { kind: "l" })] },
+  { id: "s23", ch: [C("tous les jours", "CC", { kind: "t" }), C("Max", "S", { proper: true }), C("parle", "V"), C("à sa voisine", "COI", { pron: "lui" })] },
+  { id: "s24", ch: [C("les oiseaux", "S", { pl: true }), C("construisent", "V"), C("le nid", "COD", { pron: "le" }), C("au printemps", "CC", { kind: "t" })] },
+  { id: "s25", ch: [C("les volcanologues", "S", { pl: true }), C("observent", "V"), C("le cratère", "COD", { pron: "le" }), C("avec attention", "CC", { kind: "m" })] },
 ];
 
-/* --- Cadres pour l'atelier de création --- */
-const SUBJ = [
-  { t: "le guide" }, { t: "la maîtresse" }, { t: "Léa", proper: true }, { t: "Max", proper: true }, { t: "le volcanologue" }, { t: "le maire" },
-  { t: "les habitants", pl: true }, { t: "les élèves", pl: true }, { t: "les volcanologues", pl: true }, { t: "les enfants", pl: true }, { t: "les touristes", pl: true },
+/* --- Thèmes pour l'atelier de création et le générateur (chaque thème a ses sujets, verbes, compléments et CC) --- */
+const P1 = (t) => ({ t }), PL = (t) => ({ t, pl: true }), PR = (t) => ({ t, proper: true });
+// verbe : [infinitif, singulier, pluriel, [COD], [COI]] ; COD/COI : [groupe, petit mot]
+const mkTheme = (id, name, subj, frames, cc) => ({
+  id, name, subj, cc,
+  frames: frames.map(([inf, v1, v3, cod, coi]) => ({ id: id + ":" + inf, inf, theme: id, v: [v1, v3], cod: cod || undefined, coi: coi || undefined })),
+});
+const THEMES = [
+  mkTheme("ecole", "À l'école", [P1("la maîtresse"), P1("le directeur"), PR("Léa"), PR("Max"), PL("les élèves"), PL("les enfants")], [
+    ["ouvrir", "ouvre", "ouvrent", [["le cahier", "le"], ["la fenêtre", "la"], ["les livres", "les"]]],
+    ["lire", "lit", "lisent", [["le texte", "le"], ["la consigne", "la"], ["les exercices", "les"]]],
+    ["corriger", "corrige", "corrigent", [["la dictée", "la"], ["le problème", "le"], ["les copies", "les"]]],
+    ["distribuer", "distribue", "distribuent", [["les cahiers", "les"], ["la feuille", "la"], ["le matériel", "le"]], [["aux élèves", "leur"], ["à la maîtresse", "lui"], ["à son voisin", "lui"]]],
+    ["expliquer", "explique", "expliquent", [["la leçon", "la"], ["la règle", "la"], ["les consignes", "les"]], [["aux enfants", "leur"], ["à Léa", "lui"], ["à la classe", "lui"]]],
+    ["répondre", "répond", "répondent", null, [["à la question", "y"], ["au directeur", "lui"], ["aux parents", "leur"]]],
+  ], [["chaque matin", "t"], ["pendant la récréation", "t"], ["en classe", "l"], ["dans la cour", "l"], ["avec soin", "m"], ["en silence", "m"]]),
+  mkTheme("sport", "Le sport", [P1("le professeur"), P1("la gymnaste"), PR("Léa"), PR("Max"), PL("les joueurs"), PL("les nageurs")], [
+    ["lancer", "lance", "lancent", [["le ballon", "le"], ["la balle", "la"], ["les cerceaux", "les"]]],
+    ["attraper", "attrape", "attrapent", [["le ballon", "le"], ["la balle", "la"], ["les foulards", "les"]]],
+    ["franchir", "franchit", "franchissent", [["la haie", "la"], ["le ruisseau", "le"], ["les obstacles", "les"]]],
+    ["encourager", "encourage", "encouragent", [["le gardien", "le"], ["l'équipe", "la"], ["les coureurs", "les"]]],
+    ["passer", "passe", "passent", [["le ballon", "le"], ["la balle", "la"]], [["à son coéquipier", "lui"], ["à ses partenaires", "leur"], ["à la capitaine", "lui"]]],
+    ["obéir", "obéit", "obéissent", null, [["aux règles", "y"], ["au signal", "y"], ["à l'arbitre", "lui"]]],
+  ], [["pendant le match", "t"], ["à chaque entraînement", "t"], ["sur le terrain", "l"], ["dans le gymnase", "l"], ["avec courage", "m"], ["en équipe", "m"]]),
+  mkTheme("maison", "À la maison", [P1("le papa"), P1("la grand-mère"), PR("Léa"), PR("Max"), PL("les voisins"), PL("les enfants")], [
+    ["préparer", "prépare", "préparent", [["le repas", "le"], ["la soupe", "la"], ["les crêpes", "les"]]],
+    ["manger", "mange", "mangent", [["la pomme", "la"], ["le gâteau", "le"], ["les fraises", "les"]]],
+    ["ranger", "range", "rangent", [["la chambre", "la"], ["le salon", "le"], ["les jouets", "les"]]],
+    ["fermer", "ferme", "ferment", [["la porte", "la"], ["le volet", "le"], ["les fenêtres", "les"]]],
+    ["offrir", "offre", "offrent", [["le cadeau", "le"], ["la fleur", "la"], ["les livres", "les"]], [["à sa sœur", "lui"], ["à ses amis", "leur"], ["à son voisin", "lui"]]],
+    ["raconter", "raconte", "racontent", [["l'histoire", "la"], ["le conte", "le"], ["les souvenirs", "les"]], [["aux enfants", "leur"], ["à sa fille", "lui"], ["à ses cousins", "leur"]]],
+    ["téléphoner", "téléphone", "téléphonent", null, [["à sa tante", "lui"], ["à son ami", "lui"], ["aux pompiers", "leur"]]],
+  ], [["le soir", "t"], ["le dimanche", "t"], ["chaque jour", "t"], ["dans la cuisine", "l"], ["à la maison", "l"], ["avec plaisir", "m"], ["en chantant", "m"]]),
+  mkTheme("animaux", "Les animaux", [P1("le chat"), P1("le chien"), P1("le renard"), PL("les oiseaux"), PL("les abeilles"), PL("les poules")], [
+    ["chasser", "chasse", "chassent", [["la souris", "la"], ["le lapin", "le"], ["les insectes", "les"]]],
+    ["manger", "mange", "mangent", [["l'herbe", "la"], ["le grain", "le"], ["les graines", "les"]]],
+    ["protéger", "protège", "protègent", [["le nid", "le"], ["la ruche", "la"], ["les petits", "les"]]],
+    ["suivre", "suit", "suivent", [["le chemin", "le"], ["la rivière", "la"], ["les traces", "les"]]],
+    ["obéir", "obéit", "obéissent", null, [["à son maître", "lui"], ["à la bergère", "lui"], ["aux ordres", "y"]]],
+    ["ressembler", "ressemble", "ressemblent", null, [["à son père", "lui"], ["à sa mère", "lui"], ["à leurs parents", "leur"]]],
+  ], [["la nuit", "t"], ["au printemps", "t"], ["chaque matin", "t"], ["dans la forêt", "l"], ["près de la rivière", "l"], ["sans bruit", "m"], ["rapidement", "m"]]),
+  mkTheme("ville", "En ville", [P1("le facteur"), P1("la boulangère"), P1("le pompier"), PL("les commerçants"), PL("les habitants"), PL("les pompiers")], [
+    ["livrer", "livre", "livrent", [["le colis", "le"], ["la lettre", "la"], ["les journaux", "les"]], [["aux habitants", "leur"], ["à la voisine", "lui"], ["au maire", "lui"]]],
+    ["vendre", "vend", "vendent", [["le pain", "le"], ["la farine", "la"], ["les gâteaux", "les"]], [["aux clients", "leur"], ["à une voisine", "lui"]]],
+    ["réparer", "répare", "réparent", [["la route", "la"], ["le pont", "le"], ["les toits", "les"]]],
+    ["éteindre", "éteint", "éteignent", [["le feu", "le"], ["la lumière", "la"], ["les flammes", "les"]]],
+    ["saluer", "salue", "saluent", [["le passant", "le"], ["la voisine", "la"], ["les enfants", "les"]]],
+    ["conduire", "conduit", "conduisent", [["le camion", "le"], ["la voiture", "la"], ["les enfants", "les"]]],
+  ], [["tôt le matin", "t"], ["tous les jours", "t"], ["en ville", "l"], ["dans la rue", "l"], ["sur la place", "l"], ["avec gentillesse", "m"]]),
+  mkTheme("voyage", "En voyage", [P1("le guide"), P1("la famille"), PR("Léa"), PR("Max"), PL("les touristes"), PL("les voyageurs")], [
+    ["visiter", "visite", "visitent", [["le musée", "le"], ["la grotte", "la"], ["les villages", "les"]]],
+    ["photographier", "photographie", "photographient", [["le monument", "le"], ["la plage", "la"], ["les montagnes", "les"]]],
+    ["réserver", "réserve", "réservent", [["la chambre", "la"], ["le billet", "le"], ["les places", "les"]]],
+    ["préparer", "prépare", "préparent", [["la valise", "la"], ["le sac", "le"], ["les bagages", "les"]]],
+    ["montrer", "montre", "montrent", [["le chemin", "le"], ["la carte", "la"], ["les photos", "les"]], [["aux visiteurs", "leur"], ["à son frère", "lui"], ["au chauffeur", "lui"]]],
+    ["parler", "parle", "parlent", null, [["aux voisins", "leur"], ["à la guide", "lui"], ["à ses amis", "leur"]]],
+  ], [["en été", "t"], ["pendant les vacances", "t"], ["à la montagne", "l"], ["près de la plage", "l"], ["en train", "m"], ["avec joie", "m"]]),
+  mkTheme("arts", "Musique et arts", [P1("le chanteur"), P1("le peintre"), PR("Léa"), PR("Max"), PL("les musiciens"), PL("les artistes")], [
+    ["jouer", "joue", "jouent", [["la mélodie", "la"], ["le morceau", "le"], ["les notes", "les"]]],
+    ["chanter", "chante", "chantent", [["la chanson", "la"], ["le refrain", "le"], ["les couplets", "les"]]],
+    ["dessiner", "dessine", "dessinent", [["le portrait", "le"], ["la maison", "la"], ["les arbres", "les"]]],
+    ["peindre", "peint", "peignent", [["le tableau", "le"], ["la toile", "la"], ["les murs", "les"]]],
+    ["montrer", "montre", "montrent", [["le dessin", "le"], ["la peinture", "la"], ["les photos", "les"]], [["à ses parents", "leur"], ["à sa mère", "lui"], ["aux visiteurs", "leur"]]],
+  ], [["chaque jour", "t"], ["le samedi", "t"], ["sur scène", "l"], ["dans la salle", "l"], ["avec passion", "m"], ["doucement", "m"]]),
+  mkTheme("sciences", "Sciences et volcans", [P1("le volcanologue"), P1("la chercheuse"), PR("Léa"), PL("les scientifiques"), PL("les volcanologues"), PL("les élèves")], [
+    ["observer", "observe", "observent", [["le volcan", "le"], ["le cratère", "le"], ["la fumée", "la"], ["les cendres", "les"]]],
+    ["étudier", "étudie", "étudient", [["les roches", "les"], ["la lave", "la"], ["le sol", "le"]]],
+    ["surveiller", "surveille", "surveillent", [["le cratère", "le"], ["la montagne", "la"], ["les volcans", "les"]]],
+    ["mesurer", "mesure", "mesurent", [["la température", "la"], ["le tremblement", "le"], ["les cendres", "les"]]],
+    ["expliquer", "explique", "expliquent", [["le danger", "le"], ["la règle", "la"], ["les résultats", "les"]], [["aux habitants", "leur"], ["à Léa", "lui"], ["aux enfants", "leur"]]],
+  ], [["chaque jour", "t"], ["la nuit", "t"], ["près du cratère", "l"], ["en laboratoire", "l"], ["avec attention", "m"], ["calmement", "m"]]),
 ];
-const FRAMES = [
-  { id: "observer", v: ["observe", "observent"], cod: [["le volcan", "le"], ["le cratère", "le"], ["la fumée", "la"], ["les cendres", "les"]] },
-  { id: "surveiller", v: ["surveille", "surveillent"], cod: [["le cratère", "le"], ["le village", "le"], ["la montagne", "la"], ["les touristes", "les"]] },
-  { id: "visiter", v: ["visite", "visitent"], cod: [["le musée", "le"], ["la grotte", "la"], ["les villages", "les"]] },
-  { id: "étudier", v: ["étudie", "étudient"], cod: [["les cendres", "les"], ["la lave", "la"], ["les roches", "les"]] },
-  { id: "quitter", v: ["quitte", "quittent"], cod: [["le village", "le"], ["la maison", "la"], ["la salle", "la"]] },
-  { id: "photographier", v: ["photographie", "photographient"], cod: [["le volcan", "le"], ["la lave", "la"], ["les cratères", "les"]] },
-  { id: "montrer", v: ["montre", "montrent"], cod: [["le cratère", "le"], ["la carte", "la"], ["les photos", "les"]], coi: [["aux visiteurs", "leur"], ["à son frère", "lui"], ["au maire", "lui"]] },
-  { id: "expliquer", v: ["explique", "expliquent"], cod: [["le danger", "le"], ["la règle", "la"], ["les consignes", "les"]], coi: [["aux habitants", "leur"], ["à Léa", "lui"], ["aux enfants", "leur"]] },
-  { id: "offrir", v: ["offre", "offrent"], cod: [["le cadeau", "le"], ["la fleur", "la"], ["les livres", "les"]], coi: [["à sa sœur", "lui"], ["à ses amis", "leur"], ["à son voisin", "lui"]] },
-  { id: "envoyer", v: ["envoie", "envoient"], cod: [["la lettre", "la"], ["les messages", "les"], ["le colis", "le"]], coi: [["à sa grand-mère", "lui"], ["à ses cousins", "leur"], ["à son ami", "lui"]] },
-  { id: "parler", v: ["parle", "parlent"], coi: [["aux visiteurs", "leur"], ["à la maîtresse", "lui"], ["à ses voisins", "leur"]] },
-  { id: "téléphoner", v: ["téléphone", "téléphonent"], coi: [["à son collègue", "lui"], ["à sa tante", "lui"], ["aux pompiers", "leur"]] },
-  { id: "obéir", v: ["obéit", "obéissent"], coi: [["aux consignes", "y"], ["au guide", "lui"], ["aux règles", "y"]] },
-];
-const CC_OPTS = [
-  ["hier", "t"], ["ce matin", "t"], ["chaque jour", "t"], ["samedi", "t"], ["la nuit", "t"], ["pendant l'éruption", "t"],
-  ["en France", "l"], ["près du cratère", "l"], ["dans le village", "l"],
-  ["avec attention", "m"], ["en silence", "m"], ["calmement", "m"],
-];
+const FRAMES = THEMES.flatMap((t) => t.frames);
+const SUBJ = [...new Map(THEMES.flatMap((t) => t.subj).map((x) => [x.t, x])).values()];
+const CC_OPTS = [...new Map(THEMES.flatMap((t) => t.cc).map((x) => [x[0], x])).values()];
 
 /* --- Construction d'une phrase à partir du cadre --- */
 function buildSentence({ frame, subj, cod, coi, cc, ccPos }) {
@@ -315,17 +382,18 @@ let SENT_MODE = "nouvelles"; // "nouvelles" | "mix" | "depart"
 const setSentMode = (m) => { SENT_MODE = m; };
 let GEN_N = 0;
 const headWord = (t) => t.toLowerCase().replace(/[’']/g, " ").split(/\s+/).filter((w) => !["le", "la", "les", "l", "au", "aux", "à", "son", "sa", "ses", "du", "des", "un", "une", "près", "dans", "en", "pendant", "avec"].includes(w)).pop() || t;
-const GEN_CC = CC_OPTS.filter(([t]) => t !== "hier" && t !== "ce matin");
 function randomSentence(need) {
   need = need || {};
-  for (let tries = 0; tries < 200; tries++) {
-    const f = pick(FRAMES.filter((x) => (!need.COD || x.cod) && (!need.COI || x.coi)));
-    const subj = pick(SUBJ);
+  for (let tries = 0; tries < 300; tries++) {
+    const th = pick(THEMES);
+    const f = pick(th.frames.filter((x) => (!need.COD || x.cod) && (!need.COI || x.coi)).concat([]));
+    if (!f) continue;
+    const subj = pick(th.subj);
     const cod = f.cod ? pick(f.cod) : null;
     const withCoi = f.coi && (need.COI || !f.cod || Math.random() < 0.55);
     const coi = withCoi ? pick(f.coi) : null;
     const wantCc = need.CC ? true : Math.random() < 0.75;
-    const cc = wantCc ? pick(GEN_CC) : null;
+    const cc = wantCc ? pick(th.cc) : null;
     if (!cod && !coi) continue;
     const words = [subj.t, cod && cod[0], coi && coi[0], cc && cc[0]].filter(Boolean).map(headWord);
     if (new Set(words).size !== words.length) continue;
@@ -336,8 +404,15 @@ function randomSentence(need) {
   }
   return SENT[0];
 }
-// Phrase pour une question : tirée du générateur ou des 16 phrases de départ selon le mode choisi.
+// Phrases ajoutées par l'enseignant ou l'élève (objets phrase complets)
+let MINE = [];
+const setMine = (list) => { MINE = list || []; };
+// Phrase pour une question : tirée du générateur, des phrases de départ ou des phrases personnelles selon le mode choisi.
 function sentFor(pred, need) {
+  if (SENT_MODE === "mes") {
+    const pool = pred ? MINE.filter(pred) : MINE;
+    return pool.length ? pick(pool) : null;
+  }
   const fromList = SENT_MODE === "depart" || (SENT_MODE === "mix" && Math.random() < 0.4);
   if (!fromList) {
     for (let k = 0; k < 60; k++) { const g = randomSentence(need); if (!pred || pred(g)) return g; }
@@ -345,6 +420,76 @@ function sentFor(pred, need) {
   const pool = pred ? SENT.filter(pred) : SENT;
   return pick(pool.length ? pool : SENT);
 }
+
+
+/* --- Phrases personnelles (ajoutées par l'enseignant ou l'élève) --- */
+const AUX = new Set("ai as a avons avez ont suis es est sommes êtes sont avais avait avions aviez avaient étais était étions étiez étaient aurai auras aura aurons aurez auront serai seras sera serons serez seront aurais aurait aurions auriez auraient serais serait serions seriez seraient ait aient soit soient".split(" "));
+const PRON_SUBJ = new Set("il elle ils elles on je j' tu nous vous moi toi lui eux ça ce c'".split(" "));
+const DET_WORDS = new Set("le la les l' un une des du de d' mon ma mes ton ta tes son sa ses notre nos votre vos leur leurs ce cet cette ces chaque tous toutes tout plusieurs quelques à au aux dans en sur sous avec sans pendant près chez par pour vers devant derrière après avant hier aujourd'hui demain samedi dimanche lundi mardi mercredi jeudi vendredi ce matin soir cette".split(" "));
+const PL_DET = /^(les|des|ces|mes|tes|ses|nos|vos|leurs|plusieurs|quelques|\d)/i;
+const cleanText = (t) => String(t || "").replace(/[,;:!?…«»"“”]+/g, " ").replace(/\s+/g, " ").replace(/^[\s.]+|[\s.]+$/g, "");
+const firstWord = (t) => cleanText(t).split(" ")[0].toLowerCase();
+const guessPlural = (t) => PL_DET.test(cleanText(t)) || /\set\s/.test(cleanText(t));
+function guessPron(fn, t) {
+  const w = cleanText(t).toLowerCase();
+  if (fn === "COD") {
+    if (/^(du|de la|de l'|d'|de )/.test(w)) return "en";
+    if (PL_DET.test(w)) return "les";
+    if (/^(la|une|ma|ta|sa|notre|votre|cette)\b/.test(w)) return "la";
+    return "le";
+  }
+  if (/^(de|du|des|d')(\s|'|$)/.test(w)) return "en";
+  if (/^aux\b|^à\s+(les|ses|leurs|mes|tes|ces|des|nos|vos)\b/.test(w)) return "leur";
+  return "lui";
+}
+// Valide une liste de groupes [{t, fn, pron?, kind?, pl?}] ; renvoie la liste des problèmes (vide = phrase utilisable).
+function checkCustom(gr) {
+  const err = [];
+  if (gr.length < 2) { err.push("Il faut au moins deux groupes : un sujet et un verbe."); return err; }
+  if (gr.length > 8) err.push("La phrase a trop de groupes (8 au maximum).");
+  const total = gr.map((g) => g.t).join(" ");
+  if (total.length > 130) err.push("La phrase est trop longue (130 lettres au maximum).");
+  gr.forEach((g) => { if (!g.fn) err.push("Choisis la fonction de « " + g.t + " »."); });
+  if (err.length) return err;
+  const n = (f) => gr.filter((g) => g.fn === f).length;
+  if (n("V") !== 1) err.push(n("V") === 0 ? "Il manque le verbe." : "Il y a plusieurs verbes : l'application ne gère qu'une phrase simple (un seul verbe).");
+  if (n("S") !== 1) err.push(n("S") === 0 ? "Il manque le sujet." : "Il y a plusieurs sujets : l'application ne gère qu'une phrase simple (un seul sujet).");
+  if (n("COD") > 1) err.push("Il y a deux COD : garde une phrase avec un seul COD.");
+  if (n("COI") > 1) err.push("Il y a deux COI : garde une phrase avec un seul COI.");
+  if (err.length) return err;
+  const si = gr.findIndex((g) => g.fn === "S"), vi = gr.findIndex((g) => g.fn === "V");
+  if (vi !== si + 1) err.push("Le verbe doit venir juste après le sujet (un CC peut se placer avant le sujet ou après le verbe).");
+  const s = gr[si], v = gr[vi], sw = firstWord(s.t);
+  if (PRON_SUBJ.has(sw) || /^(il|elle|ils|elles|on|je|tu|nous|vous)'/.test(sw)) err.push("Le sujet est un pronom (« " + s.t + " ») : écris plutôt un groupe nominal (le chat, les enfants, Léa...).");
+  const vw = cleanText(v.t).split(" ");
+  if (/^(se|me|te|nous|vous)$/.test(vw[0].toLowerCase()) || /^(s'|m'|t')/i.test(vw[0])) err.push("Les verbes avec « se » ne sont pas encore gérés : choisis un autre verbe.");
+  else if (vw.length > 2 || (vw.length === 2 && !AUX.has(vw[0].toLowerCase()))) err.push("Le verbe doit tenir en un mot (mange) ou en deux mots pour un temps composé (a mangé, est parti). « " + v.t + " » n'est pas géré.");
+  gr.forEach((g) => {
+    if (g.fn === "COD" && !["le", "la", "les", "en"].includes(g.pron)) err.push("Choisis le petit mot qui remplace « " + g.t + " » : le, la, les ou en.");
+    if (g.fn === "COI" && !["lui", "leur", "y", "en"].includes(g.pron)) err.push("Choisis le petit mot qui remplace « " + g.t + " » : lui, leur, y ou en.");
+  });
+  return err;
+}
+// Transforme les groupes en phrase utilisable par les manipulations et le quiz (majuscules corrigées).
+function buildCustom(gr, id) {
+  const ch = gr.map((g, i) => {
+    let t = cleanText(g.t);
+    const fw = firstWord(t);
+    const upper = /^[A-ZÀÂÉÈÊËÎÏÔÙÛÜÇ]/.test(t);
+    let proper = false;
+    if (upper) {
+      if (g.fn === "S" && !DET_WORDS.has(fw)) proper = true;
+      else if (DET_WORDS.has(fw) || i === 0 || g.fn === "CC") t = t.charAt(0).toLowerCase() + t.slice(1);
+    }
+    const o = {};
+    if (g.fn === "COD" || g.fn === "COI") o.pron = g.pron;
+    if (g.fn === "CC") { o.kind = g.kind || "x"; o.own = true; }
+    if (g.fn === "S") { o.pl = !!(g.pl || guessPlural(t)); if (proper) o.proper = true; }
+    return C(t, g.fn, o);
+  });
+  return { id: id || "m" + Date.now().toString(36), ch, mine: true };
+}
+const mineToSent = (m) => buildCustom(m.ch.map((c) => ({ t: c.t, fn: c.fn, pron: c.pron, kind: c.kind, pl: c.pl })), m.id);
 
 /* --- Texte --- */
 function sentText(chs) {
@@ -390,11 +535,13 @@ function doMove(sent, i) {
 function pronWhy(c, word) {
   const q = "« " + c.t + " »";
   if (c.fn === "COD") {
+    if (word === "en") return q + " indique une quantité (du, de la, des, de l') : on le remplace par « en ».";
     if (word === "les") return q + " est au pluriel, donc on dit « les ».";
     if (word === "l'") return q + " est " + (c.pron === "la" ? "féminin" : "masculin") + " singulier : « " + c.pron + " » devient « l' » devant un verbe qui commence par une voyelle.";
     if (word === "la") return q + " est féminin singulier, donc on dit « la ».";
     return q + " est masculin singulier, donc on dit « le ».";
   }
+  if (word === "en") return q + " commence par « de » : on le remplace par « en ».";
   if (word === "leur") return q + " est au pluriel (plusieurs personnes), donc on dit « leur » ; pour une seule personne, on dirait « lui ».";
   if (word === "lui") return q + " est au singulier (une seule personne), donc on dit « lui » ; pour plusieurs personnes, on dirait « leur ».";
   return q + " désigne une chose (pas une personne), donc on dit « y ».";
@@ -410,20 +557,39 @@ function doReplace(sent, i) {
   const word = c.pron === "le" || c.pron === "la" ? (startsVowel(chs[vi + 1].t) ? "l'" : c.pron) : c.pron;
   const text = sentText(chs);
   const kind = c.fn === "COD" ? "COD" : "COI";
-  const msg = kind === "COD"
+  const msg = word === "en" ? "Ça marche avec « en » : c'est un " + kind + "."
+    : kind === "COD"
     ? "Ça marche avec « " + word + " » (le, la, l', les) : c'est un COD."
     : "Ça marche avec « " + word + " » (lui, leur, y) : c'est un COI.";
   const why = pronWhy(c, word);
   return { text, verdict: "ok", msg: msg + " " + why, pron: word, why };
+}
+// Forme négative d'un groupe verbal : ne (n') + verbe conjugué (ou auxiliaire) + pas + reste (participe)
+function negPieces(v) {
+  const w = v.t.split(" ");
+  const head = w[0], tail = w.slice(1).join(" ");
+  const ne = startsVowel(head) ? { t: "n'", fn: "P", glue: true } : { t: "ne", fn: "P" };
+  return { ne, head: { t: head, fn: "V" }, pas: { t: "pas", fn: "P" }, tail: tail ? { t: tail, fn: "V" } : null };
+}
+// Après « ne ... pas », un COD indéfini ou partitif prend « de » : « mange du pain » devient « ne mange pas de pain ».
+function negCod(chs) {
+  return chs.map((x) => {
+    if (x.fn !== "COD") return x;
+    const m = /^(un|une|des|du|de la|de l'|d')\s*(.*)$/i.exec(x.t);
+    if (!m || /^(les|le|la|l')$/i.test(m[1])) return x;
+    const rest = m[2] || "";
+    if (!rest) return x;
+    return { ...x, t: (VOW.test(rest) ? "d'" : "de ") + rest };
+  });
 }
 function doAdd(sent, i) {
   const c = sent.ch[i];
   if (c.fn === "V") {
     const chs = [...sent.ch];
     const v = chs[i];
-    const neg = startsVowel(v.t) ? { t: "n'", fn: "P", glue: true } : { t: "ne", fn: "P" };
-    chs.splice(i, 1, neg, v, { t: "pas", fn: "P" });
-    return { text: sentText(chs), verdict: "ok", msg: "Je mets ne devant le verbe et pas après : le mot encadré est le verbe." };
+    const np = negPieces(v);
+    chs.splice(i, 1, np.ne, np.head, np.pas, ...(np.tail ? [np.tail] : []));
+    return { text: sentText(negCod(chs)), verdict: "ok", msg: "Je mets ne devant le verbe et pas après : le mot encadré est le verbe." };
   }
   if (c.fn === "S") {
     const first = sent.ch[0];
@@ -466,37 +632,37 @@ function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) {
 
 const VF = [
   { q: "Un CC peut presque toujours s'effacer et se déplacer.", a: true, skill: "cc", exp: "Oui : j'efface, je déplace, et la phrase reste correcte." },
-  { q: "On peut remplacer un COD par le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : « Le guide montre le cratère » devient « Le guide le montre »." },
+  { q: "On peut remplacer un COD par le, la, l' ou les.", a: true, skill: "cod", exp: "Oui : « Le facteur livre le courrier » devient « Le facteur le livre »." },
   { q: "Un COI se remplace souvent par lui, leur ou y.", a: true, skill: "coi", exp: "Oui : « Il parle aux touristes » devient « Il leur parle »." },
   { q: "Le COD se déplace facilement dans la phrase.", a: false, skill: "cod", exp: "Non : le COD ne se déplace pas. Ce sont les CC qui voyagent." },
-  { q: "Pour trouver le verbe, je peux mettre ne...pas autour.", a: true, skill: "verbe", exp: "Oui : « Le guide ne montre pas ». Le verbe est entre ne et pas." },
-  { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le guide qui montre ». Le sujet est entre c'est et qui." },
+  { q: "Pour trouver le verbe, je peux mettre ne...pas autour.", a: true, skill: "verbe", exp: "Oui : « Le chien ne mord pas ». Le verbe est entre ne et pas." },
+  { q: "Pour trouver le sujet, je peux dire c'est...qui.", a: true, skill: "sujet", exp: "Oui : « C'est le facteur qui livre ». Le sujet est entre c'est et qui." },
   { q: "Un CC complète le verbe comme un COD.", a: false, skill: "cc", exp: "Non : le CC donne une information en plus (quand, où, comment). On peut l'effacer." },
-  { q: "Un COI est souvent introduit par à ou de.", a: true, skill: "coi", exp: "Oui : « à sa sœur », « aux visiteurs » (à + les). Je teste avec lui, leur, y." },
-  { q: "Le verbe change quand je change le temps (hier, aujourd'hui, demain).", a: true, skill: "verbe", exp: "Oui : le verbe se conjugue. Hier il montrait, aujourd'hui il montre." },
+  { q: "Un COI est souvent introduit par à ou de.", a: true, skill: "coi", exp: "Oui : « à sa sœur », « aux élèves » (à + les). Je teste avec lui, leur, y." },
+  { q: "Le verbe change quand je change le temps (hier, aujourd'hui, demain).", a: true, skill: "verbe", exp: "Oui : le verbe se conjugue. Hier il livrait, aujourd'hui il livre." },
   { q: "Pour trouver le verbe, je cherche le mot le plus long de la phrase.", a: false, skill: "verbe", exp: "Non : la longueur ne dit rien. Je mets ne...pas autour du mot." },
   { q: "On peut effacer le verbe et garder une phrase correcte.", a: false, skill: "verbe", exp: "Non : sans verbe, il n'y a plus de phrase." },
   { q: "Un verbe peut dire un état (être, rester, sembler), pas seulement une action.", a: true, skill: "verbe", exp: "Oui : être, rester, sembler sont des verbes d'état." },
-  { q: "Le sujet peut être formé de plusieurs mots.", a: true, skill: "sujet", exp: "Oui : « les volcanologues », « le maire »." },
-  { q: "Le sujet est toujours le premier mot de la phrase.", a: false, skill: "sujet", exp: "Non : un CC peut venir avant (« Hier, le guide montre... »)." },
+  { q: "Le sujet peut être formé de plusieurs mots.", a: true, skill: "sujet", exp: "Oui : « les élèves », « le facteur », « Léa »." },
+  { q: "Le sujet est toujours le premier mot de la phrase.", a: false, skill: "sujet", exp: "Non : un CC peut venir avant (« Chaque matin, le facteur livre... »)." },
   { q: "Le sujet peut s'effacer sans problème.", a: false, skill: "sujet", exp: "Non : sans sujet, on ne sait plus qui fait l'action." },
   { q: "Quand le sujet est au pluriel, je peux dire ce sont...qui.", a: true, skill: "sujet", exp: "Oui : « Ce sont les enfants qui obéissent »." },
   { q: "Si un test hésite, je peux en faire un deuxième.", a: true, skill: "cod", exp: "Oui : deux tests qui disent la même chose, c'est plus sûr." },
-  { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le guide montre aux visiteurs » : on se demande quoi. Le COD ne s'efface pas." },
+  { q: "Quand j'efface un COD, la phrase reste complète.", a: false, skill: "cod", exp: "Non : « Le facteur livre aux habitants » : on se demande quoi. Le COD ne s'efface pas." },
 ];
 
 
 /* --- Aides pour les questions de forme négative et de c'est...qui --- */
 function negVariants(sent) {
   const vi = idx(sent, "V"), si = idx(sent, "S"), v = sent.ch[vi];
-  const ne = startsVowel(v.t) ? { t: "n'", fn: "P", glue: true } : { t: "ne", fn: "P" };
-  const pas = { t: "pas", fn: "P" }, neW = { t: "ne", fn: "P" };
-  const mk = (f) => sentText(f(sent.ch.slice()));
-  const good = mk((c) => { c.splice(vi, 1, ne, v, pas); return c; });
+  const np = negPieces(v), tl = np.tail ? [np.tail] : [];
+  const neW = { t: "ne", fn: "P" };
+  const mk = (f) => sentText(negCod(f(sent.ch.slice())));
+  const good = mk((c) => { c.splice(vi, 1, np.ne, np.head, np.pas, ...tl); return c; });
   const bad = [
-    mk((c) => { c.splice(vi, 1, v, pas); return c; }),
-    mk((c) => { c.splice(vi, 1, v, pas); c.splice(si, 0, neW); return c; }),
-    mk((c) => { c.splice(vi, 1, neW, v); c.push(pas); return c; }),
+    mk((c) => { c.splice(vi, 1, np.head, np.pas, ...tl); return c; }),
+    mk((c) => { c.splice(vi, 1, np.head, np.pas, ...tl); c.splice(si, 0, neW); return c; }),
+    mk((c) => { c.splice(vi, 1, neW, np.head, ...tl); c.push(np.pas); return c; }),
   ].filter((t, k, a) => t !== good && a.indexOf(t) === k);
   return { good, bad };
 }
@@ -524,6 +690,7 @@ function genQuestion(skill) {
     const t = pick(types);
     const needs = skill === "cod" ? { COD: true } : skill === "coi" ? { COI: true } : skill === "cc" ? { CC: true } : (t === "pron" ? {} : {});
     const sent = sentFor(null, needs);
+    if (!sent) continue;
     if (t === "neg") {
       if (skill !== "tous" && skill !== "verbe") continue;
       const nv = negVariants(sent);
@@ -544,6 +711,7 @@ function genQuestion(skill) {
       const key = SKN2[skill], wantYes = Math.random() < 0.5;
       const has = (sn, f) => sn.ch.some((c) => (f ? c.fn === key : c.fn !== key));
       const sn = sentFor((x) => has(x, wantYes), wantYes ? { [key]: true } : {});
+      if (!sn) continue;
       const cand = sn.ch.map((c, i) => i).filter((i) => (sn.ch[i].fn === key) === wantYes);
       const i = pick(cand), c = sn.ch[i], yes = c.fn === key, sent2 = sn;
       return { type: "isfn", skill, sent: sent2, target: i, prompt: "Le groupe encadré est-il " + ART[key] + " ?", options: [{ id: "o", label: "Oui" }, { id: "n", label: "Non" }], correct: yes ? "o" : "n", exp: explainChunk(sent2, i) + (yes ? "" : " Ce n'est donc pas " + ART[key] + "."), hint: FN[key].tip };
@@ -620,7 +788,7 @@ const CARDS = [
   { id: "c2", skill: "cc", f: "À quoi sert l'outil DÉPLACER ?", b: "Je change un groupe de place. Si la phrase sonne juste, c'est un CC." },
   { id: "c3", skill: "cod", f: "À quoi sert l'outil REMPLACER ?", b: "Je mets un petit mot à la place du groupe : le, la, l', les pour un COD ; lui, leur, y pour un COI." },
   { id: "c4", skill: "verbe", f: "À quoi sert l'outil AJOUTER ?", b: "J'ajoute des mots pour tester : ne...pas pour le verbe, c'est...qui pour le sujet, « et cela se passe » pour le CC." },
-  { id: "c5", skill: "verbe", f: "Comment trouver le verbe ?", b: "Je mets ne...pas autour : « Le guide ne montre pas ». Le verbe est entre ne et pas. Je peux aussi changer le temps." },
+  { id: "c5", skill: "verbe", f: "Comment trouver le verbe ?", b: "Je mets ne...pas autour : « Le chien ne mord pas ». Le verbe est entre ne et pas. Je peux aussi changer le temps." },
   { id: "c6", skill: "sujet", f: "Comment trouver le sujet ?", b: "J'encadre avec c'est...qui (ou ce sont...qui). Je peux aussi le remplacer par il, elle, ils, elles." },
   { id: "c7", skill: "cc", f: "Comment reconnaître un CC ?", b: "Il s'efface et il se déplace. Il dit quand, où ou comment. Je peux ajouter « et cela se passe »." },
   { id: "c8", skill: "cod", f: "Comment reconnaître un COD ?", b: "Il complète le verbe sans préposition. Il ne s'efface pas et ne se déplace pas. Je le remplace par le, la, l', les." },
@@ -654,7 +822,7 @@ function starsFor(n, k) {
 const starsByCount = (n, steps) => (n >= steps[2] ? 3 : n >= steps[1] ? 2 : n >= steps[0] ? 1 : 0);
 
 if (typeof module !== "undefined") {
-  module.exports = { randomSentence, setSentMode, SENT, FRAMES, SUBJ, CC_OPTS, CARDS, VF, FN, buildSentence, sentText, plain, doErase, doMove, doReplace, doAdd, explainChunk, genQuestion, starsFor, starsByCount, shuffle };
+  module.exports = { THEMES, setMine, checkCustom, buildCustom, guessPron, guessPlural, cleanText, mineToSent, randomSentence, setSentMode, SENT, FRAMES, SUBJ, CC_OPTS, CARDS, VF, FN, buildSentence, sentText, plain, doErase, doMove, doReplace, doAdd, explainChunk, genQuestion, starsFor, starsByCount, shuffle };
 }
 /* ===== OUTILS DOM ===== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -677,6 +845,7 @@ const IC = {
   quiz: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
   cards: '<rect x="3" y="7" width="14" height="12" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>',
   build: '<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/>',
   tag: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/>',
   book: '<path d="M3 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H3z"/><path d="M21 5h-7a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h7z"/>',
   path: '<path d="M5 21V4"/><path d="M5 4h13l-2.5 4L18 12H5"/>',
@@ -776,7 +945,7 @@ const VERD = { ok: ["Ça marche", "check", "v-ok"], no: ["Ça ne marche pas", "c
 
 /* ===== MÉMOIRE LOCALE (avec secours si le stockage est bloqué) ===== */
 const KEY = "manip-phrases-v1";
-const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "renard", heroSet: false } };
+const DEF = { name: "", xp: 0, stats: {}, flash: {}, lessons: {}, notebook: [], created: 0, solved: 0, hints: 0, badges: {}, history: [], settings: { skin: "auto", size: 1, read: false, motion: true, sound: false, auto: false, picto: 1, voice: "", rate: 0.9, hero: "renard", heroSet: false }, mine: [] };
 function loadStore() { try { const r = localStorage.getItem(KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
 let S = (function () {
   const l = loadStore() || {};
@@ -984,7 +1153,7 @@ function viewAccueil(root) {
        ["apprendre", "Apprendre", "book", "Sept petites leçons avec des exemples."],
        ["manipulations", "Les manipulations", "tag", "Je touche un groupe de mots, j'essaie un outil, je trouve sa fonction."],
        ["entrainer", "S'entraîner", "quiz", "Quiz et cartes mémoire pour réviser en jouant."],
-       ["creer", "Créer des phrases", "build", "Je construis mes propres phrases avec un verbe, un sujet et des compléments."]]
+       ["creer", "Créer des phrases", "build", "Je construis des phrases sur huit thèmes, ou j'écris les miennes."]]
         .map(([r, n, i, d]) => h("a", { class: "tile", href: "#" + r }, ico(i), h("b", null, n), h("span", { class: "muted small" }, d)))),
     h("div", { class: "card", style: "margin-top:1.2rem" },
       h("h2", null, "Mon prénom"),
@@ -992,7 +1161,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 12 h 05. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 13 h 10. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -1015,7 +1184,7 @@ function viewEntrainer(root) {
 }
 const skillOpts = () => [["tous", "Un peu de tout", null], ...SK.map((s) => [s.k, s.name, "sh_" + s.fn])];
 
-const MODES = [["nouvelles", "Des phrases nouvelles (créées par l\u2019appli)"], ["mix", "Un mélange"], ["depart", "Les 16 phrases de départ"]];
+const MODES = () => [["nouvelles", "Des phrases nouvelles (créées par l\u2019appli)"], ["mix", "Un mélange"], ["depart", "Les " + SENT.length + " phrases de départ"], ...(S.mine.length ? [["mes", "Mes phrases ajoutées (" + S.mine.length + ")"]] : [])];
 function startQuiz(skill, len) {
   const list = [], seen = new Set();
   let guard = 0;
@@ -1034,7 +1203,7 @@ function quizView(box, draw) {
     put(box, 
       h("p", null, "Je réponds à des questions courtes. Pas de chrono, pas de points en moins : je peux prendre mon temps et demander un indice."),
       radioGroup("Qu'est-ce que je travaille ?", "qs", skillOpts(), UI.quizSkill, (v) => { UI.quizSkill = v; }),
-      radioGroup("Quelles phrases ?", "qm", MODES, UI.sentMode, (v) => { UI.sentMode = v; }),
+      radioGroup("Quelles phrases ?", "qm", MODES(), UI.sentMode, (v) => { UI.sentMode = v; }),
       radioGroup("Combien de questions ?", "ql", [[5, "5 questions"], [8, "8 questions"], [12, "12 questions"]], UI.quizLen, (v) => { UI.quizLen = Number(v); }),
       h("button", { type: "button", class: "btn primary", on: { click: () => { setSentMode(UI.sentMode); startQuiz(UI.quizSkill, UI.quizLen); if (!UI.quiz.list.length) { UI.quiz = null; toast("Pas de question pour ce choix.", "ask"); return; } draw("#qtitle"); } } }, ico("play"), "C'est parti !"));
     return;
@@ -1163,7 +1332,9 @@ function viewManipulations(root) {
   draw();
 
   function pickSentence(key) {
-    if (key === "gen" && UI.gen) UI.lab = freshLab(UI.gen, "gen");
+    const mm = String(key).indexOf("mine:") === 0 ? S.mine.find((m) => "mine:" + m.id === key) : null;
+    if (mm) UI.lab = freshLab(mineToSent(mm), key);
+    else if (key === "gen" && UI.gen) UI.lab = freshLab(UI.gen, "gen");
     else if (key === "custom" && UI.custom) UI.lab = freshLab(UI.custom, "custom");
     else UI.lab = freshLab(SENT.find((s) => s.id === key) || SENT[0], key);
     draw("#sentgrp");
@@ -1174,7 +1345,8 @@ function viewManipulations(root) {
     const sel = h("select", { id: "selsent", on: { change: (e) => pickSentence(e.target.value) } },
       UI.gen ? h("option", { value: "gen", selected: L.key === "gen" }, "Phrase nouvelle : " + plain(UI.gen)) : null,
       UI.custom ? h("option", { value: "custom", selected: L.key === "custom" }, "Ma phrase : " + plain(UI.custom)) : null,
-      SENT.map((s) => h("option", { value: s.id, selected: L.key === s.id }, plain(s))));
+      S.mine.length ? h("optgroup", { label: "Mes phrases" }, S.mine.map((m) => h("option", { value: "mine:" + m.id, selected: L.key === "mine:" + m.id }, plain(mineToSent(m))))) : null,
+      h("optgroup", { label: "Phrases de départ" }, SENT.map((s) => h("option", { value: s.id, selected: L.key === s.id }, plain(s)))));
     const step = L.done ? "Bravo, la phrase est résolue !" : L.sel === null ? "Étape 1 : touche un groupe de mots." : L.res ? "Étape 3 : à ton avis, quelle est sa fonction ?" : "Étape 2 : choisis un outil pour tester ce groupe.";
     const c = L.sel !== null ? sent.ch[L.sel] : null;
     fill(holder,
@@ -1232,11 +1404,25 @@ function viewManipulations(root) {
 
 /* ======================================================= CRÉER */
 function viewCreer(root) {
-  if (!UI.at) UI.at = { frame: "observer", subj: 0, cod: 0, coi: -1, cc: 0, ccPos: "start", ccText: "", ccKind: "t" };
+  const body = h("div");
+  const tabs = h("ul", { class: "tabs", role: "list" },
+    [["atelier", "Atelier de phrases"], ["mes", "Mes propres phrases"]].map(([k, l]) =>
+      h("li", null, h("button", { type: "button", class: "tab", "aria-pressed": (UI.creerTab || "atelier") === k ? "true" : "false", on: { click: () => { UI.creerTab = k; draw(); } } }, l))));
+  put(root, ...title("Créer des phrases", "Je construis une phrase avec l'atelier, ou j'écris la mienne."), tabs, body);
+  draw();
+  function draw() {
+    tabs.querySelectorAll(".tab").forEach((b, i) => b.setAttribute("aria-pressed", String((i === 0 ? "atelier" : "mes") === (UI.creerTab || "atelier"))));
+    body.replaceChildren();
+    if ((UI.creerTab || "atelier") === "mes") mesPhrasesView(body); else atelierView(body);
+  }
+}
+function atelierView(root) {
+  if (!UI.at) UI.at = { theme: 0, frame: THEMES[0].frames[0].id, subj: 0, cod: 0, coi: -1, cc: 0, ccPos: "start", ccText: "", ccKind: "t" };
   const A = UI.at;
   const holder = h("div"), preview = h("div");
-  put(root, ...title("Créer des phrases", "Je choisis un verbe, un sujet et des compléments. La phrase se construit toute seule."), pictoStrip([["hand", "Je choisis"], ["build", "Ma phrase se construit"], ["speaker", "Je l'écoute"], ["tag", "Je la teste"]]), holder);
-  function frame() { return FRAMES.find((f) => f.id === A.frame); }
+  put(root, pictoStrip([["hand", "Je choisis"], ["build", "Ma phrase se construit"], ["speaker", "Je l'écoute"], ["tag", "Je la teste"]]), holder);
+  const th = () => THEMES[A.theme] || THEMES[0];
+  function frame() { return FRAMES.find((f) => f.id === A.frame) || th().frames[0]; }
   draw();
   function current() {
     const f = frame();
@@ -1244,8 +1430,8 @@ function viewCreer(root) {
     const txt = A.ccText.trim().replace(/[.,;!?]+$/, "");
     let cc = null;
     if (txt) cc = { t: txt, kind: A.ccKind, own: true };
-    else if (A.cc >= 0) cc = { t: CC_OPTS[A.cc][0], kind: CC_OPTS[A.cc][1] };
-    return buildSentence({ frame: A.frame, subj: SUBJ[A.subj], cod, coi, cc, ccPos: A.ccPos });
+    else if (A.cc >= 0) cc = { t: th().cc[A.cc][0], kind: th().cc[A.cc][1] };
+    return buildSentence({ frame: A.frame, subj: th().subj[A.subj], cod, coi, cc, ccPos: A.ccPos });
   }
   function drawPreview() {
     const sent = current();
@@ -1270,15 +1456,18 @@ function viewCreer(root) {
     fill(holder,
       h("div", { class: "grid g2" },
         h("div", null,
-          radioGroup("Le verbe", "fr", FRAMES.map((x) => [x.id, x.id, "sh_V"]), A.frame, (v) => {
+          radioGroup("Le thème", "th", THEMES.map((t, i) => [i, t.name]), A.theme, (v) => {
+            A.theme = Number(v); const nf = th().frames[0]; A.frame = nf.id; A.subj = 0; A.cod = nf.cod ? 0 : -1; A.coi = nf.coi ? (nf.cod ? -1 : 0) : -1; A.cc = 0; A.ccText = ""; draw("input[name=th]:checked");
+          }),
+          radioGroup("Le verbe", "fr", th().frames.map((x) => [x.id, x.inf, "sh_V"]), A.frame, (v) => {
             A.frame = v; const nf = frame();
             A.cod = nf.cod ? 0 : -1; A.coi = nf.coi ? (nf.cod ? -1 : 0) : -1; draw("input[name=fr]:checked");
           }),
-          radioGroup("Le sujet", "su", SUBJ.map((x, i) => [i, x.t, "sh_S"]), A.subj, (v) => { A.subj = Number(v); draw("input[name=su]:checked"); }),
+          radioGroup("Le sujet", "su", th().subj.map((x, i) => [i, x.t, "sh_S"]), A.subj, (v) => { A.subj = Number(v); draw("input[name=su]:checked"); }),
           f.cod ? radioGroup("Le COD (complète le verbe)", "co", f.cod.map((x, i) => [i, x[0], "sh_COD"]), A.cod, (v) => { A.cod = Number(v); draw("input[name=co]:checked"); }) : null,
           f.coi ? radioGroup("Le COI (avec à, aux...)", "ci", [...(f.cod ? [[-1, "Pas de COI"]] : []), ...f.coi.map((x, i) => [i, x[0], "sh_COI"])], A.coi, (v) => { A.coi = Number(v); draw("input[name=ci]:checked"); }) : null),
         h("div", null,
-          radioGroup("Le CC (quand, où, comment ?)", "cc", [[-1, "Pas de CC"], ...CC_OPTS.map((x, i) => [i, x[0], "sh_CC"])], A.cc, (v) => { A.cc = Number(v); A.ccText = ""; draw("input[name=cc]:checked"); }),
+          radioGroup("Le CC (quand, où, comment ?)", "cc", [[-1, "Pas de CC"], ...th().cc.map((x, i) => [i, x[0], "sh_CC"])], A.cc, (v) => { A.cc = Number(v); A.ccText = ""; draw("input[name=cc]:checked"); }),
           h("fieldset", null, h("legend", null, "Ou j'invente mon CC"),
             h("div", { class: "row" },
               h("label", { for: "cctxt", class: "sr" }, "Mon propre CC"),
@@ -1421,6 +1610,152 @@ function viewEnseignant(root) {
       h("div", { class: "row", style: "margin-top:1rem" }, h("button", { type: "button", class: "btn ghost", on: { click: () => askDialog("Supprimer cet élève ?", "Les codes de " + p.name + " seront effacés de cet appareil.", "Oui, supprimer", () => { delete CLASSE.pupils[p.name.toLowerCase()]; saveClasse(); UI.ens.sel = null; draw("#title"); }) } }, ico("trash"), "Supprimer cet élève")));
   }
 }
+
+
+/* ======================================================= MES PROPRES PHRASES ======================================================= */
+/* L'enseignant ou l'élève écrit une phrase, la coupe en groupes et donne la fonction de chaque groupe. Elle sert ensuite dans les manipulations et le quiz. */
+function syncMine() { setMine(S.mine.map(mineToSent)); }
+syncMine();
+const MINE_MAX = 40;
+const FN_OPT = [["S", "Sujet"], ["V", "Verbe"], ["COD", "COD"], ["COI", "COI"], ["CC", "CC"]];
+const FN_SYM = { S: "●", V: "■", COD: "▲", COI: "◆", CC: "★" };
+function mineCode() {
+  const o = S.mine.map((m) => m.ch.map((c) => [c.t, c.fn, c.pron || "", c.kind || "", c.pl ? 1 : 0]));
+  return "MP-PH1-" + btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+}
+function importMine(str) {
+  str = String(str).trim();
+  if (str.indexOf("MP-PH1-") !== 0) throw new Error("format");
+  const o = JSON.parse(decodeURIComponent(escape(atob(str.slice(7)))));
+  if (!Array.isArray(o)) throw new Error("format");
+  let added = 0, skipped = 0;
+  o.slice(0, MINE_MAX).forEach((arr) => {
+    if (!Array.isArray(arr)) { skipped++; return; }
+    const gr = arr.map((c) => ({ t: String(c[0] || "").slice(0, 60), fn: String(c[1] || ""), pron: String(c[2] || ""), kind: String(c[3] || ""), pl: !!c[4] }));
+    if (gr.some((g) => !FN[g.fn]) || checkCustom(gr).length) { skipped++; return; }
+    const sent = buildCustom(gr);
+    const txt = plain(sent);
+    if (S.mine.some((m) => plain(mineToSent(m)) === txt) || S.mine.length >= MINE_MAX) { skipped++; return; }
+    S.mine.push({ id: sent.id + added, ch: sent.ch.map((c) => ({ t: c.t, fn: c.fn, pron: c.pron, kind: c.kind, pl: c.pl })) });
+    added++;
+  });
+  save(); syncMine();
+  return { added, skipped };
+}
+function mesPhrasesView(root) {
+  const E = UI.ed || (UI.ed = { text: "", words: null, cuts: [], g: [], msg: "" });
+  const holder = h("div");
+  put(root, pictoStrip([["build", "J'écris"], ["scissors", "Je coupe"], ["tag", "Je donne la fonction"], ["save", "J'enregistre"]]), holder);
+  draw();
+
+  function groups() {
+    if (!E.words) return [];
+    const out = [[E.words[0]]];
+    for (let i = 1; i < E.words.length; i++) { if (E.cuts[i - 1]) out.push([E.words[i]]); else out[out.length - 1].push(E.words[i]); }
+    return out.map((w) => w.join(" "));
+  }
+  function ensureG(gs) {
+    // garde les choix déjà faits quand on recoupe : on repart de zéro si le nombre de groupes change
+    if (E.g.length !== gs.length || E.g.some((x, i) => x.t !== gs[i])) E.g = gs.map((t) => ({ t, fn: "", pron: "", kind: "t", pl: false }));
+  }
+  function analyse() {
+    const raw = E.text.trim();
+    if (!raw) { E.msg = "Écris d'abord une phrase."; return false; }
+    if (/[?!]\s*$/.test(raw)) { E.msg = "Écris une phrase qui finit par un point (pas une question ni une exclamation)."; return false; }
+    const w = cleanText(raw).split(" ").filter(Boolean);
+    if (w.length < 2) { E.msg = "Écris une vraie phrase : au moins un sujet et un verbe."; return false; }
+    if (w.length > 20) { E.msg = "La phrase est trop longue (20 mots au maximum)."; return false; }
+    E.words = w; E.cuts = w.slice(1).map(() => false); E.g = []; E.msg = ""; return true;
+  }
+  function draw(focus) {
+    const gs = groups(); ensureG(gs);
+    const built = E.words ? E.g.map((g) => ({ ...g })) : [];
+    const errs = E.words && gs.length > 1 ? checkCustom(built) : [];
+    const allChosen = E.words && gs.length > 1 && E.g.every((g) => g.fn);
+    const valid = allChosen && !errs.length;
+    const sent = valid ? buildCustom(built) : null;
+    const input = h("input", { type: "text", id: "mytext", value: E.text, maxlength: "140", autocomplete: "off", placeholder: "par exemple : Le chat attrape les souris dans le jardin.", on: { input: (e) => { E.text = e.target.value; }, keydown: (e) => { if (e.key === "Enter") { e.preventDefault(); if (analyse()) draw("#cutline button"); else draw("#mytext"); } } } });
+    fill(holder,
+      h("div", { class: "card" },
+        h("h2", { style: "margin-top:0" }, "1. J'écris ma phrase"),
+        h("p", { class: "muted small" }, "Une phrase simple, avec un seul verbe : un sujet, un verbe, et si je veux un COD, un COI ou un CC. Je peux écrire n'importe quel sujet : l'école, le sport, les animaux, mes lectures..."),
+        h("div", { class: "row" }, h("label", { for: "mytext", class: "sr" }, "Ma phrase"), input,
+          h("button", { type: "button", class: "btn primary", on: { click: () => { if (analyse()) draw("#cutline button"); else draw("#mytext"); } } }, ico("build"), "Je découpe ma phrase")),
+        E.msg ? h("p", { role: "alert", class: "warn" }, E.msg) : null),
+      E.words ? h("div", { class: "card", style: "margin-top:1rem" },
+        h("h2", { style: "margin-top:0" }, "2. Je coupe la phrase en groupes"),
+        h("p", { class: "muted small" }, "Je touche le petit trait entre deux mots pour couper. Un groupe peut avoir plusieurs mots (« le chat », « dans le jardin »)."),
+        h("div", { id: "cutline", class: "cutline" }, E.words.map((w, i) => [
+          h("span", { class: "cw" }, w),
+          i < E.words.length - 1 ? h("button", { type: "button", class: "cut", "aria-pressed": String(E.cuts[i]), "aria-label": "Couper entre « " + w + " » et « " + E.words[i + 1] + " »", on: { click: () => { E.cuts[i] = !E.cuts[i]; draw("#cutline .cut:nth-of-type(" + (i + 1) + ")"); } } }, E.cuts[i] ? "✂" : "·") : null])),
+        h("p", { class: "muted small", role: "status" }, gs.length + " groupe" + (gs.length > 1 ? "s" : "") + " : " + gs.map((g) => "« " + g + " »").join(" "))) : null,
+      E.words && gs.length > 1 ? h("div", { class: "card", style: "margin-top:1rem" },
+        h("h2", { style: "margin-top:0" }, "3. Je donne la fonction de chaque groupe"),
+        h("div", { class: "grid g2" }, E.g.map((g, i) => {
+          const sid = "fn" + i;
+          return h("div", { class: "fnrow" },
+            h("label", { for: sid, class: "fnl" }, "« " + g.t + " »"),
+            h("select", { id: sid, on: { change: (e) => { g.fn = e.target.value; if (g.fn === "COD" || g.fn === "COI") g.pron = guessPron(g.fn, g.t); if (g.fn === "S") g.pl = guessPlural(g.t); draw("#" + sid); } } },
+              h("option", { value: "", selected: !g.fn }, "Je choisis…"),
+              FN_OPT.map(([k, l]) => h("option", { value: k, selected: g.fn === k }, FN_SYM[k] + " " + l))),
+            g.fn === "COD" || g.fn === "COI" ? h("span", { class: "row", style: "gap:.4rem" },
+              h("label", { for: sid + "p", class: "small" }, "Je le remplace par"),
+              h("select", { id: sid + "p", on: { change: (e) => { g.pron = e.target.value; draw("#" + sid + "p"); } } },
+                (g.fn === "COD" ? ["le", "la", "les", "en"] : ["lui", "leur", "y", "en"]).map((p) => h("option", { value: p, selected: g.pron === p }, p)))) : null,
+            g.fn === "CC" ? h("span", { class: "row", style: "gap:.4rem" },
+              h("label", { for: sid + "k", class: "small" }, "Il dit"),
+              h("select", { id: sid + "k", on: { change: (e) => { g.kind = e.target.value; draw("#" + sid + "k"); } } },
+                [["t", "quand ?"], ["l", "où ?"], ["m", "comment ?"]].map(([v, l]) => h("option", { value: v, selected: g.kind === v }, l)))) : null,
+            g.fn === "S" ? h("label", { class: "choice", style: "display:inline-flex" },
+              h("input", { type: "checkbox", checked: g.pl, on: { change: (e) => { g.pl = e.target.checked; draw("#" + sid); } } }), h("span", null, "Sujet au pluriel (ce sont...qui)")) : null);
+        })),
+        errs.length ? h("div", { role: "status", class: "warn" }, h("p", { style: "margin:0 0 .3rem" }, h("b", null, "À corriger :")), h("ul", { style: "margin:0;padding-left:1.2rem" }, errs.map((e) => h("li", null, e)))) : null,
+        valid ? h("div", { style: "margin-top:1rem" },
+          h("p", { class: "muted small" }, "Voici ma phrase avec ses fonctions :"),
+          sentNode(sent, { tagged: true }),
+          h("p", { class: "muted small", style: "margin-top:.6rem" }, "Le temps composé et l'accord du participe ne sont pas vérifiés : je relis ma phrase avant de l'enregistrer."),
+          h("div", { class: "row", style: "margin-top:.6rem" },
+            speakBtn(() => plain(sent), "Écouter ma phrase"),
+            h("button", { type: "button", class: "btn primary", on: { click: () => saveMine(sent) } }, ico("save"), "Enregistrer ma phrase"),
+            h("button", { type: "button", class: "btn", on: { click: () => { UI.lab = null; UI.custom = sent; UI.customFresh = true; go("manipulations"); } } }, ico("tag"), "La tester sans l'enregistrer"))) : null) : null,
+      mineList());
+    if (focus) { const f = $(focus, holder); if (f) f.focus(); }
+  }
+  function saveMine(sent) {
+    const txt = plain(sent);
+    if (S.mine.some((m) => plain(mineToSent(m)) === txt)) { toast("Cette phrase est déjà enregistrée.", "ask"); return; }
+    if (S.mine.length >= MINE_MAX) { toast("Tu as déjà " + MINE_MAX + " phrases : supprime-en une pour continuer.", "ask"); return; }
+    S.mine.push({ id: sent.id, ch: sent.ch.map((c) => ({ t: c.t, fn: c.fn, pron: c.pron, kind: c.kind, pl: c.pl })) });
+    S.created++; gain(5); save(); syncMine();
+    UI.ed = { text: "", words: null, cuts: [], g: [], msg: "" }; E.text = ""; E.words = null; E.cuts = []; E.g = []; E.msg = "";
+    toast("Phrase enregistrée. +5 points", "save");
+    draw("#mytext");
+  }
+  function mineList() {
+    const msg = h("p", { role: "status", class: "muted small" });
+    const ta = h("textarea", { class: "bilan", rows: "3", id: "mycode", placeholder: "Je colle ici un code de phrases reçu (il commence par MP-PH1-)", "aria-label": "Code de phrases à ajouter" });
+    return h("div", { style: "margin-top:1.5rem" },
+      h("h2", { id: "minetitle", tabindex: "-1" }, "Mes phrases enregistrées (" + S.mine.length + ")"),
+      S.mine.length ? h("ul", { style: "list-style:none;padding:0;display:grid;gap:.6rem" }, S.mine.map((m, i) => {
+        const s = mineToSent(m), txt = plain(s);
+        return h("li", { class: "card", style: "display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between" },
+          h("span", { style: "font-weight:500" }, txt),
+          h("span", { class: "row" },
+            h("button", { type: "button", class: "btn", on: { click: () => { UI.custom = null; UI.lab = freshLab(s, "mine:" + m.id); go("manipulations"); } } }, ico("tag"), "Tester", h("span", { class: "sr" }, " " + txt)),
+            h("button", { type: "button", class: "btn ghost", on: { click: () => askDialog("Supprimer cette phrase ?", "« " + txt + " » sera supprimée de mes phrases.", "Supprimer", () => { S.mine.splice(i, 1); save(); syncMine(); draw("#minetitle"); }) } }, ico("trash"), "Supprimer", h("span", { class: "sr" }, " " + txt))));
+      })) : h("p", { class: "muted" }, "Je n'ai pas encore enregistré de phrase. Mes phrases serviront dans les manipulations et dans le quiz (choix « Mes phrases ajoutées »)."),
+      S.mine.length ? h("details", { class: "card", style: "margin-top:1rem" }, h("summary", null, "Partager mes phrases avec une autre personne"),
+        h("p", { class: "muted small" }, "Je copie ce code et je l'envoie. L'élève le colle dans « Ajouter des phrases reçues »."),
+        h("textarea", { class: "bilan", readonly: true, rows: "3", "aria-label": "Code de mes phrases", on: { focus: (e) => e.target.select() } }, mineCode()),
+        h("button", { type: "button", class: "btn", style: "margin-top:.4rem", on: { click: () => { try { navigator.clipboard.writeText(mineCode()).then(() => { msg.textContent = "Code copié."; }, () => { msg.textContent = "Copie impossible : sélectionne le code et copie-le."; }); } catch (e) { msg.textContent = "Copie impossible : sélectionne le code et copie-le."; } } } }, ico("copy"), "Copier le code")) : null,
+      h("details", { class: "card", style: "margin-top:1rem" }, h("summary", null, "Ajouter des phrases reçues"),
+        h("label", { for: "mycode", class: "sr" }, "Code de phrases"), ta,
+        h("button", { type: "button", class: "btn primary", style: "margin-top:.4rem", on: { click: () => {
+          try { const r = importMine(ta.value); msg.textContent = r.added + " phrase" + (r.added > 1 ? "s" : "") + " ajoutée" + (r.added > 1 ? "s" : "") + (r.skipped ? " (" + r.skipped + " ignorée" + (r.skipped > 1 ? "s" : "") + ")" : "") + "."; if (r.added) draw("#minetitle"); } catch (e) { msg.textContent = "Ce code n'est pas valide. Je vérifie que je l'ai copié en entier."; }
+        } } }, ico("upload"), "Ajouter"),
+        msg));
+  }
+}
 /* ======================================================= APPRENDRE */
 const P = (...x) => h("p", null, ...x);
 function demo(sent, i, tool) {
@@ -1433,7 +1768,7 @@ function demo(sent, i, tool) {
     r.text ? P(h("b", null, "Après : "), "« " + r.text + " »") : null,
     h("p", { class: "muted small", style: "margin:0" }, r.msg));
 }
-const L_ELI = () => buildSentence({ frame: "observer", subj: SUBJ[0], cod: ["le volcan", "le"], coi: null, cc: null, ccPos: "start" });
+const L_ELI = () => ({ id: "eli", ch: [C("le jardinier", "S"), C("arrose", "V"), C("le jardin", "COD", { pron: "le" })] });
 const LESSONS = [
   { id: "l1", title: "Mes quatre outils", skill: null, lab: "s1", body: () => [
     P("Pour comprendre une phrase, je peux la manipuler comme avec des étiquettes de mots. J'ai quatre outils. Un outil me donne un indice. Quand deux outils disent la même chose, je peux avoir confiance."),
@@ -1454,7 +1789,7 @@ const LESSONS = [
       h("li", null, h("span", null, "Je peux le remplacer par ", h("b", null, "il, elle, ils, elles"), ".")),
       h("li", null, h("span", null, "Je teste : il ", h("b", null, "ne s'efface pas"), " et ", h("b", null, "ne se déplace pas"), "."))),
     demo(SENT[0], 1, "ajouter"), demo(SENT[1], 0, "ajouter"), demo(SENT[0], 1, "effacer"), demo(SENT[0], 1, "deplacer"),
-    P(h("b", null, "Attention : "), "si le sujet est au pluriel, le verbe se met au pluriel aussi (les volcanologues observent)."),
+    P(h("b", null, "Attention : "), "si le sujet est au pluriel, le verbe se met au pluriel aussi (les élèves lisent)."),
     h("div", { class: "row" }, fnBadge("S"))] },
   { id: "l3", title: "Le CC (complément de phrase)", skill: "cc", lab: "s2", body: () => [
     P("Le CC donne une information en plus : ", h("b", null, "quand ?"), ", ", h("b", null, "où ?"), " ou ", h("b", null, "comment ?"), ". On l'appelle aussi complément de phrase."),
