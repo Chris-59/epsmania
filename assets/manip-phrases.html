@@ -2,7 +2,10 @@
 <html lang="fr" data-skin="auto" data-read="0">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Manip'Phrases">
 <title>Manip'Phrases</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1351,7 +1354,7 @@ function viewAccueil(root) {
       h("div", { class: "row" },
         h("label", { for: "nm", class: "sr" }, "Mon prénom"), nameIn,
         h("button", { type: "button", class: "btn", on: { click: () => { S.name = nameIn.value.trim().slice(0, 20); save(); announce("Prénom enregistré."); render(); } } }, ico("save"), "Enregistrer"))),
-    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 23 h 15. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
+    h("p", { class: "muted small", style: "margin-top:1rem" }, "Mise à jour : 22 novembre 2026, 23 h 35. Pour changer les couleurs, la taille des lettres ou la lecture à voix haute : bouton « Réglages » en haut de la page.")
   );
 }
 
@@ -2421,6 +2424,7 @@ function openSettings() {
       chk("Sons", "sound", "petits sons de réussite"),
       chk("Lire les questions à voix haute", "auto", canSpeak() ? "dans le quiz" : "non disponible sur cet appareil")),
     voiceBox(),
+    fsOk() ? null : h("fieldset", null, h("legend", null, "Plein écran"), P("Ce navigateur (par exemple Safari sur iPhone) n'autorise pas le plein écran. Pour utiliser l'application sans la barre du navigateur : touche le bouton Partager, puis « Sur l'écran d'accueil », et ouvre Manip'Phrases depuis cette icône.")),
     h("button", { type: "button", class: "btn primary", on: { click: closeDlg } }, "Fermer"));
   openDlg();
 }
@@ -2460,7 +2464,8 @@ function refreshBuddies() {
 function drawHeader() {
   const top = $("#topbar");
   if (!top.firstChild) {
-    top.append(
+    put(top,
+      window.top === window ? h("a", { class: "btn small", id: "backsite", href: "../manip-phrases.html" }, "← Retour au site EPS Mania") : null,
       h("a", { class: "logo", href: "#accueil" }, magma(44), h("span", null, "Manip'Phrases", h("small", null, "Les manipulations syntaxiques en jouant"))),
       h("span", { class: "spacer" }),
       h("span", { id: "pill", class: "pill" }),
