@@ -285,3 +285,31 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
   .soutien-qr { justify-self: start; }
 }
 @media print { .soutien, .soutien-mini { display: none; } }
+
+/* En-tete sur une seule ligne (ecrans larges) */
+@media (min-width: 961px) {
+  .top .wrap { flex-wrap: nowrap; gap: 8px 14px; }
+  .nav { flex-wrap: nowrap; gap: 0; min-width: 0; }
+  .nav a { white-space: nowrap; padding: 7px 8px; font-size: 0.93rem; }
+  .top .btn.small { white-space: nowrap; padding: 8px 12px; font-size: 0.9rem; flex: none; }
+}
+@media (min-width: 961px) and (max-width: 1060px) {
+  .nav a { padding: 7px 6px; font-size: 0.88rem; }
+  .top .btn.small { padding: 7px 9px; font-size: 0.85rem; }
+  .top .btn.cafe .cafe-lib { display: none; }
+}
+/* Ecrans moyens : le menu passe sur une seconde ligne */
+@media (min-width: 821px) and (max-width: 960px) {
+  .top .wrap { flex-wrap: wrap; }
+  .brand { order: 0; }
+  .top .btn.small { order: 1; padding: 7px 10px; font-size: 0.88rem; }
+  .top .btn.small:not(.cafe) { margin-left: auto; }
+  .theme-btn { order: 2; }
+  .nav { order: 3; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .top .btn.cafe .cafe-lib { display: none; }
+}
+/* Logo : un seul des deux logos est affiche (clair ou sombre) */
+.brand .logo-sombre { display: none; }
+:root[data-theme="dark"] .brand .logo-clair { display: none; }
+:root[data-theme="dark"] .brand .logo-sombre { display: block; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .brand .logo-clair { display: none; } :root:not([data-theme]) .brand .logo-sombre { display: block; } }
