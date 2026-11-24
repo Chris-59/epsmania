@@ -262,3 +262,33 @@ div.card a { color: var(--ct, var(--c)); font-weight: 700; }
 .nouv { overflow-y: auto; max-height: 12.5rem; overscroll-behavior: contain; }
 .nouv:focus-visible { outline: 2px solid var(--c, currentColor); outline-offset: 4px; }
 .card .vig.illu { aspect-ratio: 453 / 296; }
+
+/* Soutien : page Buy Me a Coffee */
+.btn.cafe { background: #FFDD00; border-color: #c9ab00; color: #1b1d22; }
+.btn.cafe:hover { background: #ffe94d; }
+.top .btn.cafe { white-space: nowrap; }
+.soutien-grand .wrap { display: grid; gap: 28px; }
+.soutien-img img { width: 100%; display: block; border-radius: 14px; border: 1px solid var(--line); background: #fff; }
+.soutien-corps { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+.soutien-texte { display: grid; gap: 14px; justify-items: start; max-width: 62ch; }
+.soutien-texte p { color: var(--muted); }
+.soutien-texte small { color: var(--muted); font-size: 0.88rem; }
+.soutien-qr { text-align: center; }
+.soutien-qr img { width: 150px; height: 150px; display: block; border-radius: 12px; background: #fff; border: 1px solid var(--line); }
+.soutien-qr figcaption { margin-top: 6px; font-size: 0.85rem; }
+.soutien-mini { padding: 0 0 44px; }
+.soutien-mini .wrap { display: flex; gap: 14px 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-left: 8px solid #FFDD00; border-radius: 12px; padding: 16px 22px; max-width: calc(1120px - 48px); }
+.soutien-mini p { color: var(--muted); max-width: 52em; }
+.soutien-mini p strong { color: var(--ink); }
+.cafe-flottant { position: fixed; right: 16px; bottom: 16px; z-index: 4; display: flex; align-items: center; gap: 4px; background: #FFDD00; color: #1b1d22; border: 2px solid #c9ab00; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.22); padding: 4px 4px 4px 14px; font-family: var(--display); font-weight: 700; font-size: 0.95rem; }
+.cafe-flottant a { text-decoration: none; display: flex; align-items: center; gap: 8px; padding: 6px 4px; color: inherit; }
+.cafe-flottant button { font: inherit; line-height: 1; border: 0; background: rgba(0,0,0,0.08); color: inherit; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; }
+.cafe-flottant button:hover { background: rgba(0,0,0,0.18); }
+.cafe-flottant[hidden] { display: none; }
+@media (max-width: 760px) {
+  .soutien-corps { grid-template-columns: 1fr; }
+  .soutien-qr { justify-self: start; }
+  .cafe-flottant .cafe-txt { display: none; }
+  .cafe-flottant { padding-left: 10px; }
+}
+@media print { .cafe-flottant, .soutien, .soutien-mini { display: none; } }
