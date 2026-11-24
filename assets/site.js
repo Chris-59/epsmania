@@ -186,15 +186,3 @@
   window.addEventListener('resize', ajuster);
   window.addEventListener('load', ajuster);
 })();
-
-// Bouton flottant « Offrir un café » : peut etre masque (memorise pour la session)
-(function () {
-  var b = document.querySelector('.cafe-flottant');
-  if (!b) return;
-  try { if (sessionStorage.getItem('epsmania-cafe-masque') === '1') { b.hidden = true; return; } } catch (e) {}
-  var x = b.querySelector('button');
-  if (x) x.addEventListener('click', function () {
-    b.hidden = true;
-    try { sessionStorage.setItem('epsmania-cafe-masque', '1'); } catch (e) {}
-  });
-})();
